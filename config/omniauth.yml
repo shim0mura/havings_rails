@@ -1,0 +1,16 @@
+production: &production
+#   facebook:
+#     key: xxxxxxxxxxx
+#     secret: XXXXXXXXXXXXXXXXXXXXXXXXX
+  hatena:
+    key: RIb0TU1KelLarQ==
+    secret: RGq8K+Jzhejersfs3vxlNp9T/xg=
+  twitter:
+    key: qavqnZYe8LqdwBsmKs5zdrX4p
+    secret: 8ayWytyWfDADeW5ito3nyRehfwhSCyUuWqnQXYEQVNdEoD0x1f
+  instagram:
+    key: 63546e803daa4e4a9a368a30cc68ad4f
+    secret: 795be510c4644246b574c550d8031a69
+
+development: &development
+  <<: *production
