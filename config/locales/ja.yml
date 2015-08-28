@@ -1,0 +1,28 @@
+ja:
+  activerecord:
+    errors:
+      template:
+        header:
+          one:   "%{model}にエラーが発生しました。"
+          other: "%{model}に%{count}つのエラーが発生しました。"
+        body: "次の項目を確認してください。"
+      messages:
+        taken: "はすでに存在します。"
+        record_invalid: "バリデーションに失敗しました。 %{errors}"
+        too_short: "が短すぎます。"
+        blank: "を入力してください。"
+      full_messages:
+        format: "[%{attribute}]%{message}"
+      models:
+        user:
+          attributes:
+            user: ユーザー
+            email: メールアドレス
+            password: パスワード
+    models:
+      user: ユーザー
+    attributes:
+       user:
+         name: 名前
+         email: メールアドレス
+         password: パスワード

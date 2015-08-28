@@ -10,6 +10,205 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require material
  *= require_tree .
  *= require_self
  */
+
+.header {
+  overflow: visible;
+  background-color: white;
+}
+footer {
+  margin-top: 50px;
+}
+
+body {
+  margin: 0;
+  background-color: #fafafa;
+}
+
+/* Disable ugly boxes around images in IE10 */
+a img{
+  border: 0px;
+}
+
+::-moz-selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+::selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+.search-box .mdl-textfield__input {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.header .mdl-menu__container {
+  z-index: 50;
+  margin: 0 !important;
+}
+
+
+.mdl-textfield--expandable {
+  width: auto;
+}
+
+.fab {
+  position: absolute;
+  right: 20%;
+  bottom: -26px;
+  z-index: 3;
+  background: #64ffda !important;
+  color: black !important;
+}
+
+.mobile-title {
+  display: none !important;
+}
+
+
+.logo-image {
+  height: 28px;
+  width: 140px;
+}
+
+
+.header {
+  overflow: visible;
+  background-color: white;
+}
+
+  .header .material-icons {
+    color: #767777 !important;
+  }
+
+  .header .mdl-layout__drawer-button {
+    background: transparent;
+    color: #767777;
+  }
+
+  .header .mdl-navigation__link {
+    color: #757575;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .navigation-container {
+    /* Simple hack to make the overflow happen to the left instead... */
+    direction: rtl;
+    order: 1;
+    width: 500px;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .navigation {
+    /* ... and now make sure the content is actually LTR */
+    direction: ltr;
+    justify-content: flex-end;
+    width: 800px;
+  }
+
+  .search-box.is-focused ~ .navigation-container {
+    opacity: 0;
+    width: 100px;
+  }
+
+
+  .navigation .mdl-navigation__link {
+    display: inline-block;
+    height: 60px;
+    line-height: 68px;
+    background-color: transparent !important;
+    border-bottom: 4px solid transparent;
+  }
+
+    .navigation .mdl-navigation__link:hover {
+      border-bottom: 4px solid #8bc34a;
+    }
+
+  .search-box {
+    order: 2;
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .more-button {
+    order: 3;
+  }
+
+
+.drawer {
+  border-right: none;
+}
+
+  .drawer-separator {
+    height: 1px;
+    background-color: #dcdcdc;
+    margin: 8px 0;
+  }
+
+  .drawer .mdl-navigation__link.mdl-navigation__link {
+    font-size: 14px;
+    color: #757575;
+  }
+
+  .drawer span.mdl-navigation__link.mdl-navigation__link {
+    color: #8bc34a;
+  }
+
+  .drawer .mdl-layout-title {
+    position: relative;
+    background: #6ab344;
+    height: 160px;
+  }
+
+    .drawer .logo-image {
+      position: absolute;
+      bottom: 16px;
+    }
+
+.section--center {
+  max-width: 900px;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-field {
+  width: 100%;
+}
+.alert.alert-error {
+  color: #E91E63;
+}
+.alert.alert-alert {
+  color: #E91E63;
+}
+.alert.alert-notice {
+  color: #468847;
+}
+.mdl-button.mdl-button-hatena {
+  width: 80%;
+  background: #537bce;
+  color: white;
+  text-transform: capitalize;
+}
+
+.mdl-button.mdl-button-instagram {
+  width: 80%;
+  background: #3f729b;
+  color: white;
+  text-transform: capitalize;
+}
+.mdl-button.mdl-button-twitter {
+  width: 80%;
+  background: #55acee;
+  color: white;
+  text-transform: capitalize;
+}
