@@ -1,0 +1,76 @@
+<% if @item.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@item.errors.count, "error") %> prohibited this item from being saved:</h2>
+
+    <ul>
+    <% @item.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="field">
+  <%= f.label :name %><br>
+  <%= f.text_field :name %>
+</div>
+<div class="field">
+  <%= f.label :description %><br>
+  <%= f.text_area :description %>
+</div>
+
+<% unless @item.is_garbage %>
+  <div class="field">
+    <%= f.label :is_list %><br>
+    <%= f.check_box :is_list %>
+  </div>
+<% end %>
+
+<%= f.hidden_field :is_garbage %>
+
+<div class="field">
+  <%= f.label :is_private %><br>
+  <%= f.check_box :is_private %>
+</div>
+<div class="field">
+  <%= f.label :count %><br>
+  <%= f.number_field :count %>
+</div>
+
+<div class="field">
+  <%= f.label :tag_list, "tags" %><br>
+  <%= text_field_tag 'item[tag_list]', @item.tag_list.join(',') %>
+</div>
+
+<% if @item.persisted? %>
+  画像を追加する
+<% end %>
+<%= f.fields_for :item_image do |i| %>
+  <div class="field">
+    <%= i.label :image %><br>
+    <%= i.file_field :image, :multiple => true, name: "item_images[image][]" %>
+  </div>
+<% end %>
+
+<% if @item.is_garbage %>
+  #TODO: ここだけ色を変えて注目をひきたい
+  <div class="field">
+    <%= f.label :garbage_reason %><br>
+    <%= f.text_area :garbage_reason %>
+  </div>
+<% end %>
+
+<% unless @item.is_garbage %>
+  <div class="field">
+    <%= f.label :list_id %><br>
+    <% @list.each do |list| %>
+      <%= f.label "list_id_#{list.id}", list.name %>
+      <%= check_box_tag 'item[list_ids][]', list.id, @item.is_already_listed_in?(list.id),{id: "item_list_id_#{list.id}"} %>
+      <br />
+    <% end %>
+  </div>
+<% end %>
+
+<div class="actions">
+  <%= f.submit %>
+</div>

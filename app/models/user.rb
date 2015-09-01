@@ -17,6 +17,8 @@ class User < ActiveRecord::Base
 
   has_many :social_profiles, dependent: :destroy
 
+  has_many :items
+
   # oauth用
   attr_accessor :create_with_oauth
 

@@ -1,0 +1,39 @@
+<h1>Listing Items</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>is list</th>
+      <th>is garbage</th>
+      <th>is private</th>
+      <th>count</th>
+      <th>garbage_reaosn</th>
+      <th>list_id</th>
+      <th colspan="8"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.name %></td>
+        <td><%= item.description %></td>
+        <td><%= item.is_list %></td>
+        <td><%= item.is_garbage %></td>
+        <td><%= item.is_private %></td>
+        <td><%= item.count %></td>
+        <td><%= item.garbage_reason %></td>
+        <td><%= item.lists.map{|a|a.id} %></td>
+        <td><%= link_to 'Show', item %></td>
+        <td><%= link_to 'Edit', edit_item_path(item) %></td>
+        <td><%= link_to 'Destroy', item, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Item', new_item_path %>

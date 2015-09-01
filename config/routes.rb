@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  resources :items
+  get  '/garbage', to: 'items#garbage'
+  post '/garbage', to: 'items#drop_garbage'
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks'
   }
