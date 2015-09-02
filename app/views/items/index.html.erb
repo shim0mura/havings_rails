@@ -25,7 +25,7 @@
         <td><%= item.is_private %></td>
         <td><%= item.count %></td>
         <td><%= item.garbage_reason %></td>
-        <td><%= item.lists.map{|a|a.id} %></td>
+        <td><%= item.list_id %></td>
         <td><%= link_to 'Show', item %></td>
         <td><%= link_to 'Edit', edit_item_path(item) %></td>
         <td><%= link_to 'Destroy', item, method: :delete, data: { confirm: 'Are you sure?' } %></td>

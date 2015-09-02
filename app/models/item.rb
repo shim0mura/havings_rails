@@ -6,10 +6,8 @@ class Item < ActiveRecord::Base
   has_many :item_images
   # has_many :favorites
 
-  has_many :list_in, class_name: ItemList, foreign_key: :item_id
-  has_many :listed,  class_name: ItemList, foreign_key: :list_id
-  has_many :lists,  through: :list_in,   source: :item_list_in
-  has_many :child_items, through: :listed, source: :item_list_from
+  belongs_to :list, :class_name => "Item"
+  has_many :child_items, :foreign_key => "list_id", :class_name => "Item"
 
   accepts_nested_attributes_for :item_images
 

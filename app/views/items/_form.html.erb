@@ -63,11 +63,7 @@
 <% unless @item.is_garbage %>
   <div class="field">
     <%= f.label :list_id %><br>
-    <% @list.each do |list| %>
-      <%= f.label "list_id_#{list.id}", list.name %>
-      <%= check_box_tag 'item[list_ids][]', list.id, @item.is_already_listed_in?(list.id),{id: "item_list_id_#{list.id}"} %>
-      <br />
-    <% end %>
+    <%= f.collection_select :list_id, @list, :id, :name, :include_blank => "どのリストにも入れない" %>
   </div>
 <% end %>
 

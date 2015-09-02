@@ -11,20 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150901162835) do
+ActiveRecord::Schema.define(version: 20150902130742) do
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255
     t.integer  "item_id",    limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
-  end
-
-  create_table "item_lists", force: :cascade do |t|
-    t.integer  "item_id",    limit: 4, null: false
-    t.integer  "list_id",    limit: 4, null: false
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
   end
 
   create_table "items", force: :cascade do |t|
@@ -38,6 +31,7 @@ ActiveRecord::Schema.define(version: 20150901162835) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "user_id",        limit: 4,                     null: false
+    t.integer  "list_id",        limit: 4
   end
 
   create_table "social_profiles", force: :cascade do |t|

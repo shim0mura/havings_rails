@@ -37,8 +37,6 @@ class ItemsController < ApplicationController
       if @item.save
         create_image!
 
-        create_item_list
-
         format.html { redirect_to @item, notice: 'Item was successfully created.' }
         format.json { render :show, status: :created, location: @item }
       else
@@ -59,8 +57,6 @@ class ItemsController < ApplicationController
         unless is_private == @item.is_private
           synchronize_with_list
         end
-
-        update_item_list
 
         format.html { redirect_to @item, notice: 'Item was successfully updated.' }
         format.json { render :show, status: :ok, location: @item }
@@ -99,7 +95,6 @@ class ItemsController < ApplicationController
       respond_to do |format|
         if @item.update(item_params)
           create_image!
-          create_item_list
           format.html { redirect_to @item, notice: 'Item was successfully updated.' }
           format.json { render :show, status: :ok, location: @item }
         else
@@ -115,7 +110,6 @@ class ItemsController < ApplicationController
       respond_to do |format|
         if @item.save
           create_image!
-          update_item_list
           format.html { redirect_to @item, notice: 'Item was successfully created.' }
           format.json { render :show, status: :created, location: @item }
         else
@@ -135,7 +129,7 @@ class ItemsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def item_params
-      params.require(:item).permit(:name, :description, :is_list, :is_garbage, :is_private, :count, :garbage_reason, :tag_list, :list_ias)
+      params.require(:item).permit(:name, :description, :is_list, :is_garbage, :is_private, :count, :garbage_reason, :tag_list, :list_id)
     end
 
     def create_image!
@@ -150,27 +144,6 @@ class ItemsController < ApplicationController
       if @item.is_list
         @item.child_items.each do |i|
           i.update_attribute(:is_private, @item.is_private)
-        end
-      end
-    end
-
-    def create_item_list
-      params["item"]["list_ids"].each do |list_id|
-        ItemList.create!(item_id: @item.id, list_id: list_id)
-      end
-    end
-
-    def update_item_list
-      list_ids = params["item"]["list_ids"] || []
-      existing_item_list = ItemList.where(item_id: @item)
-      existing_item_list.each do |item_list|
-        unless list_ids.include?(item_list.list_id)
-          item_list.delete
-        end
-      end
-      list_ids.each do |list_id|
-        unless existing_item_list.collect{|a|a.id}.include?(list_id)
-          ItemList.create!(item_id: @item.id, list_id: list_id)
         end
       end
     end
