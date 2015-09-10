@@ -33,6 +33,21 @@ a img{
   border: 0px;
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ul li {
+  padding: 12px;
+}
+
+.clearfix:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+
 ::-moz-selection {
   background-color: #6ab344;
   color: #fff;
@@ -79,11 +94,26 @@ a img{
 
 .header {
   overflow: visible;
-  background-color: white;
+}
+.layout-transparent .mdl-layout__header,
+.layout-transparent .mdl-layout__drawer-button {
+  /* This background is dark, so we set text to white. Use 87% black instead if
+     your background is light. */
+  color: #0D0D0D;
+}
+.layout-transparent {
+  background: transparent;
 }
 
   .header .material-icons {
     color: #767777 !important;
+  }
+
+  header .mdl-layout__header-row .mdl-navigation__link {
+    color: #0D0D0D;
+  }
+  header .mdl-layout__header-row .mdl-navigation__link:hover {
+    color: #999999;
   }
 
   .header .mdl-layout__drawer-button {
@@ -173,7 +203,7 @@ a img{
     }
 
 .section--center {
-  max-width: 900px;
+  max-width: 860px;
 }
 .text-center {
   text-align: center;
@@ -211,4 +241,67 @@ a img{
   background: #55acee;
   color: white;
   text-transform: capitalize;
+}
+
+.ribbon {
+  width: 100%;
+  height: 50vh;
+  background-color: #3F51B5;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  position: relative
+}
+.inner-ribbon {
+  width: 100%;
+  position: absolute;
+  bottom: 0vh;
+  color: white;
+}
+.ribbon-gradation {
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  height: 50vh;
+
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = 'transparent', endColorstr = '#000000');
+/*INNER ELEMENTS MUST NOT BREAK THIS ELEMENTS BOUNDARIES*/
+/*Element must have a height (not auto)*/
+/*All filters must be placed together*/
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr = 'transparent', endColorstr = '#000000')";
+/*Element must have a height (not auto)*/
+/*All filters must be placed together*/
+background-image: -moz-linear-gradient(top, transparent, #000000);
+background-image: -ms-linear-gradient(top, transparent, #000000);
+background-image: -o-linear-gradient(top, transparent, #000000);
+background-image: -webkit-gradient(linear, center top, center bottom, from(transparent), to(#000000));
+background-image: -webkit-linear-gradient(top, transparent, #000000);
+background-image: linear-gradient(top, transparent, #000000);
+/*--IE9 DOES NOT SUPPORT CSS3 GRADIENT BACKGROUNDS--*/
+opacity: 0.7;
+-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 75);
+/*-ms-filter must come before filter*/
+filter: alpha(opacity = 75);
+/*INNER ELEMENTS MUST NOT BREAK THIS ELEMENTS BOUNDARIES*/
+/*All filters must be placed together*/
+}
+
+.mdl-tabs a:hover {
+  background: transparent;
+  color: #666;
+}
+
+.tab-caption {
+  height: 10px;
+  margin-top: -10px;
+  margin-bottom: 6px;
+  font-size: 6px;
+  color: #727272;
+}
+.mdl-tabs__panel {
+  padding: 30px 0;
+}
+.list-content {
+  margin-top: -7vh;
 }

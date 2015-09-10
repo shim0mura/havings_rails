@@ -1,14 +1,342 @@
-<p id="notice"><%= notice %></p>
+<div class="ribbon" style="background-image:url(<%= @item.item_images.last.image_url unless @item.item_images.empty? %>)">
 
-<p>
-  <strong>Name:</strong>
-  <%= @item.name %>
-</p>
+  <div class="ribbon-gradation">
+  </div>
+  <div class="inner-ribbon">
+    <section class="mdl-grid section--center">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet ">
 
-<p>
-  <strong>Description:</strong>
-  <%= @item.description %>
-</p>
+        <div class="circle">
+          <div class="item-count"><%= @child_items.size %></div>
+          <div class="item-unit">items</div>
+        </div>
+        <div>
+          <h6 class="bread-crumb">あいうえお > かきくけこ</h6>
+          <h3 class="item-title"><i class="material-icons">folder</i> <%= @item.name %></h3>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<div class="meta-data-ribbon">
+  <section class="mdl-grid section--center">
+    <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
+      <div class="tag-icon"><i class="material-icons">label</i></div>
+            <div class="tags">
+              <% @item.tag_list.each do |tag| %>
+                <span class="tag"><%= tag %></span>
+              <% end %>
+            </div>
+            <div class="item-meta-fab">
+              <!--
+              <div class="item-meta-desc">
+              </div>
+              -->
+              <i class="material-icons">favorite</i><span>100</span>
+              　
+              <i class="material-icons">chat_bubble</i><span>100</span>
+            </div>
+    </div>
+
+    <!-- timer -->
+
+    <div class="mdl-grid section--center mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-card timer mdl-shadow--4dp">
+
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
+        <div class="timer-icon">
+          <i class="material-icons">access_time</i>
+        </div>
+        <div class="timer-data">
+          <div class="timer-desc">
+            <div class="timer-task">部屋の片付け（あと7ヶ月）</div>
+            <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+          </div>
+        </div>
+        <div class="timer-action">
+          <button class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons">check</i>
+          </button>
+          <button class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons">settings</i>
+          </button>
+        </div>
+      </div>
+
+
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
+        <div class="timer-icon">
+          <i class="material-icons">access_time</i>
+        </div>
+        <div class="timer-data">
+          <div class="timer-desc">
+            <div class="timer-task">部屋の片付け（あと7ヶ月）</div>
+            <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+          </div>
+        </div>
+        <div class="timer-action">
+          <button class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons">check</i>
+          </button>
+          <button class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons">settings</i>
+          </button>
+        </div>
+      </div>
+
+
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data  text-center">
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">add</i>
+          タイマーを追加する
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="mdl-grid section--center list-content">
+  <div class="mdl-cell mdl-cell--8-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp">
+
+    <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+      <div class="mdl-tabs__tab-bar">
+        <a href="#item-list" class="mdl-tabs__tab is-active">
+          <div class="tab-caption">モノリスト</div>
+          <div class="tab-name"><%= @child_items.size %></div>
+        </a>
+        <a href="#image-list" class="mdl-tabs__tab">
+          <div class="tab-caption">画像一覧</div>
+          <div class="tab-name"><%= @item.item_images.size %></div>
+        </a>
+        <a href="#timeline" class="mdl-tabs__tab">
+          <div class="tab-caption">履歴</div>
+          <div class="tab-name"><%= @item.item_images.size %></div>
+        </a>
+      </div>
+
+      <!-- item list -->
+      <div class="mdl-tabs__panel is-active" id="item-list">
+        <ul class="list-items">
+          <% @child_items.each do |item| %>
+            <li>
+              <!-- item-image -->
+              <div class="list-item-image">
+                <% unless item.item_images.empty? %>
+                  <div class="image-circle">
+                    <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
+                  </div>
+                <% else %>
+                  <%= link_to item_path(id: item.id) do %>
+                    <div class="image-circle list-item-image-alt">
+                      <% if item.is_list %>
+                        <i class="material-icons">folder</i>
+                      <% else %>
+                        <i class="material-icons">attachment</i>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <!-- item-text -->
+              <div class="list-item-text">
+                <h5>
+                  <%= link_to item_path(id: item.id) do %>
+                    <% if item.is_list %>
+                      <i class="material-icons">folder</i>
+                    <% else %>
+                      <i class="material-icons">attachment</i>
+                    <% end %>
+                    <%= item.name %>
+                  <% end %>
+                </h5>
+                <div class="addings">
+                  <div class="item-count">
+                    <%= item.count %><span>items</span>
+                  </div>
+                  <p class="tags">
+                    <% item.tag_list.each do |tag| %>
+                      <span class="tag"><%= tag %></span>
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- item-fabs -->
+              <div class="list-item-meta">
+                <i class="material-icons">favorite</i><span>100</span>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <!-- item images -->
+      <div class="mdl-tabs__panel" id="image-list">
+        <div class="mdl-grid">
+          <% @item.item_images.each do |image| %>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="card-image mdl-card mdl-shadow--2dp" style="background-image:url('<%= image.image_url %>')">
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- item timeline -->
+      <div class="mdl-tabs__panel" id="timeline">
+        <div class="start-circle">
+        </div>
+        <ul class="timeline">
+          <li class="bar"></li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle add">
+                <i class="material-icons">add</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>アイテムを追加しました。</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@item.item_images.last.image_url), item_path(id: @item.id) %>
+                </div>
+                かっこいいセーターあああああああああああああああ
+              </h5>
+            </div>
+            <div class="event-time">
+              1日前
+            </div>
+          </li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle image">
+                <i class="material-icons">image</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>画像を追加しました。</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@item.item_images.first.image_url), item_path(id: @item.id) %>
+                </div>
+              </h5>
+            </div>
+            <div class="event-time">
+              10時間前
+            </div>
+          </li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle dump">
+                <i class="material-icons">delete</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>アイテムを手放しました</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@item.item_images.first.image_url), item_path(id: @item.id) %>
+                </div>
+                ださいセーター
+              </h5>
+            </div>
+            <div class="event-time">
+              10時間前
+            </div>
+          </li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle create">
+                <i class="material-icons">create</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <h5 class="created">
+                アイテムを作成しました。
+              </h5>
+            </div>
+            <div class="event-time">
+              10時間前
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
 
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>
+
+  </div>
+
+  <!-- secondary card -->
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-card mdl-shadow--4dp secondary-card">
+    <p class="description">
+      <%= @item.description %>
+      あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
+    </p>
+    <div class="share">
+      <h6>共有する</h6>
+      <div class="share-button">
+        <%= image_tag "twitter-logo.png" %>
+        <%= image_tag "hatenabookmark-logo.svg" %>
+        <%= image_tag "facebook-logo.png", class: "fb" %>
+      </div>
+    </div>
+    <div class="comment">
+      <h6>コメント</h6>
+      <div class="comment-wrapper">
+        <div>
+          <div class="commenter">
+            <div class="commenter-image">
+            </div>
+            <div class="commenter-name">
+              ユーザー
+            </div>
+            <div class="commented-time">
+              10時間前
+            </div>
+          </div>
+          <p class="comment-text">
+              こめんとこめんと
+          </p>
+        </div>
+
+        <div>
+          <div class="commenter">
+            <div class="commenter-image">
+            </div>
+            <div class="commenter-name">
+              ユーザー
+            </div>
+            <div class="commented-time">
+              10時間前
+            </div>
+          </div>
+          <p class="comment-text">
+              こめんとこめんと
+          </p>
+        </div>
+
+        <form>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label comment-area">
+            <textarea class="mdl-textfield__input" type="text" rows="3" maxrows="6"
+            id="comment"></textarea>
+            <label class="mdl-textfield__label" for="comment">コメントする</label>
+          </div>
+          <div class="text-right submit-comment">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">mode_edit</i>
+              投稿
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+      
+  </div>
+</section>
+

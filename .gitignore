@@ -6,8 +6,9 @@
 
 # Ignore bundler config.
 /.bundle
-
+.DS_Store
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
 /tmp
+/public/uploads/item_image/

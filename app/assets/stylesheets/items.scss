@@ -1,3 +1,400 @@
 // Place all the styles related to the items controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+.item-title {
+  margin-top: -10px;
+  margin-bottom: 0px;
+}
+
+h2 .item-unit {
+  font-size: 0.7em;
+}
+
+.bread-crumb {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.circle{
+  width: 72px;
+  height: 72px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  float: left;
+  text-align: center;
+  margin-right: 10px;
+}
+.circle .item-count {
+  color: black;
+  padding-top: 22px;
+  padding-bottom: 5px;
+  font-size: 2.7em;
+}
+.circle .item-unit {
+  color: black;
+}
+.item-meta-data {
+  display: table;
+}
+.tag-icon {
+  display: table-cell;
+  vertical-align: middle;
+  color: white;
+  width: 28px;
+}
+.tags {
+  margin-bottom: 0px;
+}
+.tags span {
+  background: #D7CCC8;
+  color: #727272;
+  padding: 2px;
+}
+
+.meta-data-ribbon {
+  background: #795548;
+  padding-bottom: 5vh;
+}
+
+.item-meta-data .item-meta-fab {
+  display: table-cell;
+  text-align: right;
+  min-width: 160px;
+  color: #ffffff;
+}
+.item-meta-data .item-meta-fab i {
+  font-size: 15px;
+}
+.item-meta-data .item-meta-fab span {
+  font-size: 20px;
+}
+
+.mdl-card.timer {
+  min-height: 0px;
+}
+.timer > div {
+  margin-bottom: 0px;
+}
+.timer .timer-icon {
+  display: table-cell;
+  width: 40px;
+  vertical-align: middle;
+  padding-right: 5px;
+}
+.timer .timer-icon i {
+  font-size: 30px;
+  color: #727272;
+}
+.timer .timer-data {
+  display: table-cell;
+}
+.timer .timer-data .timer-desc {
+  color: #212121;
+  padding-bottom: 5px;
+  font-size: 17px;
+}
+
+
+.timer .timer-data .timer-desc .timer-task {
+  padding-bottom: 5px;
+}
+.timer .timer-action {
+  display: table-cell;
+  vertical-align: middle;
+  width: 75px;
+  padding-left: 10px;
+}
+.timer .timer-action i {
+  font-weight: bold;
+}
+
+.timer .timer-bar {
+  width: auto;
+  height: 20px;
+}
+
+
+ul.list-items li {
+  display: table;
+  width: 100%;
+}
+div.list-item-image {
+  width: 60px;
+  height: 60px;
+  display: table-cell;
+  vertical-align: top;
+}
+
+div.list-item-image .image-circle{
+  width: 60px;
+  height: 60px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  float: left;
+  text-align: center;
+  margin-right: 10px;
+  border: 1px solid #B6B6B6;
+  overflow: hidden;
+  background: #795548;
+}
+div.list-item-image img {
+  width:100%;
+}
+
+div.list-item-image .list-item-image-alt {
+  line-height: 90px;
+  text-align: center;
+}
+div.list-item-image .list-item-image-alt i {
+  font-size: 40px;
+  color: #fff;
+}
+div.list-item-text {
+  display: table-cell;
+  vertical-align: top;
+}
+div.list-item-text h5 {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+div.list-item-text h5 a {
+  text-decoration: none;
+}
+div.list-item-text h5 i {
+  font-size: 16px;
+  margin-right: -5px;
+}
+div.list-item-text .addings {
+  font-size: 1.4em;
+  color: #727272;
+}
+div.list-item-text .addings .tags {
+  float: left;
+}
+div.list-item-text .item-count {
+  float: left;
+  padding-right: 10px;
+}
+div.list-item-text .item-count span {
+  font-size: 0.7em;
+}
+div.list-item-meta {
+  display: table-cell;
+  vertical-align: top;
+  width: 72px;
+  color: #727272;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+div.list-item-meta i {
+  font-size: 15px;
+}
+div.list-item-meta span {
+  font-size: 20px;
+}
+
+.card-image.mdl-card {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: initial;
+}
+
+
+div.start-circle{
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  margin-right: 10px;
+  border: 1px solid #B6B6B6;
+  overflow: hidden;
+  background: #B6B6B6;
+  margin-left: 29px;
+}
+
+ul.timeline {
+  position: relative;
+  padding-top: 20px;
+}
+.timeline li.bar {
+  display: block;
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background: #B6B6B6;
+  left: 40px;
+  top: 0px;
+  padding: 0;
+  z-index: -1;
+}
+
+.timeline li {
+  display: table;
+  width: 100%;
+}
+.timeline li:last-child {
+  padding-bottom: 0px;
+}
+.timeline .event-type{
+  display: table-cell;
+  vertical-align: middle;
+  width: 55px;
+}
+.timeline .event-circle {
+  width: 30px;
+  height: 30px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  text-align: center;
+  overflow: hidden;
+  background: #D7CCC8;
+  margin-left: 15px;
+  margin-right: 13px;
+}
+.timeline .event-circle.add {
+  background-color: #00BCD4;
+}
+.timeline .event-circle.dump {
+  background-color: #FF4081;
+}
+.timeline .event-circle.image {
+  background-color: #009688;
+}
+.timeline .event-circle.create {
+  background-color: #8BC34A;
+}
+.timeline .event-circle i {
+  margin-top: 3px;
+  color: #fff;
+}
+.timeline .event-text {
+  display: table-cell;
+  vertical-align: top;
+}
+.timeline .event-text p {
+  margin-top: 0px;
+  margin-bottom: 5px;
+  color: #727272;
+}
+.timeline .event-text h5 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.timeline .event-text h5 {
+  margin-top: 5px;
+}
+.timeline .event-text h5 .image-circle {
+  width: 30px;
+  height: 30px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  float: left;
+  text-align: center;
+  margin-top: -5px;
+  margin-right: 3px;
+  border: 1px solid #B6B6B6;
+  overflow: hidden;
+  background: #795548;
+}
+.timeline .event-text h5 .image-circle img {
+  width:100%;
+}
+
+.timeline .event-image {
+  display: table-cell;
+  vertical-align: top;
+}
+.timeline .event-time {
+  width: 60px;
+  color: #727272;
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 5px;
+  padding-right: 25px;
+}
+
+.secondary-card {
+  padding: 15px;
+}
+.secondary-card .description {
+  margin-bottom: 5px;
+}
+
+.secondary-card > div {
+  margin-top: 15px;
+  border-top: 1px solid #B6B6B6;
+}
+.secondary-card h6 {
+  margin-top: 7px;
+  margin-bottom: 5px;
+  color: #727272;
+}
+.secondary-card .share-button {
+  margin-left: -6px;
+}
+.secondary-card .share img {
+  width: 40px;
+}
+.secondary-card .share img.fb {
+  width: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.secondary-card .comment .comment-wrapper {
+  margin-top: 10px;
+}
+.secondary-card .comment .commenter {
+  display: table;
+  width: 100%;
+}
+.secondary-card .comment .commenter > div {
+  display: table-cell;
+  vertical-align: middle;
+  color: #727272;
+  font-size: 10px;
+}
+.secondary-card .comment .commenter .commenter-image {
+  width: 25px;
+  height: 25px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  margin-top: -5px;
+  margin-right: 3px;
+  border: 1px solid #B6B6B6;
+  overflow: hidden;
+  background: #795548;
+}
+.secondary-card .comment .commenter .commenter-name {
+  padding-left: 5px;
+}
+.secondary-card .comment .commenter .commented-time {
+  text-align: right;
+  padding-left: 5px;
+}
+.secondary-card .comment .comment-text {
+  margin-top: 3px;
+}
+.secondary-card .comment-area {
+  width: 100%;
+}
+.secondary-card .submit-comment {
+  margin-top: -18px;
+}
+.secondary-card .submit-comment i {
+  font-size: 14px;
+}
