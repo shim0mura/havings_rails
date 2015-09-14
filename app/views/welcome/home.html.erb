@@ -1,0 +1,351 @@
+<div class="ribbon" style="background-image:url(<%= asset_path "bg2.jpeg" %>)">
+
+  <div class="ribbon-gradation">
+  </div>
+  <div class="inner-ribbon user-profile-wrapper">
+    <div class="user-profile">
+      <div class="user-caption">
+        <div class="circle"></div>
+        <div class="user-data">
+          <h3 class="user-name">ユーザー名</h3>
+        </div>
+      </div>
+      <div class="user-meta-data">
+        <div class="following">
+          1000
+          <div class="meta-data-unit">items</div>
+        </div>
+        <div class="follower">
+          1000
+          <div class="meta-data-unit">こなしたタスク数</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<section class="mdl-grid section--center list-content">
+
+    <!-- timer -->
+
+  <div class="mdl-card mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet mdl-shadow--4dp">
+    <div class="timer-wrapper">
+
+      <h4>
+        <i class="material-icons">access_time</i>
+        タイマー
+        <div class="timer-meta-data">
+          <span class="set-timer">100件のタイマー</span>
+          <span class="overflow-timer">100件のタイマー</span>
+        </div>
+      </h4>
+
+
+      <div class="mdl-card__supporting-text">
+
+        <div class="timer item-meta-data">
+          <div class="timer-data">
+            <div class="timer-desc">
+              <div class="timer-task"><i class="material-icons">folder</i>すごいリスト > <i class="material-icons">event</i>部屋の片付け(あと7ヶ月)</div>
+              <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+            </div>
+          </div>
+          <div class="timer-action">
+            <button class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">check</i>
+            </button>
+            <button class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">settings</i>
+            </button>
+          </div>
+        </div>
+
+        <div class="timer item-meta-data">
+          <div class="timer-data">
+            <div class="timer-desc">
+              <div class="timer-task"><i class="material-icons">folder</i>すごいリスト > <i class="material-icons">event</i>部屋の片付け(あと7ヶ月)</div>
+              <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+            </div>
+          </div>
+          <div class="timer-action">
+            <button class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">check</i>
+            </button>
+            <button class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">settings</i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+
+
+      <div class="mdl-card__actions mdl-card--border text-right">
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+          <i class="material-icons">add</i>
+          タイマーを追加する
+        </button>
+        　
+        <%= link_to "もっと見る", "#" %>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mdl-card mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet mdl-shadow--4dp">
+    <!-- graph -->
+    <div class="graph-wrapper">
+      <h4>
+        <i class="material-icons">assessment</i>
+        アイテムグラフ
+      </h4>
+      <div id="chart">
+<%= render_chart(@chart, 'chart') %>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- lists and timelines -->
+  <div class="mdl-cell mdl-cell--8-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp mdl-cell--top">
+
+    <div class="popular-list-wrapper">
+      <h4>
+        <i class="material-icons">trending_up</i>
+        人気のリスト
+      </h4>
+    
+      <div class="mdl-card__supporting-text">
+        <ul class="list-items">
+          <% @current_user.items.each do |item| %>
+            <li>
+              <!-- item-image -->
+              <div class="list-item-image">
+                <% unless item.item_images.empty? %>
+                  <div class="image-circle">
+                    <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
+                  </div>
+                <% else %>
+                  <%= link_to item_path(id: item.id) do %>
+                    <div class="image-circle list-item-image-alt">
+                      <% if item.is_list %>
+                        <i class="material-icons">folder</i>
+                      <% else %>
+                        <i class="material-icons">attachment</i>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <!-- item-text -->
+              <div class="list-item-text">
+                <h5>
+                  <%= link_to item_path(id: item.id) do %>
+                    <% if item.is_list %>
+                      <i class="material-icons">folder</i>
+                    <% else %>
+                      <i class="material-icons">attachment</i>
+                    <% end %>
+                    <%= item.name %>
+                  <% end %>
+                </h5>
+                <div class="addings">
+                  <div class="item-count">
+                    <%= item.count %><span>items</span>
+                  </div>
+                  <p class="tags">
+                    <% item.tag_list.each do |tag| %>
+                      <span class="tag"><%= tag %></span>
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- item-fabs -->
+              <div class="list-item-meta">
+                <i class="material-icons">favorite</i><span>100</span>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+
+      </div>
+      <div class="mdl-card__actions text-right">
+        <%= link_to "もっと見る", "#" %>
+      </div>
+    </div>
+
+    <!-- timeline -->
+
+    <div class="timeline-wrapper">
+      <h4>
+        <i class="material-icons">trending_up</i>
+        人気のリスト
+      </h4>
+    
+      <div class="mdl-card__supporting-text">
+
+
+
+
+        <div class="start-circle">
+        </div>
+        <ul class="timeline">
+          <li class="bar"></li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle add">
+                <i class="material-icons">add</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>アイテムを追加しました。</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                </div>
+                かっこいいセーターあああああああああああああああ
+              </h5>
+            </div>
+            <div class="event-time">
+              1日前
+            </div>
+          </li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle image">
+                <i class="material-icons">image</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>画像を追加しました。</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                </div>
+              </h5>
+            </div>
+            <div class="event-time">
+              10時間前
+            </div>
+          </li>
+          <li>
+            <div class="event-type">
+              <div class="event-circle dump">
+                <i class="material-icons">delete</i>
+              </div>
+            </div>
+            <div class="event-text">
+              <p>アイテムを手放しました</p>
+              <h5>
+                <div class="image-circle">
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                </div>
+                ださいセーター
+              </h5>
+            </div>
+            <div class="event-time">
+              10時間前
+            </div>
+          </li>
+        </ul>
+      
+
+
+
+
+      </div>
+      <div class="mdl-card__actions mdl-card--border text-right">
+        <%= link_to "もっと見る", "#" %>
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+
+
+
+  <!-- secondary card -->
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+    <div>
+      <h6>カテゴリリスト</h6>
+      <nav class="category-nav">
+        <ul class=list>
+              <li>
+                  <a href="#">Home</a>
+                    <ul>
+                        <li>
+                            <a href="#">Lab</a>
+                              <ul>
+                                  <li>
+                                      <a href="#">Code</a>
+                                      <ul>
+                                      <li>
+                                              <a href="#">Html</a>
+                                          </li>
+                                    <li>
+                                              <a href="#">Css</a>
+                                          </li>
+                                          <li>
+                                              <a href="#">Jquery</a>
+                                          </li>
+                                    </ul>
+                                </li>
+                                <li>
+                              <a href="#">Graph</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Image</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Design</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">Blog</a>
+                            <ul>
+                          <li>
+                                    <a href="#">Category</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Code</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Graph</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">About</a>
+                            <ul>
+                                <li>
+                                    <a href="#">Vcard</a>
+                                </li>
+                                <li>
+                                    <a href="#">Map</a>
+                                </li>
+                            </ul>
+                          </li>
+                    </ul>
+                </li>
+            </ul>
+      </nav>
+    </div>
+
+  
+  
+  </div>
+</section>

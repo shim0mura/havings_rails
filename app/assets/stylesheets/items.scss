@@ -75,6 +75,10 @@ h2 .item-unit {
 .mdl-card.timer {
   min-height: 0px;
 }
+.timer {
+  width: 100%;
+  margin-bottom: 15px;
+}
 .timer > div {
   margin-bottom: 0px;
 }
@@ -82,7 +86,6 @@ h2 .item-unit {
   display: table-cell;
   width: 40px;
   vertical-align: middle;
-  padding-right: 5px;
 }
 .timer .timer-icon i {
   font-size: 30px;
@@ -95,6 +98,9 @@ h2 .item-unit {
   color: #212121;
   padding-bottom: 5px;
   font-size: 17px;
+}
+.timer .timer-data .timer-desc i {
+  font-size: 13px;
 }
 
 
@@ -159,7 +165,7 @@ div.list-item-text {
   vertical-align: top;
 }
 div.list-item-text h5 {
-  margin-top: 0px;
+  margin-top: 2px;
   margin-bottom: 5px;
 }
 div.list-item-text h5 a {

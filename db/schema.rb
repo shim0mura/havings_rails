@@ -11,7 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902130742) do
+ActiveRecord::Schema.define(version: 20150914080819) do
+
+  create_table "events", force: :cascade do |t|
+    t.integer  "type",             limit: 4,     null: false
+    t.integer  "acter_id",         limit: 4,     null: false
+    t.integer  "suffered_user_id", limit: 4
+    t.text     "properties",       limit: 65535, null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "events", ["acter_id"], name: "index_events_on_acter_id", using: :btree
+  add_index "events", ["type"], name: "index_events_on_type", using: :btree
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255
@@ -33,6 +45,15 @@ ActiveRecord::Schema.define(version: 20150902130742) do
     t.integer  "user_id",        limit: 4,                     null: false
     t.integer  "list_id",        limit: 4
   end
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4,     null: false
+    t.text     "events",     limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
 
   create_table "social_profiles", force: :cascade do |t|
     t.integer  "user_id",      limit: 4

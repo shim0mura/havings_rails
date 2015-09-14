@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type: 1
+  acter_id: 1
+  suffered_user_id: 1
+  properties: MyText
+
+two:
+  type: 1
+  acter_id: 1
+  suffered_user_id: 1
+  properties: MyText

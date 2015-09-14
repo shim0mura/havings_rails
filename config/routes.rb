@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  get 'user/:user_id', to: 'user#index', as: :user_page
+
+  get 'home', to: 'welcome#home'
+
   resources :items
   get  '/garbage', to: 'items#garbage'
   post '/garbage', to: 'items#drop_garbage'

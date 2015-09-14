@@ -44,6 +44,8 @@ gem 'mini_magick'
 
 gem 'acts-as-taggable-on'
 
+gem 'google_visualr'
+
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-facebook'

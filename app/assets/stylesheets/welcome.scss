@@ -1,3 +1,162 @@
 // Place all the styles related to the welcome controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+a {
+  text-decoration: none;
+  color: #8BC34A;
+}
+a:hover {
+  color: #DCEDC8;
+}
+
+.timer-wrapper {
+}
+
+.timer-wrapper .mdl-card__supporting-text {
+  width: auto;
+}
+
+.timer-wrapper h4 {
+  margin: 0;
+  padding: 16px;
+  background: #90caf9;
+}
+.timer-wrapper h4 i {
+  font-size: 18px;
+}
+.timer-meta-data {
+  display: inline-block;
+  font-size: 13px;
+  margin-top: -10px;
+  margin-bottom: -5px;
+}
+.timer-meta-data .set-timer {
+  color: #727272;
+}
+.timer-meta-data .overflow-timer {
+  color: #f44336;
+}
+.timer-wrapper .mdl-card__actions {
+  padding-right: 27px;
+}
+
+.graph-wrapper {
+}
+.graph-wrapper h4 {
+  margin: 0;
+  padding: 16px;
+  background: #80cbc4;
+}
+.graph-wrapper h4 i {
+  font-size: 18px;
+}
+
+.popular-list-wrapper {
+}
+
+.popular-list-wrapper h4 {
+  margin: 0;
+  padding: 16px;
+}
+.popular-list-wrapper h4 i {
+  font-size: 18px;
+}
+
+.popular-list-wrapper .mdl-card__supporting-text {
+  padding: 0px;
+  width: auto;
+}
+.popular-list-wrapper .mdl-card__actions {
+  border-bottom: 1px solid #b6b6b6;
+  margin-left: 15px;
+  margin-right: 15px;
+  width: auto;
+}
+
+
+.timeline-wrapper {
+}
+
+.timeline-wrapper h4 {
+  margin: 0;
+  padding: 16px;
+}
+.timeline-wrapper h4 i {
+  font-size: 18px;
+}
+
+.timeline-wrapper .mdl-card__supporting-text {
+  padding: 0px;
+  width: auto;
+}
+.timeline-wrapper .mdl-card__actions {
+  border-bottom: 1px solid #b6b6b6;
+  margin-left: 15px;
+  margin-right: 15px;
+  width: auto;
+}
+.timeline-wrapper .timeline {
+  padding-bottom: 20px;
+}
+
+
+.category-nav {
+}
+ul.list,
+ul.list ul {
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    margin-left: -10px;
+}
+ul.list ul {
+    margin-left:10px; 
+    position:relative;
+}
+ul.list ul:before {
+    content:"";
+    display:block;
+    width:0;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    border-left:1px solid #ccc;
+}
+ul.list li  {
+    margin:0;
+    padding:3px 12px;
+    text-decoration: none;
+    font-size:13px;
+    line-height:20px;
+    color:#ccc;
+    font-weight:normal;
+    position:relative;
+}
+ul.list li a { 
+    text-decoration: none;
+    font-size:14px;
+    line-height:20px;
+    position:relative;
+}
+ul.list li a:hover,
+ul.list li a:hover+ul li a {
+}
+ul.list ul li:before {
+    content:"";
+    display:block;
+    width:8px;
+    height:0;
+    border-top:1px solid #ccc;
+    position:absolute;
+    top:10px;
+    left: 0;
+}
+ul.list ul li:last-child:before {
+    background: #ffffff; 
+    height: auto;
+    top: 10px; 
+    bottom: 0;
+}
+
+
