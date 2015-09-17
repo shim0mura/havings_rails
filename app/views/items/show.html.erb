@@ -347,32 +347,62 @@
   </button>
   <div class="inner-fab-buttons">
 
-    <div class="action-button-wrapper">
+    <div class="action-button-wrapper" data-form-type="add_list">
       <div class="tooltip">
-        Follow
+        リストを追加する
       </div>
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect">
-        <i class="material-icons">edit</i>
+        <i class="material-icons">add</i>
+      </button>
+    </div>
+
+    <div class="action-button-wrapper" data-form-type="add_item">
+      <div class="tooltip">
+        アイテムを追加する
+      </div>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
+        <i class="material-icons">add</i>
+      </button>
+    </div>
+
+    <div class="action-button-wrapper" data-form-type="edit_item">
+      <div class="tooltip">
+        リストを編集する
+      </div>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
+        <i class="material-icons">create</i>
       </button>
     </div>
 
     <div class="action-button-wrapper">
       <div class="tooltip">
-        Follow
+        手放す
       </div>
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
         <i class="material-icons">delete</i>
       </button>
     </div>
 
-    <div class="action-button-wrapper">
-      <div class="tooltip">
-        Follow
-      </div>
-      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-        <i class="material-icons">create</i>
-      </button>
-    </div>
   </div>
 </div>
 
+<div id="fab-action-form">
+  <div id="add_list">
+    <h4>リストを作成する</h4>
+    <%= form_for(@new_item) do |f| %>
+      <%= render 'list_form', f: f, item: @new_item, id: 'new_list' %>
+    <% end %>
+  </div>
+
+  <div id="add_item">
+  
+  </div>
+
+  <div id="edit_item">
+    <h4>リストを編集する</h4>
+    <%= form_for(@item) do |f| %>
+      <%= render 'list_form', f: f, item: @item, id: 'edit_list' %>
+    <% end %>
+  </div>
+
+</div>

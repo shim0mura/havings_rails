@@ -1,0 +1,68 @@
+/* https://github.com/google/material-design-lite/pull/325/files */
+
+$preferred_font: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
+$grid-tablet-breakpoint: 480px !default;
+$button-border-radius: 2px !default;
+$color-accent: #FF4081 !default;
+$button-min-width: 64px !default;
+$button-height: 36px !default;
+
+.mdl-snackbar {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-right: -50%;
+  cursor: default;
+  // Hard coded since the color is not present in any pallet.
+  background-color: #323232;
+  z-index: 10000;
+  max-height: 0;
+  border-radius: 2px;
+  display: table;
+  font-family: $preferred_font;
+  will-change: transform;
+  transform: translate3d(0,-50px,0) rotateZ(0deg);
+  @media(max-width: $grid-tablet-breakpoint - 1) {
+    width: 100%;
+    left:0;
+    min-height: 48px;
+    max-height: 80px;
+  }
+  @media(min-width: $grid-tablet-breakpoint) {
+    min-width: 288px;
+    max-width: 568px;
+  }
+  &.is-active {
+    max-height: 48px;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.mdl-snackbar__text {
+  padding: 14px 24px;
+  vertical-align: middle;
+  color: white;
+  display:table-cell;
+}
+
+.mdl-snackbar__action {
+  background: transparent;
+  border: none;
+  border-radius: $button-border-radius;
+  color: unquote("rgb(#{$color-accent})");
+  display: table-cell;
+  text-transform: uppercase;
+  min-width: $button-min-width;
+  padding: 14px 24px;
+  overflow: hidden;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  line-height: $button-height;
+  vertical-align: middle;
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
+}

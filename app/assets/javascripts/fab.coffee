@@ -1,7 +1,11 @@
 $ ->
   showing_class = "is-showing-options"
   closing_class = "is-showing-options-x"
-  $("#fab-button").click ->
+  $("#fab-button").on 'click', (e)->
+    # 何故かinner-fab-buttonsの範囲をクリックしても発火するので、
+    # その場合はreturnする
+
+    return if $(e.target).hasClass("inner-fab-buttons")
     if $(@).hasClass(showing_class)
       $(@).addClass(closing_class)
       $(@).removeClass(showing_class)

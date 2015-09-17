@@ -10,8 +10,10 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require material
  *= require_tree .
+ *= require jquery.tagit
+ *= require tagit.ui-zendesk
+ *= require material
  *= require_self
  */
 
@@ -40,6 +42,21 @@ ul {
 }
 ul li {
   padding: 12px;
+}
+
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none transparent;
+  vertical-align: middle;
+  font-size: inherit;
+  color: inherit;
+  box-sizing: content-box;
 }
 
 .clearfix:after {
@@ -306,3 +323,232 @@ filter: alpha(opacity = 75);
   margin-top: -7vh;
 }
 
+
+
+
+
+
+#modal-overlay{
+  z-index:11;
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:120%;
+  background-color:rgba(0,0,0,0.4);
+}
+#fab-action-form {
+  position: fixed;
+  width:50%;
+  max-width: 800px;
+  min-width: 300px;
+  margin:1.5em auto 0;
+  padding:10px 20px;
+  border:2px solid #aaa;
+  background:#fff;
+  z-index:12;
+  display: none;
+  overflow: auto;
+  padding-bottom: 25px;
+}
+#fab-action-form > div {
+  display: none;
+}
+#fab-action-form .description {
+  width: 100%;
+}
+.ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content {
+  z-index: 15;
+}
+
+.form-label {
+  color: #727272;
+}
+#fab-action-form .field {
+  padding: 10px 0;
+}
+#fab-action-form h4 {
+  margin-top: 10px;
+}
+
+.input-required {
+  color: #FFCDD2;
+}
+.validation-error, .sending-error {
+  color: #FF5252;
+  display: none;
+}
+
+span.twitter-typeahead input {
+  outline: none;
+}
+
+span.twitter-typeahead input:focus {
+  outline: none;
+  border-bottom: 1px solid #3f51b5;
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+  -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+.field .mdl-textfield__input {
+  outline: none;
+}
+
+.field .mdl-textfield__input:focus {
+  outline: none;
+  border-bottom: 1px solid #3f51b5;
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+  -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+.typeahead {
+  background-color: #fff;
+}
+
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu {
+  width: 400px;
+  margin: 5px 0;
+  padding: 8px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.tt-suggestion:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #0097cf;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+.field ul.tagit {
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+  -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+.field ul.tagit.onfocus {
+  border-bottom: 1px solid #3f51b5;
+}
+.field ul.tagit li.tagit-choice {
+  border-radius: none;
+  -webkit-border-radius: none;
+  border-bottom: 1px solid #3f51b5;
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+  -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+.field ul.tagit li.tagit-choice a.tagit-close:hover {
+  background: #ccc;
+}
+.field select {
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+  -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+.field select:focus {
+  border-bottom: 1px solid #3f51b5;
+}
+.image-list .thumbnail {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+}
+.image-list .thumbnail img {
+  height: 100px;
+}
+.image-field {
+  display:inline-block;
+  position:relative;
+  overflow:hidden;
+  background:#dedede;
+  color:#fff;
+  line-height:30px;
+  padding: 0;
+  margin-right: 2px;
+}
+.upload-item-image {
+  cursor:pointer;
+  opacity: 0;
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 5;
+}
+.image-description {
+  cursor:pointer;
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  text-align: center;
+  line-height: 100px;
+}
+.existing-image .image-description {
+  background: rgba(0,0,0,0.2);
+  cursor: default;
+  display: none;
+}
+.existing-image .delete-image-button {
+  cursor: pointer;
+  position: absolute;
+  bottom: 0px;
+  text-align: center;
+  width: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 5;
+}
+.existing-image .image-delete-flag {
+  display: none;
+}
+.image-description.delete-thumbnail {
+  height: auto;
+  background: rgba(0,0,0,0.4);
+  top: inherit;
+  bottom: 0;
+  line-height: inherit;
+}
+.image-description.delete-thumbnail:hover {
+  background: rgba(0,0,0,0.6);;
+}

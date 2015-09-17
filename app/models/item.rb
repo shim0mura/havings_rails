@@ -1,6 +1,10 @@
 class Item < ActiveRecord::Base
 
+  include EnumType
+
   acts_as_taggable
+
+  enum private_type: %i(global follower friends secret)
 
   belongs_to :user
   has_many :item_images
@@ -10,6 +14,8 @@ class Item < ActiveRecord::Base
   has_many :child_items, :foreign_key => "list_id", :class_name => "Item"
 
   accepts_nested_attributes_for :item_images
+
+  validates :name, presence: true
 
   scope :as_list, -> { where(is_list: true) }
 

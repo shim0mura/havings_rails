@@ -1,4 +1,11 @@
 ja:
+  states:
+    items:
+      private_type:
+        global: 全体に公開
+        follower: フォロワーまで公開
+        friends: 相互フォロワーまで公開
+        secret: 非公開
   activerecord:
     errors:
       template:

@@ -12,6 +12,23 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui
+//= require tag-it
 //= require turbolinks
 //= require material
+//= require twitter/typeahead.min
 //= require_tree .
+function createToast(message) {
+  'use strict';
+  var snackbar = document.createElement('div'),
+      text = document.createElement('div');
+  snackbar.classList.add('mdl-snackbar');
+  text.classList.add('mdl-snackbar__text');
+  text.innerText = message;
+  snackbar.appendChild(text);
+  document.body.appendChild(snackbar);
+  // Remove after 10 seconds
+  setTimeout(function(){
+    snackbar.remove();
+  }, 5000);
+}

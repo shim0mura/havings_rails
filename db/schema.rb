@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150914080819) do
+ActiveRecord::Schema.define(version: 20150917135248) do
 
   create_table "events", force: :cascade do |t|
     t.integer  "type",             limit: 4,     null: false
@@ -37,13 +37,13 @@ ActiveRecord::Schema.define(version: 20150914080819) do
     t.text     "description",    limit: 65535
     t.boolean  "is_list",        limit: 1,     default: false, null: false
     t.boolean  "is_garbage",     limit: 1,     default: false, null: false
-    t.boolean  "is_private",     limit: 1,     default: false, null: false
     t.integer  "count",          limit: 4,     default: 1,     null: false
     t.text     "garbage_reason", limit: 65535
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "user_id",        limit: 4,                     null: false
     t.integer  "list_id",        limit: 4
+    t.integer  "private_type",   limit: 4,     default: 0,     null: false
   end
 
   create_table "notifications", force: :cascade do |t|

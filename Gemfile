@@ -46,6 +46,8 @@ gem 'acts-as-taggable-on'
 
 gem 'google_visualr'
 
+gem 'jquery-fileupload-rails'
+
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-facebook'
@@ -54,6 +56,12 @@ gem 'omniauth-twitter'
 gem 'omniauth-instagram'
 
 gem 'material_design_lite-rails'
+
+gem 'gon'
+
+gem 'twitter-typeahead-rails'
+
+gem 'jquery-ui-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

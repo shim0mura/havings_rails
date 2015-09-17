@@ -2,7 +2,7 @@
   position: fixed;
   bottom: 9%;
   right: 7%;
-  z-index: 100;
+  z-index: 10;
 }
 .fab-wrapper .inner-fab-buttons .mdl-button--fab {
   background: #ddd;
@@ -33,6 +33,17 @@
       -ms-flex-direction: column-reverse;
           flex-direction: column-reverse;
 }
+.fab-wrapper.is-showing-options-x .inner-fab-buttons {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: reverse;
+  -webkit-flex-direction: column-reverse;
+      -ms-flex-direction: column-reverse;
+          flex-direction: column-reverse;
+}
 .fab-wrapper.is-showing-options .inner-fab-buttons .action-button-wrapper {
   display: block;
   -webkit-animation-name: enter;
@@ -47,7 +58,7 @@
 }
 .fab-wrapper.is-showing-options-x .inner-fab-buttons  .action-button-wrapper {
   /* display: block; */
-  margin-top: -10px;
+  /* margin-top: -10px; */
   -webkit-animation-name: close;
           animation-name: close;
   -webkit-animation-fill-mode: backwards;
@@ -83,33 +94,34 @@
           animation-delay: 0.6s;
 }
 .fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(1)  {
-  -webkit-animation-delay: 0.1s;
-          animation-delay: 0.1s;
+  -webkit-animation-delay: 0.6s;
+          animation-delay: 0.6s;
 }
 .fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(2)  {
-  -webkit-animation-delay: 0.2s;
-          animation-delay: 0.2s;
-}
-.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(3)  {
-  -webkit-animation-delay: 0.3s;
-          animation-delay: 0.3s;
-}
-.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(4)  {
-  -webkit-animation-delay: 0.4s;
-          animation-delay: 0.4s;
-}
-.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(5)  {
   -webkit-animation-delay: 0.5s;
           animation-delay: 0.5s;
 }
+.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(3)  {
+  -webkit-animation-delay: 0.4s;
+          animation-delay: 0.4s;
+}
+.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(4)  {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s;
+}
+.fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(5)  {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s;
+}
 .fab-wrapper.is-showing-options-x .inner-fab-buttons .action-button-wrapper:nth-of-type(6)  {
-  -webkit-animation-delay: 0.6s;
-          animation-delay: 0.6s;
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s;
 }
 .fab-wrapper .inner-fab-buttons {
   position: absolute;
   bottom: 100%;
   margin-bottom: 10px;
+  right: 10px;
 }
 .fab-wrapper .inner-fab-buttons .action-button-wrapper {
 /* .action-button-wrapper { */
@@ -175,7 +187,7 @@
   margin-top: 15px;
 }
 .action-button-wrapper {
-  width: 150px;
+  width: 170px;
   position: relative;
-  right: 50px;
+  text-align: right;
 }
