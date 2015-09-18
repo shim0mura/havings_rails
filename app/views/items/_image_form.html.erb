@@ -1,0 +1,39 @@
+<% if item.item_images.present? %>
+  <div class="field image-list existing-image">
+    <label class="form-label">画像を削除する</label><br>
+    <% item.item_images.each do |image| %>
+      <div class="image-field">
+        <div class="thumbnail">
+          <%= image_tag image.image_url %>
+        </div>
+        <div class="adding-text image-description">
+          <i class="material-icons">cancel</i>
+        </div>
+        <div class="delete-image-button">
+          削除
+        </div>
+        <%= check_box_tag 'item[image_deleting][]', image.id, false, {class: 'image-delete-flag'} %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="field image-list">
+  <label class="form-label">画像を追加する</label><br>
+  <div class="image-field">
+    <%= f.file_field :item_images, multiple: true, class: "upload-item-image" %>
+    <div class="thumbnail"></div>
+    <div class="adding-text image-description">
+      画像追加
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="sending-error">
+    送信に失敗しました。時間をおいてから再度お試しください。
+  </div>
+  <div class="send-form mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+    送信
+  </div>
+</div>

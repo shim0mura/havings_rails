@@ -1,7 +1,7 @@
 $ ->
   showing_class = "is-showing-options"
   closing_class = "is-showing-options-x"
-  $("#fab-button").on 'click', (e)->
+  $(document).on 'click', "#fab-button", (e)->
     # 何故かinner-fab-buttonsの範囲をクリックしても発火するので、
     # その場合はreturnする
 

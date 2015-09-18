@@ -14,7 +14,6 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require tag-it
-//= require turbolinks
 //= require material
 //= require twitter/typeahead.min
 //= require_tree .

@@ -1,5 +1,7 @@
 class Item < ActiveRecord::Base
 
+  ITEM_EVENTS = 1
+
   include EnumType
 
   acts_as_taggable
@@ -18,6 +20,31 @@ class Item < ActiveRecord::Base
   validates :name, presence: true
 
   scope :as_list, -> { where(is_list: true) }
+
+  def events(from = 0, limit = ITEM_EVENTS)
+    event_type = Event.event_types.select{|type|
+      ["create_list", "create_item", "add_image", "dump"].include?(type)
+    }.values
+
+    if from != 0
+      from_option = Event.arel_table[:id].lt(from)
+      e = Event.where(from_option)
+    else 
+      e = Event
+    end
+
+    e
+      .where(
+        event_type: event_type,
+        related_id: self.id
+      )
+      .order("id DESC")
+      .limit(limit)
+  end
+
+  def has_next_event_from?(from)
+    events(from).size > 0
+  end
 
   def is_already_listed_in?(list_id)
     lists.any? do |l|

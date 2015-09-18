@@ -190,77 +190,7 @@
         </div>
         <ul class="timeline">
           <li class="bar"></li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle add">
-                <i class="material-icons">add</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@item.item_images.last.image_url), item_path(id: @item.id) %>
-                </div>
-                かっこいいセーターあああああああああああああああ
-              </h5>
-            </div>
-            <div class="event-time">
-              1日前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle image">
-                <i class="material-icons">image</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>画像を追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@item.item_images.first.image_url), item_path(id: @item.id) %>
-                </div>
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle dump">
-                <i class="material-icons">delete</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを手放しました</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@item.item_images.first.image_url), item_path(id: @item.id) %>
-                </div>
-                ださいセーター
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle create">
-                <i class="material-icons">create</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <h5 class="created">
-                アイテムを作成しました。
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
+          <%= render 'timeline'%>
         </ul>
       </div>
 
@@ -352,7 +282,7 @@
         リストを追加する
       </div>
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect">
-        <i class="material-icons">add</i>
+        <i class="material-icons">folder</i>
       </button>
     </div>
 
@@ -361,7 +291,7 @@
         アイテムを追加する
       </div>
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-        <i class="material-icons">add</i>
+        <i class="material-icons">attachment</i>
       </button>
     </div>
 
@@ -371,6 +301,15 @@
       </div>
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
         <i class="material-icons">create</i>
+      </button>
+    </div>
+
+    <div class="action-button-wrapper" data-form-type="edit_image">
+      <div class="tooltip">
+        画像の追加/削除
+      </div>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
+        <i class="material-icons">image</i>
       </button>
     </div>
 
@@ -388,20 +327,30 @@
 
 <div id="fab-action-form">
   <div id="add_list">
-    <h4>リストを作成する</h4>
+    <h4>リストを作成</h4>
     <%= form_for(@new_item) do |f| %>
-      <%= render 'list_form', f: f, item: @new_item, id: 'new_list' %>
+      <%= render 'list_form', f: f, item: @new_item, id: 'new_list', is_list: true, type: 'create' %>
     <% end %>
   </div>
 
   <div id="add_item">
-  
+    <h4>アイテムを作成</h4>
+    <%= form_for(@new_item) do |f| %>
+      <%= render 'list_form', f: f, item: @new_item, id: 'edit_item', is_list: false, type: 'create'%>
+    <% end %>
   </div>
 
   <div id="edit_item">
-    <h4>リストを編集する</h4>
+    <h4>リストを編集</h4>
     <%= form_for(@item) do |f| %>
-      <%= render 'list_form', f: f, item: @item, id: 'edit_list' %>
+      <%= render 'list_form', f: f, item: @item, id: 'edit_list', is_list: true, type: 'edit' %>
+    <% end %>
+  </div>
+
+  <div id="edit_image">
+    <h4>画像の追加/削除</h4>
+    <%= form_for(@item) do |f| %>
+      <%= render 'image_form', f: f, item: @item, id: 'edit_image', type: 'edit_image' %>
     <% end %>
   </div>
 

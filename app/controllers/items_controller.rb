@@ -1,7 +1,7 @@
 class ItemsController < ApplicationController
 
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :edit, :update, :destroy]
+  before_action :set_item, only: [:show, :timeline, :edit, :update, :destroy]
 
   # GET /items
   # GET /items.json
@@ -16,6 +16,11 @@ class ItemsController < ApplicationController
     @list = current_user.items.as_list if user_signed_in?
     # to_aすればARをloadしない
     # @lista = @list.to_a
+  end
+
+  def timeline
+    @from = params[:from]
+    render partial: 'timeline', layout: false
   end
 
   # GET /items/new
@@ -37,16 +42,25 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params)
     @item.user_id = current_user.id
 
-    respond_to do |format|
-      if @item.save
-        create_image!
+    if @item.save
+      Event.create(
+        event_type: (@item.is_list ? :create_list : :create_item),
+        acter_id: current_user.id,
+        related_id: @item.list_id,
+        properties: {
+          item_id: @item.id
+        }
+      )
 
-        format.html { redirect_to @item, notice: 'Item was successfully created.' }
-        format.json { render :show, status: :created, location: @item }
-      else
-        format.html { render :new }
-        format.json { render json: @item.errors, status: :unprocessable_entity }
-      end
+      create_image!
+
+      render json: { status: :ok, location: @item }
+      # format.html { redirect_to @item, notice: 'Item was successfully created.' }
+      # format.json { render :show, status: :created, location: @item }
+    else
+      render json: { location: @item }, status: :unprocessable_entity
+      # format.html { render :new }
+      # format.json { render json: @item.errors, status: :unprocessable_entity }
     end
   end
 
@@ -152,11 +166,22 @@ class ItemsController < ApplicationController
     end
 
     def create_image!
-      if params[:item][:item_images]
-        params[:item][:item_images].each do |a|
-          @item_images = @item.item_images.create!(:image => a)
-        end
+      return unless params[:item][:item_images]
+
+      item_image_ids = []
+      params[:item][:item_images].each do |a|
+        item_image = @item.item_images.create!(:image => a)
+        item_image_ids.push(item_image.id)
       end
+
+      Event.create(
+        event_type: :add_image,
+        acter_id: current_user.id,
+        related_id: @item.id,
+        properties: {
+          item_image_ids: item_image_ids
+        }
+      )
     end
 
     def synchronize_with_list

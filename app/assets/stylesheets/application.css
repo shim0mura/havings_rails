@@ -487,6 +487,9 @@ span.twitter-typeahead input:focus {
 .field select:focus {
   border-bottom: 1px solid #3f51b5;
 }
+.field .item-count {
+  width: 120px;
+}
 .image-list .thumbnail {
   width: 100px;
   height: 100px;

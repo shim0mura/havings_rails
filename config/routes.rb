@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'home', to: 'welcome#home'
 
   resources :items
+  get  '/items/:id/timeline', to: 'items#timeline'
   get  '/garbage', to: 'items#garbage'
   post '/garbage', to: 'items#drop_garbage'
 

@@ -11,19 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150917135248) do
+ActiveRecord::Schema.define(version: 20150918073333) do
 
   create_table "events", force: :cascade do |t|
-    t.integer  "type",             limit: 4,     null: false
+    t.integer  "event_type",       limit: 4,     null: false
     t.integer  "acter_id",         limit: 4,     null: false
     t.integer  "suffered_user_id", limit: 4
-    t.text     "properties",       limit: 65535, null: false
+    t.text     "properties",       limit: 65535
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.integer  "related_id",       limit: 4
   end
 
   add_index "events", ["acter_id"], name: "index_events_on_acter_id", using: :btree
-  add_index "events", ["type"], name: "index_events_on_type", using: :btree
+  add_index "events", ["event_type"], name: "index_events_on_event_type", using: :btree
+  add_index "events", ["related_id"], name: "index_events_on_related_id", using: :btree
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255

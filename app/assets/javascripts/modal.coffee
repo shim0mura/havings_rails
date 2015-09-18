@@ -4,19 +4,22 @@ $ ->
   modal_id = "#modal-overlay"
 
   set_modal_position = ->
-    w = $(window).width();
-    h = $(window).height();
-    top = 60
+    w = $(window).width()
+    h = $(window).height()
+    top = $('header.header').outerHeight(true) + 20
     from_bottom = 90
     fab_form = $(fab_form_id)
     cw = fab_form.outerWidth();
-    ch = fab_form.outerHeight();
-    height = h - (top + from_bottom)
+    ch = fab_form.outerHeight(true);
+    if (h - (ch + top + from_bottom)) < 0
+      height = h - (top + from_bottom)
+    else
+      height = ch
     pxleft = ((w - cw)/2);
-    pxtop = ((h - ch)/2);
+    pxtop = ((h - height)/2);
     fab_form.css
       left: pxleft + "px"
-      top: top + "px"
+      top: pxtop + "px"
       height: height + "px"
 
   $('.action-button-wrapper').on("click", ->
@@ -116,17 +119,26 @@ $ ->
     button = $(@)
     form = $(@).closest('form')
 
+    if form.find('[name=method]').length < 1
+      type = 'POST'
+    else
+      type = form.find('[name=_method]').val()
+
+    console.log type
+    console.log form.attr('action'),
+
     formData = new FormData( form.get()[0] );
+
     $.ajax {
       url: form.attr('action'),
-      type: form.find('[name=_method]').val(),
+      type: type,
       data: formData,
       processData: false,
       contentType: false,
       beforeSend: (xhr, options)->
         # validation
         name = form.find('input[name="item[name]"]')
-        if name.val().trim() == ''
+        if name.length > 0 && name.val().trim() == ''
           $('.validation-error').css('display', 'block')
           return false
         else
@@ -138,15 +150,7 @@ $ ->
         $('.validation-error').css('display', 'none')
         $('.sending-error').css('display', 'none')
         hide_overlay()
-        createToast("アイテムを作成しました。")
+        createToast(form.prev('h4').html() + "をしました。")
       error: (xhr, status, error)->
         $('.sending-error').css('display', 'block')
     }
-
-
-
-  # create_toast = ->
-  #   bar = $('div')
-  #   text = $('div')
-  #   bar.addClass('mdl-snackbar')
-  #   text.addClass('mdl-snackbar__text')

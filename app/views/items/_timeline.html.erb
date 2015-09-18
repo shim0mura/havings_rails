@@ -1,0 +1,84 @@
+<% from = @from ? @from : 0 %>
+<% p from %>
+<% @item.events(from).each do |event| %>
+  <% case %>
+  <% when event.event_type == "create_item" %>
+    <% icon_type = "add" %>
+    <% text = "アイテムを追加しました。" %>
+    <% event_item = event.item %>
+  <% when event.event_type == "create_list" %>
+    <% icon_type = "add" %>
+    <% text = "リストを追加しました。" %>
+    <% event_item = event.item %>
+  <% when event.event_type == "add_image" %>
+    <% icon_type = "image" %>
+    <% text = "画像を追加しました。" %>
+    <% event_item = nil %>
+    <% item_images = event.item_images %>
+  <% when event.event_type == "dump" %>
+    <% icon_type = "delete" %>
+    <% text = "アイテムを手放しました。" %>
+    <% event_item = event.item %>
+  <% end %>
+
+  <li>
+    <div class="event-type">
+      <div class="event-circle <%= icon_type %>">
+        <i class="material-icons"><%= icon_type %></i>
+      </div>
+    </div>
+    <div class="event-text">
+      <p><%= text %></p>
+      <h5>
+
+        <% if event_item %>
+          <%# 画像追加じゃない場合 %>
+          <div class="image-circle">
+            <% thumbnails = event_item.item_images %>
+            <% if thumbnails.last %>
+              <%= link_to image_tag(event_item.item_images.last.image_url), item_path(id: event_item.id) %>
+            <% end %>
+          </div>
+          <%= link_to event_item.name, item_path(id: event_item.id) %>
+        <% else %>
+          <%# 画像追加の場合 %>
+          <% item_images.each do |image| %>
+            <div class="image-circle">
+              <%= image_tag(image.image_url) %>
+            </div>
+          <% end %>
+        <% end %>
+
+      </h5>
+    </div>
+    <div class="event-time">
+      1日前
+    </div>
+  </li>
+<% end %>
+
+<% if @item.events(from).size < Item::ITEM_EVENTS || !@item.has_next_event_from?(@item.events.last.id) %>
+  <li>
+    <div class="event-type">
+      <div class="event-circle create">
+        <i class="material-icons">create</i>
+      </div>
+    </div>
+    <div class="event-text">
+      <h5 class="created">
+        アイテムを作成しました。
+      </h5>
+    </div>
+    <div class="event-time">
+      10時間前
+    </div>
+  </li>
+<% else %>
+  <li class="add-timeline">
+    <%= hidden_field_tag :last_event_id, @item.events(from).last.id %>
+    <div class="more">
+      もっと見る
+    </div>
+    <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" style="display:none;"></div>
+  </li>
+<% end %>

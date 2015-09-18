@@ -1,6 +1,7 @@
 <div class="text-field field">
+  <%= f.hidden_field :is_list, value: is_list %>
   <div class="validation-error">名前を入力してください</div>
-  <%= f.label :name, "リスト名", class: "form-label" %><span class="input-required"> 必須入力</span>
+  <%= f.label :name, (is_list ? "リスト" : "アイテム" ) + "名", class: "form-label" %><span class="input-required"> 必須入力</span>
   <%= f.text_field :name, autofocus: true, class: "mdl-textfield__input typeahead list-name", required: true %>
 </div>
 
@@ -12,7 +13,7 @@
 <div class="field">
   <label class="form-label">タグ</label>
   <ul class="item-tags">
-    <% @item.tag_list.each do |tag| %>
+    <% item.tag_list.each do |tag| %>
       <li><%= tag %></li>
     <% end %>
   </ul>
@@ -34,27 +35,19 @@
 </div>
 
 <div class="field mdl-textfield mdl-js-textfield">
-  <%= f.label :list_id, class: "form-label" %><br>
-  <%= f.collection_select :list_id, @list, :id, :name, {include_blank: "どのリストにも入れない"}, {class: "mdl-textfield__input"} %>
+  <label class="form-label">属するリスト</label>
+  <% if type == 'create' %>
+    <% selected = (@item && @item.is_list ? @item.id : '') %>
+  <% else %>
+    <% selected = (@item && @item.list_id ? @item.list_id : '') %>
+  <% end %>
+  <%= f.select :list_id, options_from_collection_for_select(@list, :id, :name, { selected: selected, disabled: (item.is_list ? item.id : '')}), {include_blank: "どのリストにも入れない"}, {class: "mdl-textfield__input"} %>
 </div>
 
-<% if item.item_images.present? %>
-  <div class="field image-list existing-image">
-    <label class="form-label">画像を削除する</label><br>
-    <% item.item_images.each do |image| %>
-      <div class="image-field">
-        <div class="thumbnail">
-          <%= image_tag image.image_url %>
-        </div>
-        <div class="adding-text image-description">
-          <i class="material-icons">cancel</i>
-        </div>
-        <div class="delete-image-button">
-          削除
-        </div>
-        <%= check_box_tag 'item[image_deleting][]', image.id, false, {class: 'image-delete-flag'} %>
-      </div>
-    <% end %>
+<% unless is_list %>
+  <div class="field mdl-js-textfield">
+    <label class="form-label">アイテムの個数</label>
+    <%= f.number_field :count, class: "mdl-textfield__input item-count", min: 1 %>
   </div>
 <% end %>
 
