@@ -1,0 +1,24 @@
+<div class="dump-item">
+
+  <% if is_list %>
+    <div class="supporting-text">
+      このリストに属しているアイテムは手放されません。
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :is_garbage, value: true %>
+  <div class="text-field field garbage-reason">
+    <%= f.label :garbage_reason, "手放す理由", class: "form-label" %>
+    <%= f.text_area :garbage_reason ,class: "mdl-textfield__input", cols: "3" %>
+  </div>
+
+</div>
+
+<div>
+  <div class="sending-error">
+    送信に失敗しました。時間をおいてから再度お試しください。
+  </div>
+  <div class="send-form mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+    送信
+  </div>
+</div>

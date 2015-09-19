@@ -1,5 +1,4 @@
 <% from = @from ? @from : 0 %>
-<% p from %>
 <% @item.events(from).each do |event| %>
   <% case %>
   <% when event.event_type == "create_item" %>
@@ -17,7 +16,7 @@
     <% item_images = event.item_images %>
   <% when event.event_type == "dump" %>
     <% icon_type = "delete" %>
-    <% text = "アイテムを手放しました。" %>
+    <% text = "#{(event.item.is_list ? "リスト" : "アイテム")}を手放しました。" %>
     <% event_item = event.item %>
   <% end %>
 

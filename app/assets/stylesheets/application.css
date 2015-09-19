@@ -555,3 +555,13 @@ span.twitter-typeahead input:focus {
 .image-description.delete-thumbnail:hover {
   background: rgba(0,0,0,0.6);;
 }
+.dump-item {
+  padding-bottom: 20px;
+}
+label.check-dump-item {
+  line-height: 24px;
+}
+div.supporting-text {
+  color: #727272;
+  font-size: 9px;
+}

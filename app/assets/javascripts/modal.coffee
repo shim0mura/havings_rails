@@ -101,6 +101,16 @@ $ ->
       return
     $(@).parent().remove()
 
+  $('label.check-dump-item').on 'click', (e)->
+    target = $(e.target)
+    return unless target.hasClass('mdl-checkbox__input')
+    if target[0].checked
+      $(@).nextAll('.garbage-reason').show('fast')
+    else
+      $(@).nextAll('.garbage-reason')
+        .hide('fast')
+        .find('textarea').val('')
+
   $('.existing-image .delete-image-button').on 'click', ->
     klass = 'cancel-delete'
     if $(@).hasClass(klass)
@@ -123,9 +133,6 @@ $ ->
       type = 'POST'
     else
       type = form.find('[name=_method]').val()
-
-    console.log type
-    console.log form.attr('action'),
 
     formData = new FormData( form.get()[0] );
 

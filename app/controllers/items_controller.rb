@@ -54,6 +54,25 @@ class ItemsController < ApplicationController
 
       create_image!
 
+      if @item.is_garbage
+        # list側から捨てたことを知りたいのと
+        # item側から手放されたことを知りたいので2つイベントを入れる
+        # 設計ミス…
+        Event.create(
+          event_type: :dump,
+          acter_id: current_user.id,
+          related_id: @item.list_id,
+          properties: {
+            item_id: @item.id
+          }
+        )
+        Event.create(
+          event_type: :dump,
+          acter_id: current_user.id,
+          related_id: @item.id
+        )
+      end
+
       render json: { status: :ok, location: @item }
       # format.html { redirect_to @item, notice: 'Item was successfully created.' }
       # format.json { render :show, status: :created, location: @item }
@@ -73,6 +92,25 @@ class ItemsController < ApplicationController
     if @item.update(item_params)
       delete_image!
       create_image!
+
+      if @item.is_garbage
+        # list側から捨てたことを知りたいのと
+        # item側から手放されたことを知りたいので2つイベントを入れる
+        # 設計ミス…
+        Event.create(
+          event_type: :dump,
+          acter_id: current_user.id,
+          related_id: @item.list_id,
+          properties: {
+            item_id: @item.id
+          }
+        )
+        Event.create(
+          event_type: :dump,
+          acter_id: current_user.id,
+          related_id: @item.id
+        )
+      end
 
       unless private_type_before_update == @item.private_type
         synchronize_with_list
@@ -95,50 +133,6 @@ class ItemsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
       format.json { head :no_content }
-    end
-  end
-
-  def garbage
-    if params[:id]
-      set_item
-      is_owned_item?
-      @item.is_garbage = true
-    else
-      @item = Item.new(is_garbage: true)
-    end
-    render 
-  end
-
-  def drop_garbage
-    if params[:id]
-      set_item
-
-      respond_to do |format|
-        if @item.update(item_params)
-          create_image!
-          format.html { redirect_to @item, notice: 'Item was successfully updated.' }
-          format.json { render :show, status: :ok, location: @item }
-        else
-          format.html { render :edit }
-          format.json { render json: @item.errors, status: :unprocessable_entity }
-        end
-      end
-
-    else
-      @item = Item.new(item_params)
-      @item.user_id = current_user.id
-
-      respond_to do |format|
-        if @item.save
-          create_image!
-          format.html { redirect_to @item, notice: 'Item was successfully created.' }
-          format.json { render :show, status: :created, location: @item }
-        else
-          format.html { render :new }
-          format.json { render json: @item.errors, status: :unprocessable_entity }
-        end
-      end
-
     end
   end
 

@@ -6,8 +6,6 @@ Rails.application.routes.draw do
 
   resources :items
   get  '/items/:id/timeline', to: 'items#timeline'
-  get  '/garbage', to: 'items#garbage'
-  post '/garbage', to: 'items#drop_garbage'
 
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks'

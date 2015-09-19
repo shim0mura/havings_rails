@@ -1,5 +1,6 @@
+<%= f.hidden_field(:is_list, value: is_list) unless is_list.nil? %>
+
 <div class="text-field field">
-  <%= f.hidden_field :is_list, value: is_list %>
   <div class="validation-error">名前を入力してください</div>
   <%= f.label :name, (is_list ? "リスト" : "アイテム" ) + "名", class: "form-label" %><span class="input-required"> 必須入力</span>
   <%= f.text_field :name, autofocus: true, class: "mdl-textfield__input typeahead list-name", required: true %>
@@ -60,6 +61,30 @@
       画像追加
     </div>
   </div>
+</div>
+
+<div class="dump-item">
+  <%= f.label :is_garbage, {}, class: "check-dump-item mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect", for: id + '_is_garbage' do %>
+    <% if type == 'create' %>
+      手放した<%= is_list ? "リスト" : "アイテム" %>として追加する
+    <% else %>
+      この<%= is_list ? "リスト" : "アイテム" %>を手放す
+    <% end %>
+    <%= f.check_box :is_garbage, {class: "mdl-checkbox__input", id: id + '_is_garbage'} %>
+
+  <% end %>
+
+  <% if type == 'edit' && is_list %>
+    <div class="supporting-text">
+      このリストに属しているアイテムは手放されません。
+    </div>
+  <% end %>
+
+  <div class="text-field field garbage-reason" style="display:none;">
+    <%= f.label :garbage_reason, "手放す理由", class: "form-label" %>
+    <%= f.text_area :garbage_reason ,class: "mdl-textfield__input", cols: "3" %>
+  </div>
+
 </div>
 
 <div>

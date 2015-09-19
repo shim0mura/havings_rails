@@ -5,7 +5,11 @@ class Event < ActiveRecord::Base
   enum event_type: %i(create_list create_item add_image dump like follow comment timer)
 
   def item
-    item_id = eval(self.properties)[:item_id]
+    if self.properties
+      item_id = eval(self.properties)[:item_id]
+    else
+      item_id = self.related_id
+    end
     Item.find(item_id)
   end
 
