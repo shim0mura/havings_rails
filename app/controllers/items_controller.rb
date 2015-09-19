@@ -129,7 +129,10 @@ class ItemsController < ApplicationController
   # DELETE /items/1
   # DELETE /items/1.json
   def destroy
-    @item.destroy
+    @item.update_attribute('is_deleted', true)
+    # 関連イベントも全て論理削除
+    delete_events
+
     respond_to do |format|
       format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
       format.json { head :no_content }
@@ -176,6 +179,27 @@ class ItemsController < ApplicationController
           item_image_ids: item_image_ids
         }
       )
+    end
+
+    def delete_events
+      list_event = Event.where(
+        acter_id: current_user.id,
+        related_id: @item.list_id
+      )
+      list_events = []
+      list_event.each do |event|
+        next unless event.properties
+        item_id = eval(event.properties)[:item_id]
+        list_events.push(event.id) if item_id == @item.id
+      end
+
+      item_events = Event.where(
+        acter_id: current_user.id,
+        related_id: @item.id
+      ).collect{|e|e.id}
+      
+      Event.where(id: item_events.concat(list_events))
+        .update_all(is_deleted: true)
     end
 
     def synchronize_with_list

@@ -565,3 +565,10 @@ div.supporting-text {
   color: #727272;
   font-size: 9px;
 }
+
+.delete-item-button {
+  margin-top: 25px;
+}
+.delete-item-button .mdl-button {
+  background: #D32F2F;
+}

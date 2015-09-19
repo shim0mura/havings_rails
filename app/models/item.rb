@@ -1,6 +1,6 @@
 class Item < ActiveRecord::Base
 
-  ITEM_EVENTS = 1
+  ITEM_EVENTS = 20
 
   include EnumType
 
@@ -36,7 +36,8 @@ class Item < ActiveRecord::Base
     e
       .where(
         event_type: event_type,
-        related_id: self.id
+        related_id: self.id,
+        is_deleted: false
       )
       .order("id DESC")
       .limit(limit)

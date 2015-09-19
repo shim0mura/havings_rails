@@ -322,6 +322,15 @@
       </button>
     </div>
 
+    <div class="action-button-wrapper" data-form-type="delete_item">
+      <div class="tooltip">
+        削除
+      </div>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
+        <i class="material-icons">cancel</i>
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -355,10 +364,15 @@
   </div>
 
   <div id="dump_item">
-    <h4>この<%= (@item.is_list ?  "リスト" : "アイテム") %>を手放す</h4>
+    <h4><%= (@item.is_list ?  "リスト" : "アイテム") %>を手放す</h4>
     <%= form_for(@item) do |f| %>
       <%= render 'dump_form', f: f, id: 'dump_item', type: 'dump_item', is_list: @item.is_list, dump_item: true  %>
     <% end %>
+  </div>
+
+  <div id="delete_item">
+    <h4><%= (@item.is_list ?  "リスト" : "アイテム") %>の削除</h4>
+    <%= render 'delete_form' %>
   </div>
 
 </div>

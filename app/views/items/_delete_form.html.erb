@@ -1,0 +1,13 @@
+<div>
+  <% item = (@item.is_list ?  "リスト" : "アイテム") %>
+  <%= item %>を削除したことは履歴に残りません。他の人に通知もされません。<br>
+  また、削除された<%= item %>は見ることができなくなります。
+  <% if @item.is_list %>
+    <br>
+    このリストに属しているアイテムは削除されません。
+  <% end %>
+</div>
+
+<div class="delete-item-button">
+  <%= link_to '削除する', @item, method: :delete, class: "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" %>
+</div>
