@@ -11,6 +11,7 @@
  * file per style scope.
  *
  *= require_tree .
+ *= require jquery-ui/datepicker
  *= require jquery.tagit
  *= require tagit.ui-zendesk
  *= require material
@@ -571,4 +572,44 @@ div.supporting-text {
 }
 .delete-item-button .mdl-button {
   background: #D32F2F;
+}
+
+.calendar-wrapper {
+  padding-top: 10px;
+}
+.field.auto-width .mdl-textfield__input {
+  width: auto;
+  display: inline-block;
+  margin-top: -5px;
+}
+.edit-timer .notification {
+  padding: 5px 0 15px;
+}
+.edit-timer .notification .next-date .date-string {
+  font-weight: bold;
+}
+.repeating-or-not {
+  margin-bottom: 10px;
+}
+.timer-set-button .button {
+  display: inline-block;
+  padding-right: 15px;
+}
+.done-timer > div {
+  padding-bottom: 15px;
+}
+.done-timer .next-due-at {
+  font-weight: bold;
+}
+.done-timer .done-timer-button .mdl-button {
+  background-color:#4CAF50;
+}
+.delete-timer {
+  padding-bottom: 15px;
+}
+div.progressbar.remaining-time {
+  width: 100%;
+  background-color: transparent;
+  text-align: center;
+  font-weight: bold;
 }

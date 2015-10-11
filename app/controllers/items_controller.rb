@@ -16,6 +16,7 @@ class ItemsController < ApplicationController
     @list = current_user.items.as_list if user_signed_in?
     # to_aすればARをloadしない
     # @lista = @list.to_a
+    @timer = Timer.new(list_id: @item.id)
   end
 
   def timeline

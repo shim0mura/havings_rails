@@ -22,6 +22,9 @@
       -ms-transform: translate(-12px, -12px) rotate(45deg);
           transform: translate(-12px, -12px) rotate(45deg);
 }
+.fab-wrapper .inner-fab-buttons {
+  height: 0;
+}
 .fab-wrapper.is-showing-options .inner-fab-buttons {
   display: -webkit-box;
   display: -webkit-flex;
@@ -128,7 +131,6 @@
   -webkit-transform: scale(0);
       -ms-transform: scale(0);
           transform: scale(0);
-  /* display: none; */
 }
 @-webkit-keyframes enter {
   from {

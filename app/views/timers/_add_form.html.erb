@@ -1,0 +1,131 @@
+<div class="edit-timer">
+
+  <%= f.hidden_field :list_id %>
+  <%= hidden_field_tag "default_properties", timer.properties, class: "default-properties" %>
+  <div class="text-field field">
+    <%= f.label :name, "タイマータスク名", class: "form-label" %>
+    <%= f.text_field :name, autofocus: true, class: "mdl-textfield__input" %>
+  </div>
+
+  <label class="form-label">通知日時の設定</label>
+  <div class="calendar-wrapper">
+
+    <%# hidden_field_tag "timer[properties][start_at]", Time.now.to_s, class: "start-at" %>
+    <% default_due_date = timer.next_due_at.present? ? timer.next_due_at : nil %>
+    <%= hidden_field_tag "default_due_date", default_due_date, class: "default-due-date" %>
+    <%= hidden_field_tag "timer[properties][start_at]", Time.now.to_s, class: "start-at" %>
+    <%= f.hidden_field :next_due_at, class: "next-due-at" %>
+
+    <div class="ll-skin-melon date-picker"></div>
+    <div class="time-picker field auto-width">
+      通知時刻: 
+      <select class="hour mdl-textfield__input">
+        <% (0..23).each do |num| %>
+          <option value="<%= num %>"><%= num %></option>
+        <% end %>
+      </select>
+      時
+      <select class="minute mdl-textfield__input">
+        <% ["00", "15", "30", "45"].each do |num| %>
+          <option value="<%= num %>"><%= num %></option>
+        <% end %>
+      </select>
+      分
+    </div>
+
+    <label class="form-label">次回の通知日時</label>
+    <div class="notification">
+      <div class="start-at">
+        <span>今日</span> からタイマースタート
+      </div>
+      <div class="next-date">
+        <span class="date-string"></span> に通知
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :is_repeating, {}, class: "repeating-or-not mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect", for: "timer-repeating-or-not-" + id do %>
+        このタスクを繰り返す
+        <%= f.check_box :is_repeating, {class: "mdl-checkbox__input", id: "timer-repeating-or-not-" + id } %>
+      <% end %>
+      
+      <div class="repeat-interval">
+        <div class="repeat-by">
+          <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="<%= "repeat-by-day-" + id %>">
+            <input type="radio" id="<%= "repeat-by-day-" + id %>" class="mdl-radio__button check-repeat-by-day" name="timer[properties][repeat_by]" value="0" checked />
+            <span class="mdl-radio__label">
+              日にち指定　
+            </span>
+          </label>
+          <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="<%= "repeat-by-week-" + id %>">
+            <input type="radio" id="<%= "repeat-by-week-" + id %>" class="mdl-radio__button check-repeat-by-week" name="timer[properties][repeat_by]" value="1" />
+            <span class="mdl-radio__label">
+              曜日ごとに指定
+            </span>
+          </label>
+        </div>
+
+        <div class="repeat-by-day field auto-width">
+          <select name="timer[properties][repeat_by_day][month_interval]" class="mdl-textfield__input by-month">
+            <option value="0" selected="selected">毎月</option>
+            <option value="1">2ヶ月に1回</option>
+            <option value="2">3ヶ月に1回</option>
+            <option value="3">4ヶ月に1回</option>
+            <option value="5">半年に1回</option>
+          </select> 
+          <select name="timer[properties][repeat_by_day][day]" class="by-day mdl-textfield__input">
+            <% (1..31).each do |num| %>
+              <option value="<%= num %>"><%= num %></option>
+            <% end %>
+          </select>
+          日に通知する
+        </div>
+        <div class="repeat-by-week field auto-width">
+          <select name="timer[properties][repeat_by_week][week]" class="by-week-number mdl-textfield__input">
+            <option value="0" selected="selected">毎週</option>
+            <option value="1">第一週</option>
+            <option value="2">第二週</option>
+            <option value="3">第三週</option>
+            <option value="4">第四週</option>
+            <option value="5">最終週</option>
+          </select> 
+          <select name="timer[properties][repeat_by_week][day_of_week]" class="by-week mdl-textfield__input">
+            <option value="0" selected="selected">日曜日</option>
+            <option value="1">月曜日</option>
+            <option value="2">火曜日</option>
+            <option value="3">水曜日</option>
+            <option value="4">木曜日</option>
+            <option value="5">金曜日</option>
+            <option value="6">土曜日</option>
+          </select>
+          に通知する
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="timer-set-button">
+    <div class="validation-error name-missing-error">
+      タイマータスクの名前を指定してください。
+    </div>
+    <div class="validation-error due-date-error">
+      次回の通知時刻は現在時刻より先の時刻に指定してください。
+    </div>
+    <div class="sending-error">
+      送信に失敗しました。時間をおいてから再度お試しください。
+    </div>
+    <div class="button">
+      <div class="clear-form mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+        クリア
+      </div>
+    </div>
+
+    <div class="button">
+      <div class="send-form mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+        送信
+      </div>
+    </div>
+  </div>
+
+</div>

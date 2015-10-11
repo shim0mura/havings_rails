@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150919043934) do
+ActiveRecord::Schema.define(version: 20150921070322) do
 
   create_table "events", force: :cascade do |t|
     t.integer  "event_type",       limit: 4,                     null: false
@@ -100,6 +100,22 @@ ActiveRecord::Schema.define(version: 20150919043934) do
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
+
+  create_table "timers", force: :cascade do |t|
+    t.string   "name",          limit: 255
+    t.integer  "list_id",       limit: 4,                     null: false
+    t.integer  "user_id",       limit: 4,                     null: false
+    t.datetime "next_due_at",                                 null: false
+    t.datetime "over_due_from"
+    t.boolean  "is_repeating",  limit: 1,     default: false, null: false
+    t.text     "properties",    limit: 65535
+    t.boolean  "is_deleted",    limit: 1,     default: false, null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "timers", ["list_id"], name: "index_timers_on_list_id", using: :btree
+  add_index "timers", ["user_id"], name: "index_timers_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  limit: 190, default: "", null: false

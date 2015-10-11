@@ -13,6 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
+//= require jquery-ui/datepicker-ja
 //= require tag-it
 //= require material
 //= require twitter/typeahead.min

@@ -5,7 +5,10 @@ Rails.application.routes.draw do
   get 'home', to: 'welcome#home'
 
   resources :items
-  get  '/items/:id/timeline', to: 'items#timeline'
+  get '/items/:id/timeline', to: 'items#timeline'
+
+  resources :timers, only: [:index, :create, :update, :destroy]
+  post '/timers/:id/done', to: 'timers#done', as: :timer_done
 
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks'

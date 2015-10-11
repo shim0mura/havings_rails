@@ -44,50 +44,46 @@
 
     <div class="mdl-grid section--center mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-card timer mdl-shadow--4dp">
 
-      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
-        <div class="timer-icon">
-          <i class="material-icons">access_time</i>
-        </div>
-        <div class="timer-data">
-          <div class="timer-desc">
-            <div class="timer-task">部屋の片付け（あと7ヶ月）</div>
-            <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+      <h4>
+        <i class="material-icons">access_time</i>
+        設定中のタイマー
+      </h4>
+
+      <% @item.timers.each_with_index do |timer, index| %>
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
+          <div class="timer-data">
+            <div class="timer-desc">
+              <div class="timer-task"><%= timer.name %> <%#TODO: 毎週金曜とか繰り返し条件を表示するか、次の期限日だけを表示するか？ %></div>
+              <div class="mdl-progress mdl-js-progress timer-bar">
+                <% due_at = timer.over_due_from ? timer.over_due_from : timer.next_due_at %>
+                <% start_at = timer.get_start_at %>
+                <div class="progressbar bar bar1" style="width: <%= remaining_percent(due_at, start_at) %>%; background-color:hsl(<%= remaining_bar_style(due_at, start_at) %>, 100%, 50%);"></div>
+              <div class="progressbar bar remaining-time"><%= remaining_time_string(timer.next_due_at) %></div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="timer-action">
-          <button class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">check</i>
-          </button>
-          <button class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">settings</i>
-          </button>
-        </div>
-      </div>
+          <div class="timer-action">
+            <button class="done mdl-button mdl-js-button mdl-button--icon" data-form-type="done_timer_<%= index %>">
+              <i class="material-icons">check</i>
+            </button>
 
+            <button id="timer-action-menu-<%= index %>" class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">more_vert</i>
+            </button>
 
-      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data">
-        <div class="timer-icon">
-          <i class="material-icons">access_time</i>
-        </div>
-        <div class="timer-data">
-          <div class="timer-desc">
-            <div class="timer-task">部屋の片付け（あと7ヶ月）</div>
-            <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+            <ul class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect"
+                for="timer-action-menu-<%= index %>">
+              <li class="mdl-menu__item" data-form-type="edit_timer_<%= index %>">編集</li>
+              <li class="mdl-menu__item" data-form-type="delete_timer_<%= index %>">削除</li>
+            </ul>
+
           </div>
-        </div>
-        <div class="timer-action">
-          <button class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">check</i>
-          </button>
-          <button class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">settings</i>
-          </button>
-        </div>
-      </div>
 
+        </div>
+      <% end %>
 
       <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet item-meta-data  text-center">
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+        <button id="add_timer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect" data-form-type="add_timer">
           <i class="material-icons">add</i>
           タイマーを追加する
         </button>
@@ -374,5 +370,36 @@
     <h4><%= (@item.is_list ?  "リスト" : "アイテム") %>の削除</h4>
     <%= render 'delete_form' %>
   </div>
+
+  <div id="add_timer">
+    <h4>タイマーの追加</h4>
+    <%= form_for(@timer) do |f| %>
+      <%= render 'timers/add_form', timer: @timer, f: f, id: 'adding-timer' %>
+    <% end %>
+  </div>
+
+  <% @item.timers.each_with_index do |timer, index| %>
+    <div id="edit_timer_<%= index %>" class="edit-timer-modal">
+      <h4>タイマーの編集</h4>
+      <%= form_for(timer) do |f| %>
+        <%= render 'timers/add_form', timer: timer, f: f, id: 'edit-timer-' + index.to_s %>
+      <% end %>
+    </div>
+
+    <div id="done_timer_<%= index %>" class="done-timer-modal">
+      <h4>タイマータスクの完了</h4>
+      <%= form_tag(timer_done_path(timer.id), method: :post) do %>
+        <%= render 'timers/done_form', timer: timer, id: 'done-timer-' + index.to_s %>
+      <% end %>
+    </div>
+
+    <div id="delete_timer_<%= index %>" class="delete-timer-modal">
+      <h4>タイマータスクの削除</h4>
+      <%= form_tag({controller: "timers", action: "destroy", id: timer.id}, method: :delete) do %>
+        <%= render 'timers/delete_form', timer: timer, id: 'delete-timer-' + index.to_s %>
+      <% end %>
+    </div>
+
+  <% end %>
 
 </div>

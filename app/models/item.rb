@@ -15,9 +15,13 @@ class Item < ActiveRecord::Base
   belongs_to :list, :class_name => "Item"
   has_many :child_items, :foreign_key => "list_id", :class_name => "Item"
 
+  has_many :timers, :foreign_key => "list_id"
+
   accepts_nested_attributes_for :item_images
 
   validates :name, presence: true
+
+  default_scope -> { where(is_deleted: false) }
 
   scope :as_list, -> { where(is_list: true) }
 

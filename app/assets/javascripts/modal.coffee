@@ -22,7 +22,7 @@ $ ->
       top: pxtop + "px"
       height: height + "px"
 
-  $('.action-button-wrapper').on("click", ->
+  show_modal_form = ->
     $(@).blur()
     form_type = $(@).data("form-type")
     return false if ($("#modal-overlay")[0])
@@ -32,7 +32,11 @@ $ ->
     $("#" + form_type).show();
     $('.sending-error').css('display', 'none')
     set_modal_position()
-  )
+
+  $('.action-button-wrapper').on("click", show_modal_form)
+  $('#add_timer_button').on("click", show_modal_form)
+  $('.timer .timer-action .done').on("click", show_modal_form)
+  $('.timer .timer-action li').on("click", show_modal_form)
 
   hide_overlay = ->
     $(modal_id).fadeOut("fast", ->
@@ -124,7 +128,6 @@ $ ->
       $(@).next('.image-delete-flag').prop("checked", true)
       $(@).prev('.image-description').css('display', 'block')
 
-
   $('.send-form').on 'click', (e)->
     button = $(@)
     form = $(@).closest('form')
@@ -143,21 +146,40 @@ $ ->
       processData: false,
       contentType: false,
       beforeSend: (xhr, options)->
-        # validation
-        name = form.find('input[name="item[name]"]')
-        if name.length > 0 && name.val().trim() == ''
-          $('.validation-error').css('display', 'block')
-          return false
+        if form.find('.edit-timer').length > 0
+          # タイマーのバリデーション
+          next_due_date = new Date(form.find('.next-due-at').val())
+          current_date = new Date
+          name = form.find('input[name="timer[name]"]')
+
+          if name.length > 0 && name.val().trim() == ''
+            form.find('.validation-error.name-missing-error').css('display', 'block')
+            return false
+          else
+            form.find('.validation-error.name-missing-error').css('display', 'none')
+
+          if current_date > next_due_date
+            form.find('.validation-error.due-date-error').css('display', 'block')
+            return false
+          else
+            form.find('.validation-error.due-date-error').css('display', 'none')
+          button.attr('disabled', 'disabled')
         else
-          $('.validation-error').css('display', 'none')
-        button.attr('disabled', 'disabled')
+          # リスト、アイテムのバリデーション
+          name = form.find('input[name="item[name]"]')
+          if name.length > 0 && name.val().trim() == ''
+            form.find('.validation-error').css('display', 'block')
+            return false
+          else
+            form.find('.validation-error').css('display', 'none')
+          button.attr('disabled', 'disabled')
       complete: (xhr, textStatus)->
         button.removeAttr('disabled')
       success: (result, status, xhr)->
-        $('.validation-error').css('display', 'none')
-        $('.sending-error').css('display', 'none')
+        form.find('.validation-error').css('display', 'none')
+        form.find('.sending-error').css('display', 'none')
         hide_overlay()
         createToast(form.prev('h4').html() + "をしました。")
       error: (xhr, status, error)->
-        $('.sending-error').css('display', 'block')
+        form.find('.sending-error').css('display', 'block')
     }

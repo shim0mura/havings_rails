@@ -5,7 +5,10 @@ $ ->
     # 何故かinner-fab-buttonsの範囲をクリックしても発火するので、
     # その場合はreturnする
 
-    return if $(e.target).hasClass("inner-fab-buttons")
+    # return if $(e.target).hasClass("inner-fab-buttons")
+    if $(e.target).hasClass("inner-fab-buttons")
+      $(e.target).css("display", "none")
+      return
     if $(@).hasClass(showing_class)
       $(@).addClass(closing_class)
       $(@).removeClass(showing_class)

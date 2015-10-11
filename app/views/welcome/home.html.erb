@@ -207,7 +207,7 @@
               <p>アイテムを追加しました。</p>
               <h5>
                 <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present?%>
                 </div>
                 かっこいいセーターあああああああああああああああ
               </h5>
@@ -226,7 +226,7 @@
               <p>画像を追加しました。</p>
               <h5>
                 <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present? %>
                 </div>
               </h5>
             </div>
@@ -244,7 +244,7 @@
               <p>アイテムを手放しました</p>
               <h5>
                 <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) %>
+                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present? %>
                 </div>
                 ださいセーター
               </h5>

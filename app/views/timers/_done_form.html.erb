@@ -1,0 +1,24 @@
+<div class="done-timer">
+  <div>
+    タスク: <%= timer.name %> を完了します。
+  </div>
+
+  <% if timer.is_repeating %>
+    <div>
+      <label class="form-label">次回の通知日時</label><br>
+      <% next_due_at = timer.get_next_due_at_when_task_done %>
+      <div class="next-due-at">
+      <%= due_date_in_ja(timer.get_next_due_at_when_task_done) %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="done-timer-button">
+    <div class="sending-error">
+      送信に失敗しました。時間をおいてから再度お試しください。
+    </div>
+    <div class="send-form mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+      タスクを完了する
+    </div>
+  </div>
+</div>
