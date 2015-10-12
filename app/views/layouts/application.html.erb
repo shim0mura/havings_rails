@@ -10,10 +10,10 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
 <!-- Always shows a header, even in smaller screens. -->
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-  <header class="mdl-layout__header header">
+  <!--<header class="mdl-layout__header header">-->
+  <header class="docs-layout-header mdl-layout__header is-casting-shadow">
     <div class="mdl-layout__header-row">
       <!-- Title -->
       <span class="mdl-layout-title">Title</span>
@@ -29,12 +29,36 @@
         </div>
       </div>
       <!-- Navigation. We hide it in small screens. -->
-      <div class="navigation-container">
-        <nav class="navigation mdl-navigation mdl-layout--large-screen-only">
+      <!--<div class="docs-navigation__container navigation-container">-->
+      <div class="docs-navigation__container">
+        <nav class="docs-navigation mdl-navigation">
           <a class="mdl-navigation__link" href="">Link</a>
           <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
+          <% if user_signed_in? %>
+            <% notifications = current_user.notification.get_showing_notification %>
+            <% unread_notifications = notifications.count{|e|e[:unread]} %>
+            <span id="notification_button" class="material-icons mdl-badge <%= "already-read" if unread_notifications <= 0 %>" <%= "data-badge=#{unread_notifications}" if unread_notifications > 0 %>>notifications</span>
+            <%# notificationを既読にするためにajaxでpostする %>
+            <%# 単純なgetで適当に叩かれて他のユーザーの通知を既読にされると困るので %>
+            <%# CSRF用のtokenを使うようにする %>
+            <%= form_tag(notification_read_path, method: :put) do %>
+            <% end %>
+            <div id="notification">
+              <div class="balloon"></div>
+              <div class="notification-content">
+                <h6>お知らせ</h6>
+                <ul>
+                  <% if notifications.size > 0 %>
+                    <% notifications.each do |notification| %>
+                      <li class="<%= "unread" if notification[:unread] %>"><%== notification_html(notification) %></li>
+                    <% end %>
+                  <% else %>
+                    <li>お知らせはありません。</li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
         </nav>
       </div>
     </div>
@@ -53,6 +77,7 @@
     
       <%= yield %>
     
+      <div id="notification_overlay"></div>'
     </div>
 
     <footer class="mdl-mega-footer">

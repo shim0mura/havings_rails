@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150921070322) do
+ActiveRecord::Schema.define(version: 20151012002454) do
 
   create_table "events", force: :cascade do |t|
     t.integer  "event_type",       limit: 4,                     null: false
@@ -51,10 +51,11 @@ ActiveRecord::Schema.define(version: 20150921070322) do
   end
 
   create_table "notifications", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4,     null: false
-    t.text     "events",     limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "user_id",       limit: 4,   null: false
+    t.string   "unread_events", limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "read_events",   limit: 255
   end
 
   add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree

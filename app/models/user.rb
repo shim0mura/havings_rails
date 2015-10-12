@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_token
   before_create :set_email_provider
+  after_create  :create_notification
 
   validates:token, uniqueness: true
 
@@ -18,6 +19,8 @@ class User < ActiveRecord::Base
   has_many :social_profiles, dependent: :destroy
 
   has_many :items
+
+  has_one :notification
 
   # oauth用
   attr_accessor :create_with_oauth
@@ -61,23 +64,19 @@ class User < ActiveRecord::Base
         image: social_profile.image_url,
         description: social_profile.description
       )
-      p user
       user.save!
     end
     user
   end
 
   def email_need_validate?
-    p 1
     if create_with_oauth
       return false
     elsif email_changed?
       return true
     elsif persisted?
-      p 2
       return false
     else
-      p 3
       return true
     end
   end

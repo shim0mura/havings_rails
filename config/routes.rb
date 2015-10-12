@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resources :timers, only: [:index, :create, :update, :destroy]
   post '/timers/:id/done', to: 'timers#done', as: :timer_done
 
+  put '/notification/read', to: 'notifications#read'
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks'
   }

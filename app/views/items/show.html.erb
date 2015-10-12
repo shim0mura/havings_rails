@@ -30,10 +30,6 @@
               <% end %>
             </div>
             <div class="item-meta-fab">
-              <!--
-              <div class="item-meta-desc">
-              </div>
-              -->
               <i class="material-icons">favorite</i><span>100</span>
               　
               <i class="material-icons">chat_bubble</i><span>100</span>
@@ -57,7 +53,7 @@
               <div class="mdl-progress mdl-js-progress timer-bar">
                 <% due_at = timer.over_due_from ? timer.over_due_from : timer.next_due_at %>
                 <% start_at = timer.get_start_at %>
-                <div class="progressbar bar bar1" style="width: <%= remaining_percent(due_at, start_at) %>%; background-color:hsl(<%= remaining_bar_style(due_at, start_at) %>, 100%, 50%);"></div>
+                <div class="progressbar bar bar1" style="width: <%= remaining_percent(due_at, start_at) %>%; background-color:hsl(<%= remaining_bar_style(due_at, start_at) %>, 100%, 70%);"></div>
               <div class="progressbar bar remaining-time"><%= remaining_time_string(timer.next_due_at) %></div>
               </div>
             </div>

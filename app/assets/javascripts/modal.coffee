@@ -137,7 +137,7 @@ $ ->
     else
       type = form.find('[name=_method]').val()
 
-    formData = new FormData( form.get()[0] );
+    formData = new FormData( form.get()[0] )
 
     $.ajax {
       url: form.attr('action'),

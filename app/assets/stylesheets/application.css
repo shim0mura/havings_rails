@@ -22,6 +22,23 @@
   overflow: visible;
   background-color: white;
 }
+
+header .material-icons {
+  cursor: pointer;
+}
+header .material-icons.mdl-badge {
+  margin-right: 0px;
+}
+header .mdl-badge[data-badge]:after {
+  right: -10px;
+  top: -8px;
+  width: 18px;
+  height: 18px;
+}
+.already-read.mdl-badge[data-badge]:after {
+  display: none;
+}
+
 footer {
   margin-top: 50px;
 }
@@ -29,6 +46,57 @@ footer {
 body {
   margin: 0;
   background-color: #fafafa;
+}
+#notification_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  z-index: 9;
+  display: none;
+}
+#notification {
+  display: none;
+  position: relative;
+  z-index: 11;
+}
+#notification .balloon {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom: 10px solid #fff;
+  top: 9px;
+  right: 2px;
+}
+#notification .notification-content {
+  position: absolute;
+  top: 28px;
+  right: -10px;
+  width: 200px;
+  max-height: 200px;
+  overflow: scroll;
+  box-shadow: 0px 2px 3px rgba(0,0,0,0.5); 
+  color: black;
+  background-color: #fff;
+}
+
+#notification h6 {
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  color: #727272;
+}
+#notification li {
+  border-top: 1px solid #b6b6b6;
+  margin: 6px;
+  padding: 5px 0;
+}
+
+#notification li.unread {
+  background: #C8E6C9;
 }
 
 /* Disable ugly boxes around images in IE10 */

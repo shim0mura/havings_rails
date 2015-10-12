@@ -6,6 +6,29 @@ class Timer < ActiveRecord::Base
 
   default_scope -> { where(is_deleted: false) }
 
+  # タイマーの期限きれた時の処理
+  # 基本は定期実行ジョブから叩く
+  def pass_due_time
+    now = Time.now
+    return if next_due_at > Time.now
+
+    self.over_due_from = next_due_at
+    self.next_due_at = get_next_due_at
+
+    self.save!
+
+    event = Event.create(
+      event_type: :timer,
+      acter_id: self.user_id,
+      related_id: self.id,
+      properties: {
+        over_at: now
+      }
+    )
+
+    User.find(self.user_id).notification.add_unread_event(event)
+  end
+
   # タスク完了時のnext_due_atを求める
   # 期限日前にタスクを終わらせようとする場合はnext_due_atの次の期限日を返す
   # 期限日後にタスクを終わらせようとする場合はnext_due_atをそのまま返す
@@ -29,6 +52,8 @@ class Timer < ActiveRecord::Base
     props = JSON.parse(properties)
 
     next_due = next_due_at
+
+    return next_due unless is_repeating
 
     # 日にち指定の場合
     if props["repeat_by"] == "0"
