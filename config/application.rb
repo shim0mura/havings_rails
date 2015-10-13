@@ -30,6 +30,11 @@ module Havings
       DeviseController.respond_to :html, :json
     end
 
+    # carrir_wave用
     config.autoload_paths += Dir[Rails.root.join('app', 'uploaders')]
+
   end
 end
+
+# job_queue
+Rails.application.config.active_job.queue_adapter = :sidekiq

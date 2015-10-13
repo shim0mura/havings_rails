@@ -30,15 +30,16 @@ class TimersController < ApplicationController
   end
 
   def done
-    @timer.next_due_at = @timer.get_next_due_at
-
     if @timer.is_repeating
+      @timer.next_due_at = @timer.get_next_due_at_when_task_done
       props = JSON.parse(@timer.properties)
       props["start_at"] = Time.now.to_s
       @timer.properties = props.to_json
     else
-      @timer.is_deleted = true
+      @timer.is_active = false
     end
+
+    @timer.over_due_from = nil
 
     if @timer.save
       Event.create(
@@ -56,9 +57,16 @@ class TimersController < ApplicationController
   end
 
   def update
+
     @timer.name = params[:timer][:name]
     @timer.is_repeating = params[:timer][:is_repeating]
+    @timer.over_due_from = nil
     set_timer_props
+
+    if @timer.next_due_at < Time.now
+      render json: { }, status: :unprocessable_entity 
+      return
+    end
 
     if @timer.save
       render json: { status: :ok }
@@ -70,6 +78,8 @@ class TimersController < ApplicationController
 
   def destroy
     @timer.is_deleted = true
+    @timer.is_active = false
+    @timer.events.each{|e|e.disable}
     if @timer.save
       render json: { status: :ok }
     else

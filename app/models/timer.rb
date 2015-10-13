@@ -4,7 +4,21 @@ class Timer < ActiveRecord::Base
 
   belongs_to :list, :foreign_key => "list_id", :class_name => "Item"
 
-  default_scope -> { where(is_deleted: false) }
+  default_scope -> { where(is_deleted: false, is_active: true) }
+
+  # 1回限りのタスクで且つdone_taskされているものも取りたい場合
+  scope :without_deleted, -> { unscoped.where(is_deleted: false) }
+
+  def events
+    event_type = Event.event_types.select{|type|
+      ["timer", "done_task"].include?(type)
+    }.values
+    Event.where(
+      event_type: event_type,
+      related_id: self.id,
+      is_deleted: false
+    )
+  end
 
   # タイマーの期限きれた時の処理
   # 基本は定期実行ジョブから叩く
@@ -12,7 +26,7 @@ class Timer < ActiveRecord::Base
     now = Time.now
     return if next_due_at > Time.now
 
-    self.over_due_from = next_due_at
+    self.over_due_from = next_due_at unless self.over_due_from
     self.next_due_at = get_next_due_at
 
     self.save!
@@ -38,7 +52,9 @@ class Timer < ActiveRecord::Base
     # next_due_atは10/23(金)になっている
     # タスクは通知後に完了する場合、つまりタスクの期限オーバーの場合が多いはず
     # なのでその場合は有無を言わさずnext_due_atが次のタスク期限日になる
+    p over_due_from
     return next_due_at if over_due_from
+    p 1111111
 
     # 毎週金曜の設定でその日が10/15(木)かつnext_due_atが10/16(金)の場合
     # 10/16のタスクを終わらせた事になるので

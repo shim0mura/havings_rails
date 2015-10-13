@@ -8,6 +8,10 @@ class Event < ActiveRecord::Base
 
   default_scope -> { where(is_deleted: false) }
 
+  def disable
+    update_attribute(:is_deleted, true)
+  end
+
   def item
     if self.properties
       item_id = eval(self.properties)[:item_id]
@@ -34,7 +38,14 @@ class Event < ActiveRecord::Base
       end
 
       if e.first.event_type == "timer"
-        timers = Timer.find(e.map(&:related_id))
+        # TODO: 同じタスクがあったら排除したい
+        # 毎週金曜のタスクを2回オーバーした場合
+        # 「タスクX, タスクXが期限こえてます」という表示になってしまう
+        # その場合1つにまとめたい
+        # 「タスクX, タスクY, タスクX」という場合も同様
+        timers = Timer
+          .without_deleted
+          .where(id: e.map(&:related_id))
         next if timers.empty?
 
         hash = {

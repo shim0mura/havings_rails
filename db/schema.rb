@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151012002454) do
+ActiveRecord::Schema.define(version: 20151013005433) do
 
   create_table "events", force: :cascade do |t|
     t.integer  "event_type",       limit: 4,                     null: false
@@ -113,6 +113,7 @@ ActiveRecord::Schema.define(version: 20151012002454) do
     t.boolean  "is_deleted",    limit: 1,     default: false, null: false
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
+    t.boolean  "is_active",     limit: 1,     default: true,  null: false
   end
 
   add_index "timers", ["list_id"], name: "index_timers_on_list_id", using: :btree
