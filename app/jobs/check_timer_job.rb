@@ -12,7 +12,7 @@ class CheckTimerJob < ActiveJob::Base
 
       timer.pass_due_time
 
-      # TODO: push通知の処理
+      # TODO: push通知の処理とメールの処理
       # この処理が行われた瞬間に通知するタイプと
       # X日オーバー時点でのリマインドとして通知するタイプと
       # X日前時点での予めリマインドとして通知するタイプの3つ？

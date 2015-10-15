@@ -38,11 +38,6 @@ class Event < ActiveRecord::Base
       end
 
       if e.first.event_type == "timer"
-        # TODO: 同じタスクがあったら排除したい
-        # 毎週金曜のタスクを2回オーバーした場合
-        # 「タスクX, タスクXが期限こえてます」という表示になってしまう
-        # その場合1つにまとめたい
-        # 「タスクX, タスクY, タスクX」という場合も同様
         timers = Timer
           .without_deleted
           .where(id: e.map(&:related_id))

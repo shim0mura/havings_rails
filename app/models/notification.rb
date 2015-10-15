@@ -20,21 +20,37 @@ class Notification < ActiveRecord::Base
   # 未読のイベントの追加
   # 同じタイプのイベントはまとめる
   def add_unread_event(event)
-    events = unread_events ? JSON.parse(unread_events) : []
-    if events.empty?
-      events << event.id
+    unread = unread_events ? JSON.parse(unread_events) : []
+
+    if unread.empty?
+      # 既読の最初が同じタイプのイベントだった場合
+      # 例）unread:[], read:[timer, favorite], event:timer
+      # readの最初のtimerをここで追加するeventとまとめてunreadにいれる
+      # なのでreadの最初のtimerは既読から未読に移ることになる
+      # 結果）unread:[[timer(event), timer(既読だったもの)]], read:[favorite]
+      read = read_events ? JSON.parse(read_events) : []
+      latest_read_event = Event.where(id: [read.first].flatten).first
+
+      if latest_read_event && latest_read_event.event_type == event.event_type
+        latest_event_ids = read.shift
+        unread.unshift([latest_event_ids].unshift(event.id).flatten)
+        self.read_events = read
+      else
+        unread << event.id
+      end
+      
     else
-      latest_event = Event.find([events.first]).first
+      latest_event = Event.find([unread.first]).first
 
       if latest_event.event_type == event.event_type
-        latest_event_ids = events.shift
-        events.unshift([latest_event_ids].unshift(event.id).flatten)
+        latest_event_ids = unread.shift
+        unread.unshift([latest_event_ids].unshift(event.id).flatten)
       else
-        events.unshift(event.id)
+        unread.unshift(event.id)
       end
     end
 
-    self.unread_events = events
+    self.unread_events = unread
     save!
   end
 

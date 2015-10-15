@@ -52,9 +52,7 @@ class Timer < ActiveRecord::Base
     # next_due_atは10/23(金)になっている
     # タスクは通知後に完了する場合、つまりタスクの期限オーバーの場合が多いはず
     # なのでその場合は有無を言わさずnext_due_atが次のタスク期限日になる
-    p over_due_from
     return next_due_at if over_due_from
-    p 1111111
 
     # 毎週金曜の設定でその日が10/15(木)かつnext_due_atが10/16(金)の場合
     # 10/16のタスクを終わらせた事になるので
