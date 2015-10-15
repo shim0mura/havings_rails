@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151013005433) do
+ActiveRecord::Schema.define(version: 20151015034322) do
 
   create_table "events", force: :cascade do |t|
     t.integer  "event_type",       limit: 4,                     null: false
@@ -27,6 +27,15 @@ ActiveRecord::Schema.define(version: 20151013005433) do
   add_index "events", ["acter_id"], name: "index_events_on_acter_id", using: :btree
   add_index "events", ["event_type"], name: "index_events_on_event_type", using: :btree
   add_index "events", ["related_id"], name: "index_events_on_related_id", using: :btree
+
+  create_table "favorites", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4, null: false
+    t.integer  "item_id",    limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "favorites", ["user_id", "item_id"], name: "index_favorites_on_user_id_and_item_id", unique: true, using: :btree
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255

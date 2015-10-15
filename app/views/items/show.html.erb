@@ -30,7 +30,13 @@
               <% end %>
             </div>
             <div class="item-meta-fab">
-              <i class="material-icons">favorite</i><span>100</span>
+              <%= form_tag({controller: "favorite", action: "create", id: @item.id}, {class: "favorite-item"}) do %>
+              <% end %>
+              <%= form_tag({controller: "favorite", action: "destroy", id: @item.id}, {class: "unfavorite-item", method: :delete}) do %>
+              <% end %>
+              <% favorite_class = "favorite" %>
+              <% favorite_class = favorite_class + " not-sigined-in" unless user_signed_in? %>
+              <i class="material-icons <%= favorite_class + (user_signed_in? && @item.is_favorited?(current_user.id) ? " already-favorite" : "") %>">favorite</i><span><%= @item.favorites.count %></span>
               　
               <i class="material-icons">chat_bubble</i><span>100</span>
             </div>

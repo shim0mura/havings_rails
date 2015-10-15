@@ -681,3 +681,9 @@ div.progressbar.remaining-time {
   text-align: center;
   font-weight: bold;
 }
+i.favorite.already-favorite {
+  color: rgb(255,64,129);
+}
+i.favorite.already-favorite + span {
+  color: rgb(255,64,129);
+}

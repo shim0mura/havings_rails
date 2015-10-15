@@ -10,7 +10,8 @@ class Item < ActiveRecord::Base
 
   belongs_to :user
   has_many :item_images
-  # has_many :favorites
+
+  has_many :favorites
 
   belongs_to :list, :class_name => "Item"
   has_many :child_items, :foreign_key => "list_id", :class_name => "Item"
@@ -55,6 +56,13 @@ class Item < ActiveRecord::Base
     lists.any? do |l|
       list_id == l.id
     end
+  end
+
+  def is_favorited?(user_id)
+    Favorite.exists?(
+      user_id: user_id,
+      item_id: self.id
+    )
   end
 
 end

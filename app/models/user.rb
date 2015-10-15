@@ -22,6 +22,8 @@ class User < ActiveRecord::Base
 
   has_one :notification
 
+  has_many :favorites
+
   # oauth用
   attr_accessor :create_with_oauth
 

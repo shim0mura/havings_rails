@@ -6,6 +6,9 @@ Rails.application.routes.draw do
 
   resources :items
   get '/items/:id/timeline', to: 'items#timeline'
+  get '/items/:id/favorite', to: 'favorite#index'
+  post '/items/:id/favorite', to: 'favorite#create'
+  delete '/items/:id/favorite', to: 'favorite#destroy'
 
   resources :timers, only: [:index, :create, :update, :destroy]
   post '/timers/:id/done', to: 'timers#done', as: :timer_done
