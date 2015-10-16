@@ -14,7 +14,7 @@ class CommentsController < ApplicationController
 
     if comment.save
       item = Item.find(params[:id])
-      Event.create(
+      event = Event.create(
         event_type: :comment,
         acter_id: current_user.id,
         suffered_user_id: item.user_id,
@@ -23,8 +23,9 @@ class CommentsController < ApplicationController
           comment_id: comment.id
         }
       )
+      item.user.notification.add_unread_event(event)
 
-      render json: { status: :ok , commenter: current_user}
+      render json: { status: :ok , commenter: current_user.to_light}
     else
       render json: { }, status: :unprocessable_entity
     end

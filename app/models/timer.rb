@@ -119,4 +119,13 @@ class Timer < ActiveRecord::Base
     Time.parse(props["start_at"])
   end
 
+
+  def to_light
+    {
+      id:    self.list_id,
+      name:  self.name,
+      path:  Rails.application.routes.url_helpers.item_path(self.list_id)
+    }
+  end
+
 end

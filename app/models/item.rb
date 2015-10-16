@@ -67,4 +67,19 @@ class Item < ActiveRecord::Base
     )
   end
 
+  def to_light
+    if item_image = self.item_images.last
+      image = item_image.image_url
+    else
+      image = nil
+    end
+
+    {
+      id:    self.id,
+      name:  self.name,
+      image: image,
+      path:  Rails.application.routes.url_helpers.item_path(self.id)
+    }
+  end
+
 end

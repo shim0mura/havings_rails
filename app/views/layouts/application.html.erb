@@ -50,7 +50,10 @@
                 <ul>
                   <% if notifications.size > 0 %>
                     <% notifications.each do |notification| %>
-                      <li class="<%= "unread" if notification[:unread] %>"><%== notification_html(notification) %></li>
+                      <% notification_str = notification_str_by_type(notification) %>
+                      <% if notification_str %>
+                        <li class="<%= "unread" if notification[:unread] %>"><%== notification_str %></li>
+                      <% end %>
                     <% end %>
                   <% else %>
                     <li>お知らせはありません。</li>

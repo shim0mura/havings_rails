@@ -98,4 +98,13 @@ class User < ActiveRecord::Base
     return true
   end
 
+  def to_light
+    {
+      id:    self.id,
+      name:  self.name,
+      image: self.image,
+      path:  Rails.application.routes.url_helpers.user_page_path(self.id)
+    }
+  end
+
 end

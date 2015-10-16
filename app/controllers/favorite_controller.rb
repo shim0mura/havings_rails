@@ -13,7 +13,7 @@ class FavoriteController < ApplicationController
 
     if favorite.save
       item = Item.find(params[:id])
-      Event.create(
+      event = Event.create(
         event_type: :favorite,
         acter_id: current_user.id,
         suffered_user_id: item.user_id,
@@ -22,6 +22,7 @@ class FavoriteController < ApplicationController
           favorite_id: favorite.id
         }
       )
+      item.user.notification.add_unread_event(event)
 
       render json: { status: :ok }
     else
