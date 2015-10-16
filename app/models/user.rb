@@ -20,6 +20,8 @@ class User < ActiveRecord::Base
 
   has_many :items
 
+  has_many :comments
+
   has_one :notification
 
   has_many :favorites

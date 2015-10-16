@@ -10,14 +10,7 @@ module ItemsHelper
     is_over = remaining_seconds < 0
     remaining_seconds = remaining_seconds.abs
 
-    if remaining_seconds < 60 * 60
-      str = (Time.parse("1/1") + remaining_seconds).strftime("%-M分")
-    elsif remaining_seconds < 60 * 60 * 24
-      str = (Time.parse("1/1") + remaining_seconds).strftime("%-H時間")
-    else
-      day = remaining_seconds / (60 * 60 * 24)
-      str = day.to_s + "日"
-    end
+    str = time_to_str(remaining_seconds)
 
     if is_over
       return str + "オーバー"

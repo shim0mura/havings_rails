@@ -13,6 +13,8 @@ class Item < ActiveRecord::Base
 
   has_many :favorites
 
+  has_many :comments
+
   belongs_to :list, :class_name => "Item"
   has_many :child_items, :foreign_key => "list_id", :class_name => "Item"
 

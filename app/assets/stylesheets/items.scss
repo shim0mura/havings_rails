@@ -375,6 +375,10 @@ ul.timeline {
 .secondary-card .comment .comment-wrapper {
   margin-top: 10px;
 }
+.secondary-card .comment .comment-wrapper > div {
+  padding-bottom: 16px;
+}
+
 .secondary-card .comment .commenter {
   display: table;
   width: 100%;
@@ -385,6 +389,18 @@ ul.timeline {
   color: #727272;
   font-size: 10px;
 }
+
+.commenter div.list-item-image {
+  width: 25px;
+  height: 25px;
+}
+.commenter div.list-item-image .image-circle {
+  width: 25px;
+  height: 25px;
+  float: none;
+  margin-right: 0px;
+}
+/*
 .secondary-card .comment .commenter .commenter-image {
   width: 25px;
   height: 25px;
@@ -399,8 +415,16 @@ ul.timeline {
   overflow: hidden;
   background: #795548;
 }
+*/
 .secondary-card .comment .commenter .commenter-name {
   padding-left: 5px;
+}
+.secondary-card .comment .commenter .commenter-name form {
+  display: none;
+}
+.secondary-card .comment .commenter .commenter-name i {
+  font-size: 10px;
+  cursor: pointer;
 }
 .secondary-card .comment .commenter .commented-time {
   text-align: right;
@@ -408,6 +432,7 @@ ul.timeline {
 }
 .secondary-card .comment .comment-text {
   margin-top: 3px;
+  margin-bottom: 0px;
 }
 .secondary-card .comment-area {
   width: 100%;
@@ -418,3 +443,4 @@ ul.timeline {
 .secondary-card .submit-comment i {
   font-size: 14px;
 }
+

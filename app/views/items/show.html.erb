@@ -216,51 +216,66 @@
     <div class="comment">
       <h6>コメント</h6>
       <div class="comment-wrapper">
-        <div>
-          <div class="commenter">
-            <div class="commenter-image">
-            </div>
-            <div class="commenter-name">
-              ユーザー
-            </div>
-            <div class="commented-time">
-              10時間前
-            </div>
-          </div>
-          <p class="comment-text">
-              こめんとこめんと
-          </p>
-        </div>
+        <% now = Time.now %>
+        <% @item.comments.each do |comment| %>
+          <div class="comment-post">
+            <div class="commenter">
+              <div class="list-item-image">
+                <% unless comment.user.image.empty? %>
+                  <div class="image-circle">
+                    <%= link_to image_tag(comment.user.image), user_page_path(user_id: comment.user_id) %>
+                  </div>
+                <% else %>
+                  <%= link_to user_page_path(user_id: comment.user_id) do %>
+                    <div class="image-circle list-item-image-alt">
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="commenter-name">
+                <%= link_to comment.user.name, user_page_path(user_id: comment.user_id) %>
+                <% if current_user.id == comment.user.id %>
+                  <span>
+                    <%= form_tag({controller: "comments", action: "destroy", id: @item.id, comment_id: comment.id}, method: "delete", class: "delete-comment") do |f| %>
+                    <% end %>
+                    <div class="sending-error">
+                      送信に失敗しました。時間をおいてから再度お試しください。
+                    </div>
+                    <i class="material-icons">cancel</i>
+                  </span>
+                <% end %>
+              </div>
+              <div class="commented-time">
+                <%= time_to_str(now - comment.created_at) + "前" %>
+              </div>
 
-        <div>
-          <div class="commenter">
-            <div class="commenter-image">
             </div>
-            <div class="commenter-name">
-              ユーザー
-            </div>
-            <div class="commented-time">
-              10時間前
-            </div>
+            <p class="comment-text">
+              <%= comment.content %>
+            </p>
           </div>
-          <p class="comment-text">
-              こめんとこめんと
-          </p>
-        </div>
 
-        <form>
+        <% end %>
+
+        <%= form_tag({controller: "comments", action: "create", id: @item.id}, class: "post-comment") do |f| %>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label comment-area">
-            <textarea class="mdl-textfield__input" type="text" rows="3" maxrows="6"
-            id="comment"></textarea>
-            <label class="mdl-textfield__label" for="comment">コメントする</label>
+            <%= label_tag 'comment[content]', 'コメントする', class: 'mdl-textfield__label' %>
+            <%= text_area_tag 'comment[content]', nil, class: 'mdl-textfield__input', rows: 3, maxrows: 6 %>
+          </div>
+
+          <div class="sending-error">
+            送信に失敗しました。時間をおいてから再度お試しください。
+          </div>
+          <div class="validation-error">
+            コメント内容を入力してください。
           </div>
           <div class="text-right submit-comment">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+            <div class="<%= "not-sigined-in" unless user_signed_in? %> post-comment mdl-button mdl-js-button mdl-js-ripple-effect">
               <i class="material-icons">mode_edit</i>
               投稿
-            </button>
+            </div>
           </div>
-        </form>
+        <% end %>
 
       </div>
     </div>

@@ -17,4 +17,16 @@ module ApplicationHelper
     return str
   end
 
+  def time_to_str(seconds)
+    if seconds < 60 * 60
+      str = (Time.parse("1/1") + seconds).strftime("%-M分")
+    elsif seconds < 60 * 60 * 24
+      str = (Time.parse("1/1") + seconds).strftime("%-H時間")
+    else
+      day = seconds / (60 * 60 * 24)
+      str = day.to_s + "日"
+    end
+    return str
+  end
+
 end

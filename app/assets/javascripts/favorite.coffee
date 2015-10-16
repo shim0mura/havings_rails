@@ -4,29 +4,9 @@
 $ ->
   already_favorite = "already-favorite"
 
-  toggle_favorite = (button)->
-    form = button.nextAll('form')
-
-    if form.find('[name=method]').length < 1
-      type = 'POST'
-    else
-      type = form.find('[name=_method]').val()
-
-    $.ajax {
-      url: form.attr('action'),
-      type: type,
-      data: new FormData(form.get()[0]),
-      processData: false,
-      contentType: false
-      success: (result, status, xhr)->
-        button.toggleClass(already_favorite)
-    }
-
   $(document).on "click", "i.favorite", (e)->
     if $(@).hasClass("not-sigined-in")
       alert("お気に入りをするにはログインしてください。")
-    # else if $(@).hasClass(already_favorite)
-    #   toggle_favorite($(@), 
     else
       button = $(@)
       if $(@).hasClass(already_favorite)

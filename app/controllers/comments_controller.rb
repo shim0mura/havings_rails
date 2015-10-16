@@ -1,29 +1,30 @@
-class FavoriteController < ApplicationController
+class CommentsController < ApplicationController
 
   before_action :authenticate_user!, only: [:create, :destroy]
 
-  def index
-  end
+  # def index
+  # end
 
   def create
-    favorite = Favorite.new(
+    comment = Comment.new(
       user_id: current_user.id,
-      item_id: params[:id]
+      item_id: params[:id],
+      content: params[:comment][:content]
     )
 
-    if favorite.save
+    if comment.save
       item = Item.find(params[:id])
       Event.create(
-        event_type: :favorite,
+        event_type: :comment,
         acter_id: current_user.id,
         suffered_user_id: item.user_id,
         related_id: item.id,
         properties: {
-          favorite_id: favorite.id
+          comment_id: comment.id
         }
       )
 
-      render json: { status: :ok }
+      render json: { status: :ok , commenter: current_user}
     else
       render json: { }, status: :unprocessable_entity
     end
@@ -31,24 +32,28 @@ class FavoriteController < ApplicationController
   end
 
   def destroy
-    favorite = Favorite.where(
-      user_id: current_user.id,
-      item_id: params[:id]
-    ).first.destroy
+    comment = Comment.find(params[:comment_id])
 
-    if favorite.destroyed?
+    comment.destroy
+
+    if comment.destroyed?
       item = Item.find(params[:id])
-      Event.where(
-        event_type: Event.event_types["favorite"],
+      event = Event.where(
+        event_type: Event.event_types["comment"],
         acter_id: current_user.id,
         suffered_user_id: item.user_id,
         related_id: item.id
-      ).update_all(is_deleted: true)
+      ).select{|e|
+        eval(e.properties)[:comment_id] == comment.id
+      }.first
+
+      event.update_attribute("is_deleted", true)
 
       render json: { status: :ok }
     else
       render json: { }, status: :unprocessable_entity
     end
   end
+
 
 end

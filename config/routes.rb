@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   get '/items/:id/favorite', to: 'favorite#index'
   post '/items/:id/favorite', to: 'favorite#create'
   delete '/items/:id/favorite', to: 'favorite#destroy'
+  post '/items/:id/comment', to: 'comments#create'
+  delete '/items/:id/comment/:comment_id', to: 'comments#destroy'
 
   resources :timers, only: [:index, :create, :update, :destroy]
   post '/timers/:id/done', to: 'timers#done', as: :timer_done
