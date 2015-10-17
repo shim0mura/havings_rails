@@ -158,7 +158,6 @@ class Notification < ActiveRecord::Base
       acter = Timer
         .without_deleted
         .where(id: event.map(&:related_id))
-
       target = nil
     when :favorite
       acter = User.where(id: event.map(&:acter_id))
@@ -166,6 +165,9 @@ class Notification < ActiveRecord::Base
     when :comment
       acter = User.where(id: event.map(&:acter_id))
       target = Item.where(id: event.map(&:related_id))
+    when :follow
+      acter = User.where(id: event.map(&:acter_id))
+      target = nil
     else
     end
 
@@ -203,6 +205,8 @@ class Notification < ActiveRecord::Base
       return acter.present? && target.present?
     when :comment
       return acter.present? && target.present?
+    when :follow
+      return acter.present?
     else
       return false
     end

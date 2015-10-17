@@ -356,6 +356,21 @@ ul.timeline {
   margin-top: 15px;
   border-top: 1px solid #B6B6B6;
 }
+.secondary-card > div:first-child {
+  margin-top: 0;
+  border-top: none;
+}
+.secondary-card .comment.item-owner .comment-wrapper {
+  margin-top: 0px;
+}
+.secondary-card .comment.item-owner .comment-wrapper > div {
+  padding-bottom: 5px;
+}
+.item-owner .mdl-button.follow {
+  height: 24px;
+  line-height: 24px;
+  font-size: 10px;
+}
 .secondary-card h6 {
   margin-top: 7px;
   margin-bottom: 5px;

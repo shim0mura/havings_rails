@@ -47,6 +47,20 @@ module ApplicationHelper
 
       str = str + "が#{link_to_item}にコメントしました。"
 
+    when :follow
+      follower = []
+      notification[:acter].slice(0...Notification::MAX_SHOWING_ACTER_IN_WEB).each do |a|
+        follower << link_to(a[:name], a[:path])
+      end
+
+      return false if follower.empty?
+
+      str = follower.join(", ")
+      if notification[:acter].size > Notification::MAX_SHOWING_ACTER_IN_WEB
+        str = str + "ほか#{notification.size - MAX_EVENT_SHOWING}人"
+      end
+      str = str + "があなたをフォローしました。"
+
     end
 
     return str
@@ -58,7 +72,7 @@ module ApplicationHelper
     elsif seconds < 60 * 60 * 24
       str = (Time.parse("1/1") + seconds).strftime("%-H時間")
     else
-      day = seconds / (60 * 60 * 24)
+      day = (seconds / (60 * 60 * 24)).to_i
       str = day.to_s + "日"
     end
     return str

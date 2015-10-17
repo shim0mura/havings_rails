@@ -201,6 +201,60 @@
 
   <!-- secondary card -->
   <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+    <div class="item-owner comment">
+      <div class="comment-wrapper">
+          <% user = @item.user %>
+          <div class="comment-post">
+            <div class="commenter">
+              <div class="list-item-image">
+                <% unless user.image.empty? %>
+                  <div class="image-circle">
+                    <%= link_to image_tag(user.image), user_page_path(user_id: user.id) %>
+                  </div>
+                <% else %>
+                  <%= link_to user_page_path(user_id: user.id) do %>
+                    <div class="image-circle list-item-image-alt">
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="commenter-name">
+                <%= link_to user.name, user_page_path(user_id: user.id) %>
+              </div>
+              <div class="commented-time">
+
+                <% unless user_signed_in? && current_user.id == user.id %>
+                  <%= form_tag({controller: "follows", action: "create", user_id: user.id}, {class: "follow-user"}) do %>
+                  <% end %>
+                  <%= form_tag({controller: "follows", action: "destroy", user_id: user.id}, {class: "unfollow-user", method: :delete}) do %>
+                  <% end %>
+
+
+                  <% follow_class = "follow" %>
+                  <% follow_class = follow_class + " not-sigined-in" unless user_signed_in? %>
+                  <% if user_signed_in? && current_user.already_follow?(user.id) %>
+                    <% follow_class = follow_class + " already-follow" %>
+                    <% icon = "person" %>
+                    <% follow_span = "フォロー中" %>
+                  <% else %>
+                    <% icon = "person_add" %>
+                    <% follow_span = "フォロー" %>
+                  <% end %>
+
+
+                  <div class="<%= follow_class %> mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                    <i class="material-icons"><%= icon %></i>
+                    <span><%= follow_span %></span>
+                  </div>
+                <% end %>
+
+              </div>
+
+            </div>
+          </div>
+
+      </div>
+    </div>
     <p class="description">
       <%= @item.description %>
     </p>
@@ -220,7 +274,7 @@
           <div class="comment-post">
             <div class="commenter">
               <div class="list-item-image">
-                <% unless comment.user.image.empty? %>
+                <% if comment.user.image %>
                   <div class="image-circle">
                     <%= link_to image_tag(comment.user.image), user_page_path(user_id: comment.user_id) %>
                   </div>
@@ -233,7 +287,7 @@
               </div>
               <div class="commenter-name">
                 <%= link_to comment.user.name, user_page_path(user_id: comment.user_id) %>
-                <% if current_user.id == comment.user.id %>
+                <% if user_signed_in? && current_user.id == comment.user.id %>
                   <span>
                     <%= form_tag({controller: "comments", action: "destroy", id: @item.id, comment_id: comment.id}, method: "delete", class: "delete-comment") do |f| %>
                     <% end %>

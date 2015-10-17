@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
 
   get 'user/:user_id', to: 'user#index', as: :user_page
+  post '/user/:user_id/follow', to: 'follows#create'
+  delete '/user/:user_id/follow', to: 'follows#destroy'
 
   get 'home', to: 'welcome#home'
 

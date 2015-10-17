@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151015113605) do
+ActiveRecord::Schema.define(version: 20151017033349) do
 
   create_table "comments", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,     null: false
@@ -44,6 +44,17 @@ ActiveRecord::Schema.define(version: 20151015113605) do
   end
 
   add_index "favorites", ["user_id", "item_id"], name: "index_favorites_on_user_id_and_item_id", unique: true, using: :btree
+
+  create_table "follows", force: :cascade do |t|
+    t.integer  "following_user_id", limit: 4, null: false
+    t.integer  "followed_user_id",  limit: 4, null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "follows", ["followed_user_id"], name: "index_follows_on_followed_user_id", using: :btree
+  add_index "follows", ["following_user_id", "followed_user_id"], name: "index_follows_on_following_user_id_and_followed_user_id", unique: true, using: :btree
+  add_index "follows", ["following_user_id"], name: "index_follows_on_following_user_id", using: :btree
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255

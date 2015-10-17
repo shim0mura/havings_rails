@@ -26,6 +26,11 @@ class User < ActiveRecord::Base
 
   has_many :favorites
 
+  has_many :follows_from, class_name: Follow, foreign_key: :followed_user_id, dependent: :destroy
+  has_many :follows_to,   class_name: Follow, foreign_key: :following_user_id,   dependent: :destroy
+  has_many :followed,  through: :follows_from,   source: :following_user
+  has_many :following, through: :follows_to, source: :followed_user
+
   # oauth用
   attr_accessor :create_with_oauth
 
@@ -96,6 +101,10 @@ class User < ActiveRecord::Base
   def password_required?
     return false if create_with_oauth
     return true
+  end
+
+  def already_follow?(user_id)
+    self.following.map(&:id).include?(user_id.to_i)
   end
 
   def to_light
