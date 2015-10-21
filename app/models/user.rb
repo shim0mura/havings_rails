@@ -130,4 +130,48 @@ class User < ActiveRecord::Base
     }
   end
 
+  def item_tree(current = nil, start_at = nil, items = nil, queue = nil, result = nil)
+    if start_at
+      queue = Item.where(id: start_at).to_a
+    end
+
+    if items.nil?
+      items = Item.where(user_id: self.id).to_a
+    end
+
+    if queue.nil?
+      queue = []
+      items.delete_if do |item|
+        if item.list_id == nil
+          queue << item
+          true
+        end
+      end
+    end
+
+    current_result = []
+    while !queue.empty?
+      parent_item = queue.shift
+      child_queue = []
+      hash = {
+        item: parent_item.to_light,
+        children: nil,
+        current: (parent_item.id == current),
+        count: parent_item.count
+      }
+      items.delete_if do |item|
+        if item.list_id == parent_item.id
+          child_queue << item
+          true
+        end
+      end
+      hash[:children] = item_tree(current, nil, items, child_queue, Marshal.load(Marshal.dump(result)))
+      children_count = hash[:children].inject(0){|sum, item| sum + item[:count]} || 0
+      hash[:count] = hash[:count] + children_count
+
+      current_result << hash
+    end
+    current_result
+  end
+
 end

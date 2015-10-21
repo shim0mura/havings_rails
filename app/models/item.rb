@@ -75,10 +75,12 @@ class Item < ActiveRecord::Base
     end
 
     {
-      id:    self.id,
-      name:  self.name,
-      image: image,
-      path:  Rails.application.routes.url_helpers.item_path(self.id)
+      id:      self.id,
+      name:    self.name,
+      is_list: self.is_list,
+      count:   self.count,
+      image:   image,
+      path:    Rails.application.routes.url_helpers.item_path(self.id)
     }
   end
 

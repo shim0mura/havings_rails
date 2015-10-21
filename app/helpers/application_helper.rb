@@ -78,4 +78,28 @@ module ApplicationHelper
     return str
   end
 
+  def category_list(obj)
+    html = content_tag :ul, class: "list" do
+      content_tag(:li, link_to("home", "#") + content_tag(:ul, recursive_category(obj)))
+    end
+  end
+
+  def recursive_category(obj)
+    html = ""
+    obj.each do |item|
+      next unless item[:item][:is_list]
+      children = ""
+      item[:children].each do |child|
+        if child[:item][:is_list]
+          children = children.html_safe + recursive_category([child])
+        end
+      end
+      children = content_tag(:ul, children) unless children.empty?
+      current_html = content_tag(:li, link_to(item[:item][:name] + "(#{item[:count]})", item[:item][:path]) + children)
+
+      html = html.html_safe + current_html
+    end
+    html
+  end
+
 end
