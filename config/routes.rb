@@ -20,7 +20,8 @@ Rails.application.routes.draw do
   put '/notification/read', to: 'notifications#read'
 
   devise_for :users, controllers: {
-    omniauth_callbacks: 'omniauth_callbacks'
+    omniauth_callbacks: 'omniauth_callbacks',
+    registrations: 'registrations'
   }
 
   require 'sidekiq/web'

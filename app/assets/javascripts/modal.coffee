@@ -91,9 +91,13 @@ $ ->
     reader = new FileReader()
     reader.onload = =>
       img = $('<img>').attr('src', reader.result)
-      $(@).css('display', 'none')
+      $(@).css('display', 'none') unless $(@).attr("id") == "user_image"
       $(@).next('.thumbnail').html(img)
     reader.readAsDataURL(file)
+    
+    # ユーザー情報変更のプロフィール画像変更画面でも
+    # 同じロジック使ってるので、その場合は処理をちょっと変えてる
+    return if $(@).attr("id") == "user_image"
 
     addings = $(@).parent().clone()
     addings.find('input[type=file].upload-item-image').val('').css('display', 'block')

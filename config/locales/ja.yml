@@ -26,10 +26,14 @@ ja:
             user: ユーザー
             email: メールアドレス
             password: パスワード
+            password_confirmation: パスワード(確認)
+            current_password: 現在のパスワード
     models:
       user: ユーザー
     attributes:
-       user:
-         name: 名前
-         email: メールアドレス
-         password: パスワード
+      user:
+        name: 名前
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード(確認)
+        current_password: 現在のパスワード

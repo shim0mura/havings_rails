@@ -207,9 +207,9 @@
           <div class="comment-post">
             <div class="commenter">
               <div class="list-item-image">
-                <% unless user.image.empty? %>
+                <% if user_thumbnail = user.thumbnail %>
                   <div class="image-circle">
-                    <%= link_to image_tag(user.image), user_page_path(user_id: user.id) %>
+                    <%= link_to image_tag(user_thumbnail), user_page_path(user_id: user.id) %>
                   </div>
                 <% else %>
                   <%= link_to user_page_path(user_id: user.id) do %>
@@ -274,9 +274,9 @@
           <div class="comment-post">
             <div class="commenter">
               <div class="list-item-image">
-                <% if comment.user.image %>
+                <% if commenter_thumbnail = comment.user.thumbnail %>
                   <div class="image-circle">
-                    <%= link_to image_tag(comment.user.image), user_page_path(user_id: comment.user_id) %>
+                    <%= link_to image_tag(commenter_thumbnail), user_page_path(user_id: comment.user_id) %>
                   </div>
                 <% else %>
                   <%= link_to user_page_path(user_id: comment.user_id) do %>

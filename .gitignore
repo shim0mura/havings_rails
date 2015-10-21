@@ -11,5 +11,5 @@
 /log/*
 !/log/.keep
 /tmp
-/public/uploads/item_image/
+/public/uploads/
 /dump.rdb

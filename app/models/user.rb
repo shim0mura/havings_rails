@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  mount_uploader :image, AvatarUploader
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -91,7 +93,7 @@ class User < ActiveRecord::Base
   end
 
   def email_required?
-    if create_with_oauth
+    if create_with_oauth || provider != "email"
       return false
     else 
       return true
@@ -99,19 +101,31 @@ class User < ActiveRecord::Base
   end
 
   def password_required?
-    return false if create_with_oauth
-    return true
+    return false if create_with_oauth || provider != "email"
+    super
   end
 
   def already_follow?(user_id)
     self.following.map(&:id).include?(user_id.to_i)
   end
 
+  def thumbnail
+    # TODO:social_profileの画像をどうにかしてuserカラムの中に収めたい
+    #      その分sqlを1本減らしたい
+    if image && image.file.exists?
+      image.thumb.url
+    elsif social_profiles.present?
+      social_profiles.last.image_url
+    else
+      nil
+    end
+  end
+
   def to_light
     {
       id:    self.id,
       name:  self.name,
-      image: self.image,
+      image: self.thumbnail,
       path:  Rails.application.routes.url_helpers.user_page_path(self.id)
     }
   end

@@ -44,3 +44,25 @@
 .list-item-text .item-owner {
   color: #727272;
 }
+.user-edit .image-list .thumbnail {
+  width: 50px;
+  height: 50px;
+}
+.user-edit .image-list .thumbnail img {
+  height: 50px;
+}
+.user-edit .image-description {
+  line-height: 50px;
+}
+.delete-user {
+  padding-bottom: 30px;
+}
+.delete-user h4 {
+  text-align:center
+}
+.delete-user p {
+  padding: 15px;
+}
+.delete-user .mdl-button {
+  background: #D32F2F;
+}

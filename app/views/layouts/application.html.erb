@@ -36,7 +36,6 @@
           <a class="mdl-navigation__link" href="">Link</a>
           <% if user_signed_in? %>
             <% notifications = current_user.notification.get_showing_notification %>
-            <% pp notifications %>
             <% unread_notifications = notifications.count{|e|e[:unread]} %>
             <span id="notification_button" class="material-icons mdl-badge <%= "already-read" if unread_notifications <= 0 %>" <%= "data-badge=#{unread_notifications}" if unread_notifications > 0 %>>notifications</span>
             <%# notificationを既読にするためにajaxでpostする %>
