@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   before_create :generate_token
   before_create :set_email_provider
   after_create  :create_notification
+  after_create  :create_home_list
 
   validates:token, uniqueness: true
 
@@ -107,6 +108,35 @@ class User < ActiveRecord::Base
 
   def already_follow?(user_id)
     self.following.map(&:id).include?(user_id.to_i)
+  end
+
+  def get_home_list
+    Item.where(
+      user_id: self.id,
+      list_id: nil
+    ).first
+  end
+
+  def create_home_list
+    home_list = Item.create(
+      name: "ホーム",
+      is_list: true,
+      is_garbage: false,
+      count: 0,
+      user_id: self.id,
+      list_id: nil,
+      private_type: 0
+    )
+    new_list_event = Event.create(
+      event_type: :create_list,
+      acter_id: self.id,
+      related_id: home_list.id,
+      properties: {
+        item_id: home_list.id,
+        is_home: true
+      }
+    )
+    home_list.change_count(0, new_list_event, home_list)
   end
 
   def thumbnail

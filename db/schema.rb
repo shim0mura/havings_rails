@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151020115850) do
+ActiveRecord::Schema.define(version: 20151024132601) do
 
   create_table "comments", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,     null: false
@@ -64,18 +64,19 @@ ActiveRecord::Schema.define(version: 20151020115850) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.text     "description",    limit: 65535
-    t.boolean  "is_list",        limit: 1,     default: false, null: false
-    t.boolean  "is_garbage",     limit: 1,     default: false, null: false
-    t.integer  "count",          limit: 4,     default: 1,     null: false
-    t.text     "garbage_reason", limit: 65535
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.integer  "user_id",        limit: 4,                     null: false
-    t.integer  "list_id",        limit: 4
-    t.integer  "private_type",   limit: 4,     default: 0,     null: false
-    t.boolean  "is_deleted",     limit: 1,     default: false, null: false
+    t.string   "name",             limit: 255
+    t.text     "description",      limit: 65535
+    t.boolean  "is_list",          limit: 1,     default: false, null: false
+    t.boolean  "is_garbage",       limit: 1,     default: false, null: false
+    t.integer  "count",            limit: 4,     default: 1,     null: false
+    t.text     "garbage_reason",   limit: 65535
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.integer  "user_id",          limit: 4,                     null: false
+    t.integer  "list_id",          limit: 4
+    t.integer  "private_type",     limit: 4,     default: 0,     null: false
+    t.boolean  "is_deleted",       limit: 1,     default: false, null: false
+    t.text     "count_properties", limit: 65535
   end
 
   create_table "notifications", force: :cascade do |t|

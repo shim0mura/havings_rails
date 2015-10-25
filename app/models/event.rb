@@ -2,7 +2,7 @@ class Event < ActiveRecord::Base
 
   include EnumType
 
-  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task)
+  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count)
 
   default_scope -> { where(is_deleted: false) }
 

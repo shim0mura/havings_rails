@@ -67,6 +67,32 @@ class Item < ActiveRecord::Base
     )
   end
 
+  def change_count(count_diff = 0, event = nil, current_list = nil)
+    parent_list = current_list || self.list
+    return unless parent_list
+
+    properties = parent_list.count_properties ? JSON.parse(parent_list.count_properties) : []
+    latest_date = properties.present? ? Date.parse(properties.last["date"]) : nil
+
+    if latest_date && (latest_date == Date.today)
+      hash = properties.pop
+      hash["date"] = latest_date
+      hash["count"] = hash["count"] + count_diff
+    else
+      hash = {}
+      hash["date"] = Date.today
+      hash["count"] = (is_list ? self.user.item_tree(nil, parent_list.id).first[:count] : self.count)
+      hash["events"] = []
+    end
+
+    hash["events"] << event.id if event.present?
+    properties << hash
+
+    parent_list.count_properties = properties.to_json
+    parent_list.save
+    parent_list.change_count(count_diff) unless current_list
+  end
+
   def to_light
     if item_image = self.item_images.last
       image = item_image.image_url

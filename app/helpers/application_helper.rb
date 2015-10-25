@@ -79,9 +79,7 @@ module ApplicationHelper
   end
 
   def category_list(obj)
-    html = content_tag :ul, class: "list" do
-      content_tag(:li, link_to("home", "#") + content_tag(:ul, recursive_category(obj)))
-    end
+    content_tag(:ul, recursive_category(obj), class: "list")
   end
 
   def recursive_category(obj)

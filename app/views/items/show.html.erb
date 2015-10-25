@@ -416,9 +416,9 @@
   </div>
 
   <div id="edit_item">
-    <h4>リストを編集</h4>
+    <h4><%= (@item.is_list ?  "リスト" : "アイテム") %>を編集</h4>
     <%= form_for(@item) do |f| %>
-      <%= render 'list_form', f: f, item: @item, id: 'edit_list', is_list: true, type: 'edit' %>
+      <%= render 'list_form', f: f, item: @item, id: 'edit_list', is_list: @item.is_list, type: 'edit' %>
     <% end %>
   </div>
 

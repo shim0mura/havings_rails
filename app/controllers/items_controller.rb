@@ -43,9 +43,11 @@ class ItemsController < ApplicationController
   def create
     @item = Item.new(item_params)
     @item.user_id = current_user.id
+    @item.list_id = current_user.get_home_list.id unless @item.list_id
+    @item.count = 0 if @item.is_list
 
     if @item.save
-      Event.create(
+      new_item_event = Event.create(
         event_type: (@item.is_list ? :create_list : :create_item),
         acter_id: current_user.id,
         related_id: @item.list_id,
@@ -54,13 +56,13 @@ class ItemsController < ApplicationController
         }
       )
 
-      create_image!
+      image_event = create_image!
 
       if @item.is_garbage
         # list側から捨てたことを知りたいのと
         # item側から手放されたことを知りたいので2つイベントを入れる
         # 設計ミス…
-        Event.create(
+        dump_from_list_event = Event.create(
           event_type: :dump,
           acter_id: current_user.id,
           related_id: @item.list_id,
@@ -68,11 +70,30 @@ class ItemsController < ApplicationController
             item_id: @item.id
           }
         )
-        Event.create(
+        dump_as_item_event = Event.create(
           event_type: :dump,
           acter_id: current_user.id,
           related_id: @item.id
         )
+      end
+
+      # グラフのための情報を更新
+      # グラフは今のところリストからしか参照しないので、リストに関するイベントと
+      # リストに属するアイテムの個数変化のみ記録
+      # 1. 手放した状態での追加
+      # 2. リスト、アイテムの追加
+      # 3. リストの画像追加
+      if @item.is_garbage
+        @item.change_count(0, dump_from_list_event)
+      else
+        if @item.is_list
+          @item.change_count(0, new_item_event, @item)
+        else
+          @item.change_count(@item.count, new_item_event)
+        end
+      end
+      if (image_event.present? && @item.is_list)
+        @item.change_count(0, image_event, @item)
       end
 
       render json: { status: :ok, location: @item }
@@ -90,16 +111,29 @@ class ItemsController < ApplicationController
   def update
     # is_private = @item.is_private
     private_type_before_update = @item.private_type
+    item_count_before_update = @item.count
     # respond_to do |format|
     if @item.update(item_params)
       delete_image!
-      create_image!
+      image_event = create_image!
+
+      if @item.count != item_count_before_update
+        Event.create(
+          event_type: :change_count,
+          acter_id: current_user.id,
+          related_id: @item.id,
+          properties: {
+            before: item_count_before_update,
+            after: @item.count
+          }
+        )
+      end
 
       if @item.is_garbage
         # list側から捨てたことを知りたいのと
         # item側から手放されたことを知りたいので2つイベントを入れる
         # 設計ミス…
-        Event.create(
+        dump_from_list_event = Event.create(
           event_type: :dump,
           acter_id: current_user.id,
           related_id: @item.list_id,
@@ -107,11 +141,28 @@ class ItemsController < ApplicationController
             item_id: @item.id
           }
         )
-        Event.create(
+        dump_as_item_event = Event.create(
           event_type: :dump,
           acter_id: current_user.id,
           related_id: @item.id
         )
+      end
+
+      # グラフのための情報を更新
+      # グラフは今のところリストからしか参照しないので、リストに関するイベントと
+      # リストに属するアイテムの個数変化のみ記録
+      # 1. アイテムorリストの手放し
+      # 2. アイテムの個数変化
+      # 3. リストの画像追加
+      # TODO: リストを手放した時、そのリストに属していたアイテムも
+      # 手放せるようにしたいので、それに対応する
+      if dump_from_list_event
+        count_diff = (@item.is_list ? 0 : @item.count * (-1))
+        @item.change_count(count_diff, dump_from_list_event)
+      elsif @item.count != item_count_before_update
+        @item.change_count(@item.count - item_count_before_update)
+      elsif (image_event.present? && @item.is_list)
+        @item.change_count(0, image_event, @item)
       end
 
       unless private_type_before_update == @item.private_type
@@ -134,6 +185,9 @@ class ItemsController < ApplicationController
     @item.update_attribute('is_deleted', true)
     # 関連イベントも全て論理削除
     delete_events
+    unless @item.is_list
+      @item.change_count(@item.count * (-1))
+    end
 
     respond_to do |format|
       format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
@@ -165,7 +219,7 @@ class ItemsController < ApplicationController
     end
 
     def create_image!
-      return unless params[:item][:item_images]
+      return false unless params[:item][:item_images]
 
       item_image_ids = []
       params[:item][:item_images].each do |a|
