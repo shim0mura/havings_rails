@@ -18,6 +18,9 @@ class ItemsController < ApplicationController
     # to_aすればARをloadしない
     # @lista = @list.to_a
     @timer = Timer.new(list_id: @item.id)
+
+    line_chart
+
   end
 
   def timeline
@@ -281,5 +284,10 @@ class ItemsController < ApplicationController
         redirect_to items_path
       end
     end
+
+    def line_chart
+      gon.item = @item.showing_events
+    end
+
 
 end

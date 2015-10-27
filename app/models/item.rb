@@ -29,6 +29,7 @@ class Item < ActiveRecord::Base
   scope :as_list, -> { where(is_list: true) }
 
   def events(from = 0, limit = ITEM_EVENTS)
+    # TODO: グラフ用のshowing_eventsと一緒にしたい
     event_type = Event.event_types.select{|type|
       ["create_list", "create_item", "add_image", "dump"].include?(type)
     }.values
@@ -108,6 +109,49 @@ class Item < ActiveRecord::Base
       image:   image,
       path:    Rails.application.routes.url_helpers.item_path(self.id)
     }
+  end
+
+  def showing_events(relation_with_owner = 0)
+    # TODO: 何日前まで取得するか決める
+    properties_by_day = JSON.parse(self.count_properties)
+    events = Event.where(id: properties_by_day.map{|prop|prop["events"]}.flatten)
+    # a = properties_by_day.map do |prop|
+    properties_by_day.each do |prop|
+      event_ids = prop["events"]
+
+      # count_propertiesにあるイベントと関連アイテムを全部一気に取得
+      # いちいち取得してたら発行するSQLがすごい数になるから
+      events_of_the_day = events.select{|e|event_ids.include?(e.id)}
+      item_ids = []
+      events_of_the_day.each do |e|
+        if e.event_type == "add_image"
+          item_ids << e.related_id
+        else
+          item_ids << eval(e.properties)[:item_id]
+        end
+      end
+      items = Item.where(id: item_ids)
+
+      # 日ごとに記録してるevent_idsをイベントオブジェクトに置き換え
+      event_objects = []
+      events_of_the_day.each do |e|
+        hash = {}
+        hash["event_type"] = e.event_type
+        if e.event_type == "add_image"
+          item = items.detect{|i|i.id == e.related_id}
+          image_id = eval(e.properties)[:item_image_id]
+          adding_image = ItemImage.where(id: image_id).first
+          adding_image = adding_image.image_url if adding_image
+        else
+          item = items.detect{|i|i.id == eval(e.properties)[:item_id]}
+        end
+        hash["item"] = item.to_light if item.present?
+        hash["item"]["image"] = adding_image if adding_image.present?
+        event_objects << hash
+      end
+      prop["events"] = event_objects
+    end
+    properties_by_day
   end
 
 end

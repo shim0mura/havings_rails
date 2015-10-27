@@ -32,3 +32,4 @@ function createToast(message) {
     snackbar.remove();
   }, 5000);
 }
+

@@ -345,6 +345,63 @@ ul.timeline {
   cursor: pointer;
 }
 
+.google-visualization-tooltip{
+  .thumbnail-wrapper {
+    position: relative;
+    padding: 10px 0;
+  }
+  .thumbnail {
+    text-align: center;
+  }
+  .thumbnail img {
+    height: 100px;
+  }
+  .item-props {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    color: white;
+  }
+  ul.timeline {
+    padding-top: 3px;
+    max-height: 70px;
+    overflow: scroll;
+  }
+  .timeline li {
+    padding: 2px;
+  }
+  .timeline .event-type {
+    width: 20px;
+  }
+  .timeline .event-circle {
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .timeline .event-circle i {
+    font-size: 10px;
+    margin-top: 0px;
+  }
+  .timeline .event-text h5 .image-circle {
+    width: 12px;
+    height: 12px;
+    margin-top: 0px;
+  }
+  .timeline .event-text h5 {
+    margin-top: 2px;
+    font-size: 10px;
+  }
+  .timeline .event-text p {
+    margin-bottom: 2px;
+    font-size: 9px;
+    line-height: 9px;
+  }
+}
+
 .secondary-card {
   padding: 15px;
 }

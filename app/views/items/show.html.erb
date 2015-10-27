@@ -111,6 +111,10 @@
           <div class="tab-caption">履歴</div>
           <div class="tab-name"><%= @item.item_images.size %></div>
         </a>
+        <a href="#graph" class="mdl-tabs__tab">
+          <div class="tab-caption">グラフ</div>
+          <div class="tab-name"><%= @item.item_images.size %></div>
+        </a>
       </div>
 
       <!-- item list -->
@@ -190,6 +194,13 @@
           <li class="bar"></li>
           <%= render 'timeline'%>
         </ul>
+      </div>
+
+      <!-- item graph -->
+      <div class="mdl-tabs__panel" id="graph">
+
+        <div id="chart">
+        </div>
       </div>
 
     </div>
