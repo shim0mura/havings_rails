@@ -687,3 +687,56 @@ i.favorite.already-favorite {
 i.favorite.already-favorite + span {
   color: rgb(255,64,129);
 }
+.ribbon.page-guide {
+  height: 40vh;
+}
+.ribbon.page-guide .inner-ribbon {
+  padding-bottom: 40px;
+}
+.done-task-lists ul.list-items li {
+
+}
+.done-task-lists .list-item-image .circle {
+  background-color: #222;
+  color: white;
+  width: 50px;
+  height:50px;
+}
+.done-task-lists .list-item-image .circle .item-count {
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 0px;
+  font-size: 1.8em;
+}
+.done-task-lists .list-item-image .circle .item-unit {
+  color: white;
+  font-size: 0.8em;
+  margin-top: -5px;
+}
+.done-task-lists .list-item-text h5 {
+  font-size: 1.7em;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+.done-task-lists .list-item-text .addings {
+  font-size: 1em;
+  font-weight: bold;
+}
+.done-task-lists .done-date-caption {
+  float: left;
+}
+.done-task-lists ul.done-date {
+  float: left;
+  padding-left: 15px;
+  max-height: 65px;
+  overflow: scroll;
+}
+.done-task-lists ul.done-date li {
+  padding: 0;
+}
+.done-task-lists .list-item-meta {
+  width: 90px;
+}
+.done-task-lists .list-item-meta i {
+  font-size: 18px;
+}

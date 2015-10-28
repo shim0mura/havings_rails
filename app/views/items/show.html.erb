@@ -37,8 +37,14 @@
               <% favorite_class = "favorite" %>
               <% favorite_class = favorite_class + " not-sigined-in" unless user_signed_in? %>
               <i class="material-icons <%= favorite_class + (user_signed_in? && @item.is_favorited?(current_user.id) ? " already-favorite" : "") %>">favorite</i><span><%= @item.favorites.count %></span>
-              　
+              &nbsp;
               <i class="material-icons">chat_bubble</i><span>100</span>
+              &nbsp;
+              <% if @item.is_list && (done_task_count = Timer.done_task_count(current_user.id, @item.id)) %>
+                <%= link_to ({controller: "items", action: "done_task", id: @item.id}), {class: "done-tasks"} do %>
+                  <i class="material-icons">done</i><span><%= done_task_count %></span>
+                <% end %>
+              <% end %>
             </div>
     </div>
 

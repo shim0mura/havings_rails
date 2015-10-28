@@ -1,0 +1,91 @@
+<div class="ribbon page-guide">
+
+  <div class="inner-ribbon">
+<section class="mdl-grid section--center list-content">
+  <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--top">
+    <div class="bread-crumb"><%= @item.name %> > こなしたタスク一覧
+    <h3>
+      <i class="material-icons">trending_up</i>
+      こなしたタスク一覧
+    </h3>
+  </div>
+</section>
+  </div>
+
+</div>
+<section class="mdl-grid section--center list-content">
+
+  <div class="mdl-cell mdl-cell--8-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp mdl-cell--top">
+
+    <div class="popular-list-wrapper">
+    
+      <div class="mdl-card__supporting-text">
+        <ul class="list-items done-task-lists">
+          <% @tasks.each do |task| %>
+            <li>
+              <!-- task-count -->
+              <div class="list-item-image">
+                <div class="circle">
+                  <div class="item-count"><%= task[:events].size %></div>
+                  <div class="item-unit">times</div>
+                </div>
+              </div>
+
+              <!-- task-text -->
+              <div class="list-item-text">
+                <h5>
+                  <%= link_to item_path(id: task[:timer][:id]) do %>
+                    <%= task[:timer][:name] %>
+                  <% end %>
+                </h5>
+                <div class="addings">
+                  <% if task[:timer][:is_repeating] %>
+                    <% props = JSON.parse(task[:timer][:properties]) %>
+                    <%= repeating_task_to_str(props) %>
+                  <% end %>
+                </div>
+                <div class="clearfix">
+                  <div class="done-date-caption">実行日:</div>
+                  <ul class="done-date">
+                    <% task[:events].each do |event| %>
+                      <li>
+                        <% date = Time.parse(JSON.parse(event)["done_date"]) %>
+                        <%= date.strftime("%Y年%m月%d日(#{%w(日 月 火 水 木 金 土)[date.wday]}) %H時%M分")  %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- item-fabs -->
+              <div class="list-item-meta">
+                <% if task[:timer][:is_active] %>
+                  <i class="material-icons">notifications_active</i><span>稼働中</span>
+                <% else %>
+                  <i class="material-icons">notifications_off</i><span>終了</span>
+                <% end %>
+              </div>
+            </li>
+
+          <% end %>
+        </ul>
+
+      </div>
+      <div class="mdl-card__actions text-right">
+        <%= link_to "もっと見る", "#" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- secondary card -->
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+    <div>
+      <h6>カテゴリリスト</h6>
+      <nav class="category-nav">
+
+        <%== category_list(current_user.item_tree) %>
+      </nav>
+    </div>
+  </div>
+
+</section>

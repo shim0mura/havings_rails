@@ -100,4 +100,42 @@ module ApplicationHelper
     html
   end
 
+  def repeating_task_to_str(props_by_json)
+    if props_by_json["repeat_by"] == "0"
+      case(props_by_json["repeat_by_day"]["month_interval"])
+      when("0")
+        month_interval = "毎月 "
+      when("1")
+        month_interval = "2ヶ月に1回 "
+      when("2")
+        month_interval = "3ヶ月に1回 "
+      when("3")
+        month_interval = "4ヶ月に1回 "
+      when("5")
+        month_interval = "半年に1回 "
+      end
+      day = props_by_json["repeat_by_day"]["day"] + "日"
+      str = month_interval + day
+    else
+      case(props_by_json["repeat_by_week"]["week"])
+      when("0")
+        week = "毎週 "
+      when("1")
+        week = "毎月第一週 "
+      when("2")
+        week = "毎月第二週 "
+      when("3")
+        week = "毎月第三週 "
+      when("4")
+        week = "毎月第四週 "
+      when("5")
+        week = "毎月最終週 "
+      end
+      wdays = ["日", "月", "火", "水", "木", "金", "土"]
+      day_of_week = wdays[props_by_json["repeat_by_week"]["day_of_week"].to_i]
+      str = week + day_of_week + "曜日"
+    end
+    return str + "に通知"
+  end
+
 end

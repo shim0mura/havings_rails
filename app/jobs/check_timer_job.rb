@@ -3,6 +3,7 @@ class CheckTimerJob < ActiveJob::Base
 
   def perform(*args)
     # timers = Timer.where(next_due_at: 1.hour.ago..Time.now)
+    now = Time.now
     timers = Timer.where(next_due_at: 3.day.ago..Time.now)
     timers.each do |timer|
 
@@ -10,7 +11,7 @@ class CheckTimerJob < ActiveJob::Base
       # それについては飛ばす
       next if !timer.is_repeating && timer.over_due_from
 
-      timer.pass_due_time
+      timer.pass_due_time(now)
 
       # TODO: push通知の処理とメールの処理
       # この処理が行われた瞬間に通知するタイプと

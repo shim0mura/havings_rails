@@ -71,6 +71,15 @@ h2 .item-unit {
 .item-meta-data .item-meta-fab span {
   font-size: 20px;
 }
+.item-meta-data .item-meta-fab .favorite {
+  cursor: pointer;
+}
+.item-meta-data .item-meta-fab .done-tasks {
+  color: #8BC34A;
+}
+.item-meta-data .item-meta-fab .done-tasks:hover {
+  background: none;
+}
 
 .mdl-card.timer {
   min-height: 0px;

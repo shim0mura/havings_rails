@@ -9,6 +9,57 @@ class Timer < ActiveRecord::Base
   # 1回限りのタスクで且つdone_taskされているものも取りたい場合
   scope :without_deleted, -> { unscoped.where(is_deleted: false) }
 
+  # 削除済みのものや1回限りのタイマーを含める
+  scope :all_timers, ->(user_id, list_id = nil){
+    if list_id
+      unscoped.where(
+        user_id: user_id,
+        list_id: list_id
+      )
+    else
+      unscoped.where(
+        user_id: user_id
+      )
+    end
+  }
+
+  def self.done_task_count(user_id, list_id = nil)
+    timers = all_timers(user_id, list_id)
+    tasks = Event.done_tasks(timers.map(&:id))
+    tasks.count
+  end
+
+  def self.done_tasks(user_id, list_id = nil)
+    timers = all_timers(user_id, list_id)
+    tasks = Event.done_tasks(timers.map(&:id))
+
+    result = timers.map do |timer|
+      hash = {
+        timer: timer.to_light
+      }
+      events = []
+      tasks.each do |t|
+        events << t.properties if t.related_id == timer.id
+      end
+
+      # 削除済みのもので一度もタスクが行われてないもの
+      # （作成ミスと思われるもの）は含めない
+      next if events.empty? && timer.is_deleted
+
+      n = events.size
+      0.upto(n - 2) do |i|
+        (n - 1).downto(i + 1) do |j|
+          if JSON.parse(events[j])["done_date"] < JSON.parse(events[j - 1])["done_date"]
+            events[j], events[j - 1] = events[j - 1], events[j]
+          end
+        end
+      end
+
+      hash[:events] = events
+      hash
+    end.compact
+  end
+
   def events
     event_type = Event.event_types.select{|type|
       ["timer", "done_task"].include?(type)
@@ -22,8 +73,7 @@ class Timer < ActiveRecord::Base
 
   # タイマーの期限きれた時の処理
   # 基本は定期実行ジョブから叩く
-  def pass_due_time
-    now = Time.now
+  def pass_due_time(now = Time.now)
     return if next_due_at > Time.now
 
     self.over_due_from = next_due_at unless self.over_due_from
@@ -37,7 +87,7 @@ class Timer < ActiveRecord::Base
       related_id: self.id,
       properties: {
         over_at: now
-      }
+      }.to_json
     )
 
     User.find(self.user_id).notification.add_unread_event(event)
@@ -123,8 +173,12 @@ class Timer < ActiveRecord::Base
   def to_light
     {
       id:    self.list_id,
+      timer_id:    self.id,
       name:  self.name,
-      path:  Rails.application.routes.url_helpers.item_path(self.list_id)
+      path:  Rails.application.routes.url_helpers.item_path(self.list_id),
+      properties: self.properties,
+      is_repeating: self.is_repeating,
+      is_active: self.is_active && !self.is_deleted
     }
   end
 

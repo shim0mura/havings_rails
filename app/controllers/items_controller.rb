@@ -2,7 +2,7 @@ class ItemsController < ApplicationController
 
   # before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :timeline, :edit, :update, :destroy]
+  before_action :set_item, only: [:show, :timeline, :done_task, :edit, :update, :destroy]
 
   # GET /items
   # GET /items.json
@@ -20,12 +20,16 @@ class ItemsController < ApplicationController
     @timer = Timer.new(list_id: @item.id)
 
     line_chart
-
   end
 
   def timeline
     @from = params[:from]
     render partial: 'timeline', layout: false
+  end
+
+  def done_task
+    redirect_to @item unless @item.is_list
+    @tasks = Timer.done_tasks(current_user.id, @item.id)
   end
 
   # GET /items/new

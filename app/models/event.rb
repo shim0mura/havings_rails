@@ -6,6 +6,13 @@ class Event < ActiveRecord::Base
 
   default_scope -> { where(is_deleted: false) }
 
+  scope :done_tasks, ->(timer_ids){
+    where(
+      event_type: Event.event_types["done_task"],
+      related_id: timer_ids
+    )
+  }
+
   def disable
     update_attribute(:is_deleted, true)
   end

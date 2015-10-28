@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'home', to: 'welcome#home'
 
   resources :items
+  get '/items/:id/done_task', to: 'items#done_task'
   get '/items/:id/timeline', to: 'items#timeline'
   get '/items/:id/favorite', to: 'favorite#index'
   post '/items/:id/favorite', to: 'favorite#create'

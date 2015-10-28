@@ -48,7 +48,7 @@ class TimersController < ApplicationController
         related_id: @timer.id,
         properties: {
           done_date: Time.now
-        }
+        }.to_json
       )
       render json: { status: :ok }
     else

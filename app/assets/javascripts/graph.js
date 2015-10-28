@@ -87,6 +87,9 @@ function convertEventObjToData(events){
 }
 
 function drawBasic() {
+      if(typeof gon == "undefined"){
+        return;
+      }
       var dataArray = convertEventObjToData(gon.item);
 
       var data = new google.visualization.DataTable();
