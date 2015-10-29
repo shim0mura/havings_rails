@@ -20,7 +20,7 @@
     <div class="popular-list-wrapper">
     
       <div class="mdl-card__supporting-text">
-        <ul class="list-items done-task-lists">
+        <ul class="list-items generic-lists">
           <% @tasks.each do |task| %>
             <li>
               <!-- task-count -->
@@ -38,7 +38,7 @@
                     <%= task[:timer][:name] %>
                   <% end %>
                 </h5>
-                <div class="addings">
+                <div class="addings bold">
                   <% if task[:timer][:is_repeating] %>
                     <% props = JSON.parse(task[:timer][:properties]) %>
                     <%= repeating_task_to_str(props) %>
@@ -70,9 +70,6 @@
           <% end %>
         </ul>
 
-      </div>
-      <div class="mdl-card__actions text-right">
-        <%= link_to "もっと見る", "#" %>
       </div>
     </div>
   </div>

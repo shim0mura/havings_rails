@@ -1,0 +1,111 @@
+<div class="ribbon page-guide">
+
+  <div class="inner-ribbon">
+<section class="mdl-grid section--center list-content">
+  <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--top">
+    <div class="bread-crumb"><%= link_to(@user.name, user_page_path(@user.id)) %> > <%= @heading_text %>
+    <h3>
+      <i class="material-icons">people</i>
+      <%= @heading_text %>
+    </h3>
+  </div>
+</section>
+  </div>
+
+</div>
+<section class="mdl-grid section--center list-content">
+
+  <div class="mdl-cell mdl-cell--8-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp mdl-cell--top">
+
+    <div class="popular-list-wrapper">
+      <% if @users.present? %>
+        <div class="mdl-card__supporting-text">
+
+          <ul class="list-items generic-lists">
+            <% @users.each do |user| %>
+              <li>
+                <!-- user-avater -->
+                <div class="list-item-image">
+                  <div class="image-circle">
+                    <% if thumbnail = user[:image] %>
+                      <%= image_tag thumbnail %>
+                    <% end %>
+                  </div>
+                </div>
+
+                <!-- user-infomation -->
+                <div class="list-item-text">
+                  <h5>
+                    <%= link_to user_page_path(user_id: user[:id]) do %>
+                      <%= user[:name] %>
+                    <% end %>
+                  </h5>
+                  <div class="addings">
+                    <div class="item-count">
+                      <%= user[:total_item_count] %><span>items</span>
+                    </div>
+                    <div class="description">
+                      <%= user[:description] %>
+                      おあいうえおあいうえおあいうえおあいうえおあいうえおあいうえおあいうえおあいうえお
+                    </div>
+                  </div>
+                </div>
+
+                <!-- item-fabs -->
+                <div class="list-item-meta">
+
+
+                  <% unless user_signed_in? && current_user.id == user[:id] %>
+                    <%= form_tag({controller: "follows", action: "create", user_id: user[:id]}, {class: "follow-user"}) do %>
+                    <% end %>
+                    <%= form_tag({controller: "follows", action: "destroy", user_id: user[:id]}, {class: "unfollow-user", method: :delete}) do %>
+                    <% end %>
+
+
+                    <% follow_class = "follow" %>
+                    <% follow_class = follow_class + " not-sigined-in" unless user_signed_in? %>
+                    <% if user_signed_in? && user[:is_following] %>
+                      <% follow_class = follow_class + " already-follow" %>
+                      <% icon = "person" %>
+                      <% follow_span = "フォロー中" %>
+                    <% else %>
+                      <% icon = "person_add" %>
+                      <% follow_span = "フォロー" %>
+                    <% end %>
+
+
+                    <div class="<%= follow_class %> mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                      <i class="material-icons"><%= icon %></i>
+                      <span><%= follow_span %></span>
+                    </div>
+                  <% end %>
+
+
+
+                </div>
+              </li>
+
+            <% end %>
+          </ul>
+
+        </div>
+      <% else %>
+        <div class="nothing-in-generic-list">
+          <%= @heading_text %>はいません。
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- secondary card -->
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+    <div>
+      <h6>カテゴリリスト</h6>
+      <nav class="category-nav">
+
+        <%== category_list(current_user.item_tree) %>
+      </nav>
+    </div>
+  </div>
+
+</section>

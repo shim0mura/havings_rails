@@ -159,6 +159,7 @@ class User < ActiveRecord::Base
       id:    self.id,
       name:  self.name,
       image: self.thumbnail,
+      description: self.description,
       path:  Rails.application.routes.url_helpers.user_page_path(self.id)
     }
   end
@@ -200,7 +201,11 @@ class User < ActiveRecord::Base
       end
       hash[:children] = item_tree(current, nil, items, child_queue, Marshal.load(Marshal.dump(result)))
       children_count = hash[:children].inject(0){|sum, item| sum + item[:count]} || 0
-      hash[:count] = hash[:count] + children_count
+      if hash[:item][:is_list]
+        hash[:count] = children_count
+      else
+        hash[:count] = hash[:count] + children_count
+      end
 
       current_result << hash
     end

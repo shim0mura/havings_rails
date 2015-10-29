@@ -2,6 +2,8 @@ Rails.application.routes.draw do
 
   get 'user/:user_id', to: 'user#index', as: :user_page
   get 'user/:user_id/timeline', to: 'user#timeline'
+  get 'user/:user_id/following', to: 'user#following'
+  get 'user/:user_id/followers', to: 'user#followers'
   post '/user/:user_id/follow', to: 'follows#create'
   delete '/user/:user_id/follow', to: 'follows#destroy'
 

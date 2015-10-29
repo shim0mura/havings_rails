@@ -693,50 +693,72 @@ i.favorite.already-favorite + span {
 .ribbon.page-guide .inner-ribbon {
   padding-bottom: 40px;
 }
-.done-task-lists ul.list-items li {
+.generic-lists ul.list-items li {
 
 }
-.done-task-lists .list-item-image .circle {
+.generic-lists .list-item-image .circle {
   background-color: #222;
   color: white;
   width: 50px;
   height:50px;
 }
-.done-task-lists .list-item-image .circle .item-count {
+.generic-lists .list-item-image .image-circle {
+  width: 50px;
+  height:50px;
+}
+.generic-lists .list-item-image .circle .item-count {
   color: white;
   padding-top: 10px;
   padding-bottom: 0px;
   font-size: 1.8em;
 }
-.done-task-lists .list-item-image .circle .item-unit {
+.generic-lists .list-item-image .circle .item-unit {
   color: white;
   font-size: 0.8em;
   margin-top: -5px;
 }
-.done-task-lists .list-item-text h5 {
+.generic-lists .list-item-text h5 {
   font-size: 1.7em;
   margin-top: 4px;
   margin-bottom: 2px;
 }
-.done-task-lists .list-item-text .addings {
+.generic-lists .list-item-text .addings.bold {
   font-size: 1em;
   font-weight: bold;
 }
-.done-task-lists .done-date-caption {
+.generic-lists .list-item-text .addings .description {
+  font-size: 0.5em;
+  line-height: 1.2em;
+}
+.generic-lists .mdl-button.follow {
+  height: 24px;
+  line-height: 24px;
+  font-size: 10px;
+  margin-top: 15px;
+  margin-left: -10px;
+}
+.generic-lists .mdl-button.follow span {
+  font-size: 10px;
+}
+.generic-lists .done-date-caption {
   float: left;
 }
-.done-task-lists ul.done-date {
+.generic-lists ul.done-date {
   float: left;
   padding-left: 15px;
   max-height: 65px;
   overflow: scroll;
 }
-.done-task-lists ul.done-date li {
+.generic-lists ul.done-date li {
   padding: 0;
 }
-.done-task-lists .list-item-meta {
+.generic-lists .list-item-meta {
   width: 90px;
 }
-.done-task-lists .list-item-meta i {
+.generic-lists .list-item-meta i {
   font-size: 18px;
+}
+.nothing-in-generic-list {
+  text-align: center;
+  line-height: 12;
 }

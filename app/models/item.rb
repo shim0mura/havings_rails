@@ -90,6 +90,7 @@ class Item < ActiveRecord::Base
     properties << hash
 
     parent_list.count_properties = properties.to_json
+    parent_list.count = hash["count"].to_i
     parent_list.save
     parent_list.change_count(count_diff) unless current_list
   end
