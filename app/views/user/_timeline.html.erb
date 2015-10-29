@@ -1,0 +1,87 @@
+<% now = Time.now %>
+<% timeline.each do |event| %>
+  <% case %>
+  <% when event[:type] == :create_item %>
+    <% icon_type = "add" %>
+    <% text = "アイテムを追加しました。" %>
+  <% when event[:type] == :create_list %>
+    <% icon_type = "add" %>
+    <% text = "リストを追加しました。" %>
+  <% when event[:type] == :add_image %>
+    <% icon_type = "image" %>
+    <% link = link_to "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}: #{event[:target].first[:name]}", event[:target].first[:path] %>
+    <% text = "#{link}に画像を追加しました。" %>
+  <% when event[:type] == :dump %>
+    <% icon_type = "delete" %>
+    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}を手放しました。" %>
+  <% when event[:type] == :favorite %>
+    <% icon_type = "favorite" %>
+    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}をお気に入りに登録しました。" %>
+  <% when event[:type] == :comment %>
+    <% icon_type = "chat_bubble" %>
+    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}にコメントしました。" %>
+  <% when event[:type] == :follow %>
+    <% icon_type = "person_add" %>
+    <% text = "ユーザーをフォローしました。" %>
+  <% end %>
+
+  <li>
+    <div class="event-type">
+      <div class="event-circle <%= icon_type %>">
+        <i class="material-icons"><%= icon_type %></i>
+      </div>
+    </div>
+    <div class="event-text">
+      <p><%== text %></p>
+      <h5>
+
+        <% event[:target].each do |target| %>
+          <% if target[:image].kind_of?(Array) %>
+            <%# 画像追加の場合 %>
+            <% target[:image].each do |i| %>
+              <div class="image-circle">
+                <%= link_to image_tag(i), target[:path] %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="image-circle">
+              <% if target[:image] %>
+                <%= link_to image_tag(target[:image]), target[:path] %>
+              <% end %>
+            </div>
+            <%= link_to target[:name], target[:path] %>
+          <% end %>
+        <% end %>
+
+      </h5>
+    </div>
+    <div class="event-time">
+      <%= time_to_str((now - event[:date]).to_i) + "前" %>
+    </div>
+  </li>
+<% end %>
+
+<% if timeline.size < User::MAX_SHOWING_EVENTS || !has_next_event %>
+  <li>
+    <div class="event-type">
+      <div class="event-circle create">
+        <i class="material-icons">create</i>
+      </div>
+    </div>
+    <div class="event-text">
+      <h5 class="created">
+        登録しました。
+      </h5>
+    </div>
+    <div class="event-time">
+    </div>
+  </li>
+<% else %>
+  <li class="add-timeline">
+    <%= hidden_field_tag :last_event_id, timeline.last[:event_id] %>
+    <div class="more">
+      もっと見る
+    </div>
+    <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" style="display:none;"></div>
+  </li>
+<% end %>

@@ -296,6 +296,15 @@ ul.timeline {
 .timeline .event-circle.create {
   background-color: #8BC34A;
 }
+.timeline .event-circle.favorite {
+  background-color: #FF4081;
+}
+.timeline .event-circle.chat_bubble {
+  background-color: #FFC107;
+}
+.timeline .event-circle.person_add {
+  background-color: #8BC34A;
+}
 .timeline .event-circle i {
   margin-top: 3px;
   color: #fff;

@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+
+  MAX_SHOWING_EVENTS = 20
+
   mount_uploader :image, AvatarUploader
 
   # Include default devise modules. Others available are:
@@ -202,6 +205,92 @@ class User < ActiveRecord::Base
       current_result << hash
     end
     current_result
+  end
+
+  def timeline(from = 0, limit = MAX_SHOWING_EVENTS)
+    # TODO: get_showing_notificationと同じような構造なので
+    # 同じにできないか？
+    # TODO: add_imageはthumbnailを渡す
+    events = get_related_event(from, limit)
+    item_ids = []
+    followed_user_ids = []
+    events.each do |e|
+      case(e.event_type)
+      when "create_list", "create_item"
+        next unless e.properties
+        item_ids << eval(e.properties)[:item_id]
+      when "add_image", "dump", "favorite", "comment"
+        item_ids << e.related_id
+      when "follow"
+        followed_user_ids << e.suffered_user_id
+      end
+    end
+    items = Item.where(id: item_ids)
+    followed_users = User.where(id: followed_user_ids)
+
+    events.map do |e|
+      hash = {
+        event_id: e.id,
+        type: e.event_type.to_sym,
+        acter: [self.to_light],
+        target: [],
+        date: e.updated_at
+      }
+
+      case(e.event_type)
+      when "create_list", "create_item"
+        item_id = eval(e.properties)[:item_id]
+        item = items.detect{|i|i.id == item_id}
+        next unless item.present?
+        hash[:target] << item.to_light
+      when "dump", "favorite", "comment"
+        item_id = e.related_id
+        item = items.detect{|i|i.id == item_id}
+        next unless item.present?
+        hash[:target] << item.to_light
+      when "add_image"
+        item_id = e.related_id
+        item = items.detect{|i|i.id == item_id}
+        next unless item.present?
+        item_images = ItemImage.where(id: eval(e.properties)[:item_image_ids])
+        light_item = item.to_light
+        light_item[:image] = item_images.map{|i|i.image_url} if item_images.present?
+        hash[:target] << light_item
+      when "follow"
+        followed_user_id = e.suffered_user_id
+        user = followed_users.detect{|i|i.id == followed_user_id}
+        next unless user.present?
+        hash[:target] << user.to_light
+      end
+
+      hash
+    end.compact
+  end
+
+  def has_next_event_from?(from)
+    get_related_event(from).size > 0
+  end
+
+  private
+  def get_related_event(from = 0, limit = MAX_SHOWING_EVENTS)
+    event_type = Event.event_types.select{|type|
+      ["create_list", "create_item", "add_image", "dump", "favorite", "follow", "comment"].include?(type)
+    }.values
+
+    if from != 0
+      from_option = Event.arel_table[:id].lt(from)
+      e = Event.where(from_option)
+    else 
+      e = Event
+    end
+
+    e
+      .where(
+        event_type: event_type,
+        acter_id: self.id
+      )
+      .order("id DESC")
+      .limit(limit)
   end
 
 end

@@ -129,77 +129,7 @@
         </div>
         <ul class="timeline">
           <li class="bar"></li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle add">
-                <i class="material-icons">add</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@user.items.last.item_images.last.image_url), item_path(id: @user.items.last.id) %>
-                </div>
-                かっこいいセーターあああああああああああああああ
-              </h5>
-            </div>
-            <div class="event-time">
-              1日前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle image">
-                <i class="material-icons">image</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>画像を追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@user.items.last.item_images.last.image_url), item_path(id: @user.items.last.id) %>
-                </div>
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle dump">
-                <i class="material-icons">delete</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを手放しました</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@user.items.last.item_images.last.image_url), item_path(id: @user.items.last.id) %>
-                </div>
-                ださいセーター
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle create">
-                <i class="material-icons">create</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <h5 class="created">
-                アイテムを作成しました。
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
+          <%= render 'timeline', timeline: @user_timeline, has_next_event: @has_next_event %>
         </ul>
       </div>
 
