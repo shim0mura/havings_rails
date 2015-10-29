@@ -115,7 +115,6 @@ class Item < ActiveRecord::Base
     # TODO: 何日前まで取得するか決める
     properties_by_day = JSON.parse(self.count_properties)
     events = Event.where(id: properties_by_day.map{|prop|prop["events"]}.flatten)
-    # a = properties_by_day.map do |prop|
     properties_by_day.each do |prop|
       event_ids = prop["events"]
 

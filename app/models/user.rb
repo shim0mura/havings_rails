@@ -280,7 +280,7 @@ class User < ActiveRecord::Base
       ["create_list", "create_item", "add_image", "dump", "favorite", "follow", "comment"].include?(type)
     }.values
 
-    if from != 0
+    if from && from != 0
       from_option = Event.arel_table[:id].lt(from)
       e = Event.where(from_option)
     else 

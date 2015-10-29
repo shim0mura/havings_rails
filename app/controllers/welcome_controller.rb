@@ -8,36 +8,31 @@ class WelcomeController < ApplicationController
 
   def home
     @current_user = current_user
-    line_chart
+    @timeline = following_timeline(nil, 5) if @current_user
   end
 
+  def timeline
+    @current_user = current_user
+    timeline = following_timeline(params[:from]) if @current_user
+    render partial: 'shared/timeline', layout: false, locals: {timeline: timeline, has_next_event: @has_next_event, is_home: true}
+  end
 
-  def line_chart
-    data_table = GoogleVisualr::DataTable.new
-    data_table.new_column('string', 'Year')
-    data_table.new_column('number', 'Sales')
-    data_table.new_column('number', 'ああああ')
-    data_table.add_rows(3)
-    data_table.set_cell(0, 0, '2004')
-    data_table.set_cell(0, 1, 1000)
-    data_table.set_cell(0, 2, 400)
-    data_table.set_cell(1, 0, '2005')
-    data_table.set_cell(1, 1, 1170)
-    data_table.set_cell(1, 2, nil)
-    data_table.set_cell(2, 0, '2007')
-    data_table.set_cell(2, 1, 860)
-    data_table.set_cell(2, 2, 580)
-    # data_table.set_cell(3, 0, '2007')
-    # data_table.set_cell(3, 1, 1030)
-    # data_table.set_cell(3, 2, 540)
-
-    options = {
-      height: 240,
-      title: 'Company Performance',
-      legend: 'bottom',
-      interpolateNulls: true
-    }
-    @chart = GoogleVisualr::Interactive::LineChart.new(data_table, options)
+  private
+  def following_timeline(from = 0, size = User::MAX_SHOWING_EVENTS)
+    timeline = []
+    @current_user.following.each do |user|
+      timeline.concat(user.timeline(@current_user, from))
+    end
+    n = timeline.size
+    0.upto(n - 2) do |i|
+      (n - 1).downto(i + 1) do |j|
+        if timeline[j][:event_id] > timeline[j - 1][:event_id]
+          timeline[j], timeline[j - 1] = timeline[j - 1], timeline[j]
+        end
+      end
+    end
+    @has_next_event = (n >= size)
+    timeline.slice(0...size)
   end
 
 end

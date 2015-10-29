@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   delete '/user/:user_id/follow', to: 'follows#destroy'
 
   get 'home', to: 'welcome#home'
+  get 'home/timeline', to: 'welcome#timeline'
 
   resources :items
   get '/items/:id/done_task', to: 'items#done_task'

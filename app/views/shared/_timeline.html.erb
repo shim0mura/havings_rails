@@ -1,28 +1,33 @@
 <% now = Time.now %>
 <% timeline.each do |event| %>
+  <% if defined?(is_home) && is_home %>
+    <% acter_str = link_to("#{event[:acter].first[:name]}さん", event[:acter].first[:path]) + "が" %>
+  <% else %>
+    <% acter_str = "" %>
+  <% end %>
   <% case %>
   <% when event[:type] == :create_item %>
     <% icon_type = "add" %>
-    <% text = "アイテムを追加しました。" %>
+    <% text = acter_str + "アイテムを追加しました。" %>
   <% when event[:type] == :create_list %>
     <% icon_type = "add" %>
-    <% text = "リストを追加しました。" %>
+    <% text = acter_str + "リストを追加しました。" %>
   <% when event[:type] == :add_image %>
     <% icon_type = "image" %>
     <% link = link_to "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}: #{event[:target].first[:name]}", event[:target].first[:path] %>
-    <% text = "#{link}に画像を追加しました。" %>
+    <% text = "#{acter_str}#{link}に画像を追加しました。" %>
   <% when event[:type] == :dump %>
     <% icon_type = "delete" %>
-    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}を手放しました。" %>
+    <% text = acter_str + "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}を手放しました。" %>
   <% when event[:type] == :favorite %>
     <% icon_type = "favorite" %>
-    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}をお気に入りに登録しました。" %>
+    <% text = acter_str + "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}をお気に入りに登録しました。" %>
   <% when event[:type] == :comment %>
     <% icon_type = "chat_bubble" %>
-    <% text = "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}にコメントしました。" %>
+    <% text = acter_str + "#{(event[:target].first[:is_list] ? "リスト" : "アイテム")}にコメントしました。" %>
   <% when event[:type] == :follow %>
     <% icon_type = "person_add" %>
-    <% text = "ユーザーをフォローしました。" %>
+    <% text = acter_str + "ユーザーをフォローしました。" %>
   <% end %>
 
   <li>
@@ -61,22 +66,8 @@
   </li>
 <% end %>
 
-<% if timeline.size < User::MAX_SHOWING_EVENTS || !has_next_event %>
-  <li>
-    <div class="event-type">
-      <div class="event-circle create">
-        <i class="material-icons">create</i>
-      </div>
-    </div>
-    <div class="event-text">
-      <h5 class="created">
-        登録しました。
-      </h5>
-    </div>
-    <div class="event-time">
-    </div>
-  </li>
-<% else %>
+<% if has_next_event || timeline.size > User::MAX_SHOWING_EVENTS %>
+
   <li class="add-timeline">
     <%= hidden_field_tag :last_event_id, timeline.last[:event_id] %>
     <div class="more">
@@ -84,4 +75,24 @@
     </div>
     <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" style="display:none;"></div>
   </li>
+
+<% else %>
+
+  <li>
+    <div class="event-type">
+      <div class="event-circle create">
+        <i class="material-icons"><%= "create" unless defined?(is_home) %></i>
+      </div>
+    </div>
+    <div class="event-text">
+      <h5 class="created">
+        <% unless defined?(is_home) %>
+          登録しました。
+        <% end %>
+      </h5>
+    </div>
+    <div class="event-time">
+    </div>
+  </li>
+
 <% end %>

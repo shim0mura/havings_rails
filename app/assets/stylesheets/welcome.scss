@@ -96,7 +96,7 @@ a:hover {
   width: auto;
 }
 .timeline-wrapper .timeline {
-  padding-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 
@@ -158,5 +158,9 @@ ul.list ul li:last-child:before {
     top: 10px; 
     bottom: 0;
 }
-
+div.nothing {
+  padding: 15px;
+  padding-bottom: 40px;
+  font-size: 1.3em;
+}
 

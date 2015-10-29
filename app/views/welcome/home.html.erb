@@ -103,7 +103,6 @@
         アイテムグラフ
       </h4>
       <div id="chart">
-<%= render_chart(@chart, 'chart') %>
       </div>
 
     </div>
@@ -184,84 +183,22 @@
 
     <div class="timeline-wrapper">
       <h4>
-        <i class="material-icons">trending_up</i>
-        人気のリスト
+        <i class="material-icons">list</i>
+        みんなのタイムライン
       </h4>
     
       <div class="mdl-card__supporting-text">
-
-
-
-
-        <div class="start-circle">
-        </div>
-        <ul class="timeline">
-          <li class="bar"></li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle add">
-                <i class="material-icons">add</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present?%>
-                </div>
-                かっこいいセーターあああああああああああああああ
-              </h5>
-            </div>
-            <div class="event-time">
-              1日前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle image">
-                <i class="material-icons">image</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>画像を追加しました。</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present? %>
-                </div>
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-          <li>
-            <div class="event-type">
-              <div class="event-circle dump">
-                <i class="material-icons">delete</i>
-              </div>
-            </div>
-            <div class="event-text">
-              <p>アイテムを手放しました</p>
-              <h5>
-                <div class="image-circle">
-                  <%= link_to image_tag(@current_user.items.last.item_images.last.image_url), item_path(id: @current_user.items.last.id) if @current_user.items.last.item_images.present? %>
-                </div>
-                ださいセーター
-              </h5>
-            </div>
-            <div class="event-time">
-              10時間前
-            </div>
-          </li>
-        </ul>
+        <% if @timeline.size > 0 %>
+          <div class="start-circle">
+          </div>
+          <ul class="timeline">
+            <li class="bar"></li>
+            <%= render 'shared/timeline', timeline: @timeline, has_next_event: @has_next_event, is_home: true %>
+          </ul>
+        <% else %>
+          <div class="text-center nothing">イベントはありません。</div>
+        <% end %>
       
-
-
-
-
-      </div>
-      <div class="mdl-card__actions mdl-card--border text-right">
-        <%= link_to "もっと見る", "#" %>
       </div>
     </div>
 

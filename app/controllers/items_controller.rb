@@ -280,12 +280,6 @@ class ItemsController < ApplicationController
       end
     end
 
-    def is_owned_item?
-      unless user_signed_in? && current_user.id == @item.user_id
-        redirect_to items_path
-      end
-    end
-
     def is_already_droped?
       if @item.is_garbage
         redirect_to items_path

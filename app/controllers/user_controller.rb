@@ -1,6 +1,5 @@
 class UserController < ApplicationController
 
-  # before_action :authenticate_user!, only:[:follow, :remove]
   before_action :set_user
 
   def index
@@ -12,7 +11,7 @@ class UserController < ApplicationController
 
   def timeline
     timeline = @user.timeline(current_user, params[:from])
-    render partial: 'timeline', layout: false, locals: {timeline: timeline, has_next_event: @user.has_next_event_from?(timeline.last[:event_id])}
+    render partial: 'shared/timeline', layout: false, locals: {timeline: timeline, has_next_event: @user.has_next_event_from?(timeline.last[:event_id])}
   end
 
   private
