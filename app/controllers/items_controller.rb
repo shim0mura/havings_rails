@@ -1,8 +1,8 @@
 class ItemsController < ApplicationController
 
-  # before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
-  before_action :authenticate_user!
+  before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy]
   before_action :set_item, only: [:show, :timeline, :done_task, :edit, :update, :destroy]
+  before_action :can_show?, only: [:show, :timeline, :done_task, :edit, :update, :destroy]
 
   # GET /items
   # GET /items.json
@@ -13,6 +13,7 @@ class ItemsController < ApplicationController
   # GET /items/1
   # GET /items/1.json
   def show
+
     @new_item = Item.new
     @list = current_user.items.as_list if user_signed_in?
     # to_aすればARをloadしない
@@ -274,7 +275,9 @@ class ItemsController < ApplicationController
     end
 
     def can_show?
-
+      unless @item.can_show?(current_user)
+        redirect_to user_page_path(@item.user_id)
+      end
     end
 
     def is_owned_item?

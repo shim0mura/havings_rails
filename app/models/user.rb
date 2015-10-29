@@ -207,7 +207,7 @@ class User < ActiveRecord::Base
     current_result
   end
 
-  def timeline(from = 0, limit = MAX_SHOWING_EVENTS)
+  def timeline(showing_user = nil, from = 0, limit = MAX_SHOWING_EVENTS)
     # TODO: get_showing_notificationと同じような構造なので
     # 同じにできないか？
     # TODO: add_imageはthumbnailを渡す
@@ -242,16 +242,19 @@ class User < ActiveRecord::Base
         item_id = eval(e.properties)[:item_id]
         item = items.detect{|i|i.id == item_id}
         next unless item.present?
+        next unless item.can_show?(showing_user)
         hash[:target] << item.to_light
       when "dump", "favorite", "comment"
         item_id = e.related_id
         item = items.detect{|i|i.id == item_id}
         next unless item.present?
+        next unless item.can_show?(showing_user)
         hash[:target] << item.to_light
       when "add_image"
         item_id = e.related_id
         item = items.detect{|i|i.id == item_id}
         next unless item.present?
+        next unless item.can_show?(showing_user)
         item_images = ItemImage.where(id: eval(e.properties)[:item_image_ids])
         light_item = item.to_light
         light_item[:image] = item_images.map{|i|i.image_url} if item_images.present?

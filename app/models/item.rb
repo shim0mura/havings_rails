@@ -154,4 +154,24 @@ class Item < ActiveRecord::Base
     properties_by_day
   end
 
+  def can_show?(user)
+    relation_to_owner = Relation::NOTHING unless user.present?
+    relation_to_owner = Relation::HIMSELF if user.present? && user.id == self.user_id
+
+    unless relation_to_owner
+      followers = self.user.followed.map(&:id)
+      followings = self.user.following.map(&:id)
+
+      if followers.include?(user.id) && followings.include?(user.id)
+        relation_to_owner = Relation::FRIEND
+      elsif followers.include?(user.id) && !followings.include?(user.id)
+        relation_to_owner = Relation::FOLLOWED
+      else
+        relation_to_owner = Relation::NOTHING
+      end
+    end
+
+    relation_to_owner >= Item.private_types[self.private_type]
+  end
+
 end
