@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: notifications
+#
+#  id            :integer          not null, primary key
+#  user_id       :integer          not null
+#  unread_events :string(255)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  read_events   :string(255)
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
