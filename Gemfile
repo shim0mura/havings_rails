@@ -78,6 +78,5 @@ group :development, :test do
 
   gem 'annotate'
   gem 'awesome_print'
-  gem 'rails-flog', require: 'flog'
 end
 

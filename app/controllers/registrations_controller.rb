@@ -1,6 +1,7 @@
 class RegistrationsController < Devise::RegistrationsController
 
-  before_action :configure_permitted_parameters, only: [:update]
+  before_action :configure_permitted_parameters_on_sign_up, only: [:sign_up]
+  before_action :configure_permitted_parameters_on_update, only: [:update]
   protected
 
   def update_resource(resource, params)
@@ -32,8 +33,14 @@ class RegistrationsController < Devise::RegistrationsController
 
 
   private 
-  
-  def configure_permitted_parameters
+
+  def configure_permitted_parameters_on_sign_up
+    devise_parameter_sanitizer.for(:account_update) do |u|
+      u.permit(:name, :email, :password, :password_confirmation)
+    end
+  end 
+
+  def configure_permitted_parameters_on_update
     devise_parameter_sanitizer.for(:account_update) do |u|
       u.permit(:name, :email, :password, :password_confirmation, :current_password, :image, :image_cache, :remove_image)
     end

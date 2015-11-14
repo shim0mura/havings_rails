@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
 
+  get 'dummy', to: 'items#dummy'
+
+  # https://developer.chrome.com/multidevice/android/intents
+  get "/android/signin/:token/:uid" => redirect("intent://signinbyoauth/#Intent;scheme=tswork_havings;package=work.t_s.shim0mura.havings;S.token=%{token};S.uid=%{uid};end"), as: :oauth_android_callback
+
   get 'user/:user_id', to: 'user#index', as: :user_page
   get 'user/:user_id/timeline', to: 'user#timeline'
   get 'user/:user_id/following', to: 'user#following'

@@ -8,15 +8,17 @@ class ApplicationController < ActionController::Base
   # トークンによる認証
   before_action      :authenticate_user_from_token!, if: -> {request.format.json?}
 
+  # ユーザー情報の登録関係はregistrationscontrollerでも行う
+  # 両方登録しないといけないっぽい
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   # http://source.hatenadiary.jp/entry/2014/03/11/104307
   # トークンによる認証
   def authenticate_user_from_token!
-    if request.headers['uid'].present? && request.headers['access-token'].present?
-      user = User.find_by(uid: request.headers['uid'])
+    if request.headers['HTTP_X_UID'].present? && request.headers['HTTP_X_ACCESS_TOKEN'].present?
+      user = User.find_by(uid: request.headers['HTTP_X_UID'])
       request.env['devise.skip_trackable'] = true
-      if Devise.secure_compare(user.try(:token), request.headers['access-token'])
+      if Devise.secure_compare(user.try(:token), request.headers['HTTP_X_ACCESS_TOKEN'])
         sign_in user, store: false
       else
         render :json => { "status" => "ssss" }, :status => :unauthorized

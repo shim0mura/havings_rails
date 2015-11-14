@@ -4,6 +4,13 @@ class ItemsController < ApplicationController
   before_action :set_item, only: [:show, :timeline, :done_task, :edit, :update, :destroy]
   before_action :can_show?, only: [:show, :timeline, :done_task, :edit, :update, :destroy]
 
+
+  def dummy
+    seconds = params[:seconds].to_i || 3
+    sleep(seconds)
+    render json: { status: :ok, time: seconds }
+  end
+
   # GET /items
   # GET /items.json
   def index
