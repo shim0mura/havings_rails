@@ -17,6 +17,15 @@ class Event < ActiveRecord::Base
 
   include EnumType
 
+  CREATE_LIST = "create_list"
+  CREATE_ITEM = "create_item"
+  ADD_IMAGE   = "add_image"
+  DUMP        = "dump"
+  FAVORITE    = "favorite"
+  FOLLOW      = "follow"
+  COMMENT     = "comment"
+  TIMER       = "timer"
+
   enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count)
 
   default_scope -> { where(is_deleted: false) }
@@ -27,6 +36,12 @@ class Event < ActiveRecord::Base
       related_id: timer_ids
     )
   }
+
+  def self.item_related_event_types
+    event_types.map do |k, v|
+      v if [CREATE_LIST, CREATE_ITEM, DUMP, ADD_IMAGE].include?(k)
+    end.compact
+  end
 
   def disable
     update_attribute(:is_deleted, true)

@@ -195,7 +195,7 @@ class User < ActiveRecord::Base
     end
 
     if items.nil?
-      items = Item.where(user_id: self.id).to_a
+      items = Item.countable.where(user_id: self.id).to_a
     end
 
     if queue.nil?
@@ -233,6 +233,25 @@ class User < ActiveRecord::Base
       end
 
       current_result << hash
+    end
+    current_result
+  end
+
+  def list_tree(tree = nil, result = [], nest = 0)
+    tree = self.item_tree unless tree.present? 
+    current_result = []
+    tree.each do |i|
+      if i[:item][:is_list]
+        hash = {}
+        hash[:id]    = i[:item][:id]
+        hash[:name]  = i[:item][:name]
+        hash[:count] = i[:count]
+        hash[:nest]  = nest
+        current_result << hash if i[:item][:is_list]
+      end
+      if i[:children].present?
+        current_result.concat(list_tree(i[:children], Marshal.load(Marshal.dump(result)), nest + 1))
+      end
     end
     current_result
   end

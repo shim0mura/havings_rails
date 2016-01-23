@@ -18,7 +18,7 @@
 
 class Timer < ActiveRecord::Base
 
-  MAX_COUNT_PER_LIST = 3
+  MAX_COUNT_PER_LIST = 4
 
   belongs_to :list, :foreign_key => "list_id", :class_name => "Item"
 
@@ -40,6 +40,16 @@ class Timer < ActiveRecord::Base
       )
     end
   }
+
+  validates :name, presence: true
+  validate :is_valid_next_due_time?
+
+  def is_valid_next_due_time?
+    current = Time.now
+    if current > next_due_at
+      errors.add(:next_due_at, "is invalid.")
+    end
+  end
 
   def self.done_task_count(user_id, list_id = nil)
     timers = all_timers(user_id, list_id)
@@ -95,7 +105,16 @@ class Timer < ActiveRecord::Base
     return if next_due_at > Time.now
 
     self.over_due_from = next_due_at unless self.over_due_from
+    self.latest_calc_at = next_due_at
     self.next_due_at = get_next_due_at
+
+    # TODO: ここのwhileに入った場合のログを取る
+    #       基本的に定期実行ジョブが死んでない限りここには入らないはずだけど
+    #       何かを見落としてここに入る場合があるかも
+    while self.next_due_at < now do
+      self.latest_calc_at = next_due_at
+      self.next_due_at = get_next_due_at
+    end
 
     self.save!
 
@@ -118,7 +137,7 @@ class Timer < ActiveRecord::Base
     return nil unless is_repeating
     # 毎週金曜の設定でその日が10/17(土)かつ10/16(金)のタスクを終わらせてない場合
     # next_due_atは10/23(金)になっている
-    # タスクは通知後に完了する場合、つまりタスクの期限オーバーの場合が多いはず
+    # タスクは通知後に完了するという使い方、つまりタスクの期限オーバーになる場合が多いはず
     # なのでその場合は有無を言わさずnext_due_atが次のタスク期限日になる
     return next_due_at if over_due_from
 
@@ -137,45 +156,81 @@ class Timer < ActiveRecord::Base
 
     return next_due unless is_repeating
 
+    candidate_hour = props["notice_hour"].to_i
+    candidate_minute = props["notice_minute"].to_i
+
     # 日にち指定の場合
-    if props["repeat_by"] == "0"
+    if props["repeat_by"].to_i == 0
       candidate_day = props["repeat_by_day"]["day"].to_i
       candidate_month = props["repeat_by_day"]["month_interval"].to_i
 
-      candidate_date = next_due + (candidate_month + 1).month
+      candidate_date = next_due_at
+
+      if candidate_date.day > candidate_day
+        candidate_date = candidate_date + (candidate_month + 1).month
+      elsif candidate_date.day == candidate_day
+        if before_candidate_date?(candidate_date, candidate_hour, candidate_minute)
+          candidate_date = candidate_date + (candidate_month + 1).month
+        else
+          candidate_date = candidate_date + candidate_month.month
+        end
+      else
+        candidate_date = candidate_date + candidate_month.month
+      end
 
       last_day = candidate_date.end_of_month.day
 
       if candidate_day >= last_day
         candidate_date = candidate_date.change(day: last_day)
+      else
+        candidate_date = candidate_date.change(day: candidate_day)
       end
 
+      candidate_date = candidate_date.change(
+        hour: candidate_hour,
+        min: candidate_minute
+      )
+
     # 曜日指定の場合
-    elsif props["repeat_by"] == "1"
-      if props["repeat_by_week"]["week"] == "0"
-        candidate_date = next_due + 7.days
+    elsif props["repeat_by"].to_i == 1
+      candidate_date = next_due_at
+      week_number = props["repeat_by_week"]["week"].to_i
+      day_of_week = props["repeat_by_week"]["day_of_week"].to_i
+      if week_number == 0
+
+        val = (7 - candidate_date.wday + day_of_week) % 7
+        if val == 0
+          if before_candidate_date?(candidate_date, candidate_hour, candidate_minute)
+            val = 7 
+          else
+            val = 0
+          end
+        end
+        candidate_date = candidate_date + val.days
+        candidate_date = candidate_date.change(
+          hour: candidate_hour,
+          min: candidate_minute
+        )
+
+        # candidate_date = next_due + 7.days
       else
-        week_number = props["repeat_by_week"]["week"].to_i
-        day_of_week = props["repeat_by_week"]["day_of_week"].to_i
-        candidate_date = next_due.next_month
+        candidate_day = get_day_of_specified_week(candidate_date, week_number, day_of_week)
 
-        first_day_week_of_month = candidate_date.beginning_of_month.wday
-        last_day = candidate_date.end_of_month.day
-
-        first_candidate_day = day_of_week - first_day_week_of_month + 1
-
-        if first_candidate_day <= 0
-          first_candidate_day = first_candidate_day + 7
+        if candidate_day == candidate_date.day
+          if before_candidate_date?(candidate_date, candidate_hour, candidate_minute)
+            candidate_date = next_due_at.next_month
+            candidate_day = get_day_of_specified_week(candidate_date, week_number, day_of_week)
+          end
+        elsif candidate_day < candidate_date.day
+          candidate_date = next_due_at.next_month
+          candidate_day = get_day_of_specified_week(candidate_date, week_number, day_of_week)
         end
 
-        day = first_candidate_day + (7 * (week_number - 1))
-
-        while day > last_day
-          day = day - 7
-        end
-
-        candidate_date = candidate_date.change(day: day)
-
+        candidate_date = candidate_date.change(
+          day: candidate_day,
+          hour: candidate_hour,
+          min: candidate_minute
+        )
       end
     end
 
@@ -187,7 +242,10 @@ class Timer < ActiveRecord::Base
     Time.parse(props["start_at"])
   end
 
-
+  # TODO: idとtimer_idを変更する
+  # idはtimerのidを、timerの属するlistのidはlist_idとして設定
+  # timer_controller#json_rendered_timerも合わせて直す
+  # webがid=list_id, timer_id=idで必要としてるっぽいのでそこから直す
   def to_light
     {
       id:    self.list_id,
@@ -198,6 +256,39 @@ class Timer < ActiveRecord::Base
       is_repeating: self.is_repeating,
       is_active: self.is_active && !self.is_deleted
     }
+  end
+
+  private
+  def before_candidate_date?(candidate_date, hour, minute)
+    candidate = candidate_date.change(
+      sec: 0, usec: 0
+    )
+    compared = candidate_date.change(
+      hour: hour,
+      min: minute,
+      sec: 0, usec: 0
+    )
+
+    candidate >= compared
+  end
+
+  def get_day_of_specified_week(candidate_date, week_number, day_of_week)
+    first_day_week_of_month = candidate_date.beginning_of_month.wday
+    last_day = candidate_date.end_of_month.day
+
+    first_candidate_day = day_of_week - first_day_week_of_month + 1
+
+    if first_candidate_day <= 0
+      first_candidate_day = first_candidate_day + 7
+    end
+
+    day = first_candidate_day + (7 * (week_number - 1))
+
+    while day > last_day
+      day = day - 7
+    end
+
+    return day
   end
 
 end

@@ -1,10 +1,17 @@
 Rails.application.routes.draw do
 
+  get 'admin/index'
+  post 'admin/extract'
+  get 'admin/extracted_item'
+  post 'admin/type_item'
+  get 'admin/tags'
+
   get 'dummy', to: 'items#dummy'
 
   # https://developer.chrome.com/multidevice/android/intents
   get "/android/signin/:token/:uid" => redirect("intent://signinbyoauth/#Intent;scheme=tswork_havings;package=work.t_s.shim0mura.havings;S.token=%{token};S.uid=%{uid};end"), as: :oauth_android_callback
 
+  get 'user/list_tree', to: 'user#list_tree'
   get 'user/:user_id', to: 'user#index', as: :user_page
   get 'user/:user_id/timeline', to: 'user#timeline'
   get 'user/:user_id/following', to: 'user#following'
@@ -16,8 +23,12 @@ Rails.application.routes.draw do
   get 'home/timeline', to: 'welcome#timeline'
 
   resources :items
+  put '/items/:id/dump', to: 'items#dump'
+  get '/items/:id/next_items', to: 'items#next_items'
+  get '/items/:id/next_images', to: 'items#next_images'
   get '/items/:id/done_task', to: 'items#done_task'
   get '/items/:id/timeline', to: 'items#timeline'
+  get '/items/:id/showing_events', to: 'items#showing_events'
   get '/items/:id/favorite', to: 'favorite#index'
   post '/items/:id/favorite', to: 'favorite#create'
   delete '/items/:id/favorite', to: 'favorite#destroy'
@@ -26,8 +37,14 @@ Rails.application.routes.draw do
 
   resources :timers, only: [:index, :create, :update, :destroy]
   post '/timers/:id/done', to: 'timers#done', as: :timer_done
+  post '/timers/:id/do_later', to: 'timers#do_later'
+  post '/timers/:id/end', to: 'timers#end_timer'
 
   put '/notification/read', to: 'notifications#read'
+
+  get '/tags/default_tag_migration/', to: 'tags#default_tag_migration'
+  get '/tags/tag_migration/:migration_id', to: 'tags#tag_migration'
+  get '/tags/current_migration_version/', to: 'tags#tag_migration_version'
 
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks',

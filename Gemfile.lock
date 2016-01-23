@@ -89,6 +89,9 @@ GEM
       request_store (>= 1.0)
     google_visualr (2.5.1)
     hashie (3.4.2)
+    httparty (0.13.1)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     jbuilder (2.3.1)
       activesupport (>= 3.0.0, < 5)
@@ -260,6 +263,7 @@ DEPENDENCIES
   enumerize
   gon
   google_visualr
+  httparty
   jbuilder (~> 2.0)
   jquery-fileupload-rails
   jquery-rails

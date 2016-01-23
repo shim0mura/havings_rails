@@ -78,5 +78,7 @@ group :development, :test do
 
   gem 'annotate'
   gem 'awesome_print'
+
+  gem 'httparty'
 end
 

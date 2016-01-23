@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151024132601) do
+ActiveRecord::Schema.define(version: 20160120041839) do
 
   create_table "comments", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,     null: false
@@ -61,6 +61,8 @@ ActiveRecord::Schema.define(version: 20151024132601) do
     t.integer  "item_id",    limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.datetime "added_at",               null: false
+    t.string   "memo",       limit: 255
   end
 
   create_table "items", force: :cascade do |t|
@@ -111,6 +113,23 @@ ActiveRecord::Schema.define(version: 20151024132601) do
   add_index "social_profiles", ["provider", "uid"], name: "index_social_profiles_on_provider_and_uid", unique: true, using: :btree
   add_index "social_profiles", ["user_id"], name: "index_social_profiles_on_user_id", using: :btree
 
+  create_table "tag_migration_histories", force: :cascade do |t|
+    t.text     "added_tags",     limit: 65535
+    t.text     "updated_tags",   limit: 65535
+    t.text     "deleted_tags",   limit: 65535
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.datetime "tag_changed_at"
+  end
+
+  create_table "tag_relations", force: :cascade do |t|
+    t.integer  "tag_id",        limit: 4, null: false
+    t.integer  "parent_tag_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "relation_type", limit: 4
+  end
+
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
     t.integer  "taggable_id",   limit: 4
@@ -125,24 +144,35 @@ ActiveRecord::Schema.define(version: 20151024132601) do
   add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", using: :btree
 
   create_table "tags", force: :cascade do |t|
-    t.string  "name",           limit: 255
-    t.integer "taggings_count", limit: 4,   default: 0
+    t.string   "name",           limit: 255
+    t.integer  "taggings_count", limit: 4,   default: 0
+    t.string   "yomi_jp",        limit: 255
+    t.string   "yomi_roma",      limit: 255
+    t.integer  "parent_id",      limit: 4
+    t.integer  "tag_type",       limit: 4
+    t.integer  "priority",       limit: 4
+    t.integer  "nest",           limit: 4
+    t.boolean  "is_default_tag", limit: 1,   default: false, null: false
+    t.boolean  "is_deleted",     limit: 1,   default: false, null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
 
   create_table "timers", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.integer  "list_id",       limit: 4,                     null: false
-    t.integer  "user_id",       limit: 4,                     null: false
-    t.datetime "next_due_at",                                 null: false
+    t.string   "name",           limit: 255
+    t.integer  "list_id",        limit: 4,                     null: false
+    t.integer  "user_id",        limit: 4,                     null: false
+    t.datetime "next_due_at",                                  null: false
     t.datetime "over_due_from"
-    t.boolean  "is_repeating",  limit: 1,     default: false, null: false
-    t.text     "properties",    limit: 65535
-    t.boolean  "is_deleted",    limit: 1,     default: false, null: false
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.boolean  "is_active",     limit: 1,     default: true,  null: false
+    t.boolean  "is_repeating",   limit: 1,     default: false, null: false
+    t.text     "properties",     limit: 65535
+    t.boolean  "is_deleted",     limit: 1,     default: false, null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.boolean  "is_active",      limit: 1,     default: true,  null: false
+    t.datetime "latest_calc_at",                               null: false
   end
 
   add_index "timers", ["list_id"], name: "index_timers_on_list_id", using: :btree
@@ -172,5 +202,25 @@ ActiveRecord::Schema.define(version: 20151024132601) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["token"], name: "index_users_on_token", unique: true, using: :btree
   add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
+
+  create_table "yahoo_categories", force: :cascade do |t|
+    t.string   "category_name",        limit: 255
+    t.string   "category_name_jp",     limit: 255
+    t.string   "category_name_roma",   limit: 255
+    t.string   "url",                  limit: 255
+    t.integer  "category_id_by_yahoo", limit: 4
+    t.integer  "parent_id",            limit: 4
+    t.boolean  "is_end",               limit: 1,     default: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.integer  "root_category_id",     limit: 4
+    t.boolean  "is_brand",             limit: 1,     default: false
+    t.text     "duplicates",           limit: 65535
+    t.integer  "depth",                limit: 4
+    t.boolean  "is_default_tag",       limit: 1,     default: false
+    t.integer  "tag_type",             limit: 4
+    t.integer  "tagging_flag",         limit: 4
+    t.integer  "tagged_depth",         limit: 4
+  end
 
 end

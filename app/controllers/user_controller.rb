@@ -1,6 +1,7 @@
 class UserController < ApplicationController
 
-  before_action :set_user
+  before_action :set_user, only: [:index, :timeline, :following, :followers]
+  before_action :authenticate_user!, only: [:list_tree]
 
   def index
     @current_user = user_signed_in? ? current_user : nil
@@ -12,6 +13,9 @@ class UserController < ApplicationController
   def timeline
     timeline = @user.timeline(current_user, params[:from])
     render partial: 'shared/timeline', layout: false, locals: {timeline: timeline, has_next_event: @user.has_next_event_from?(timeline.last[:event_id])}
+  end
+
+  def list_tree
   end
 
   def following

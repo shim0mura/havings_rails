@@ -1,0 +1,14 @@
+<h1>Admin#index</h1>
+<p>Find me in app/views/admin/index.html.erb</p>
+
+<%# form_tag('/admin/extract') do %>
+<%#= recursive_child_items(@item) %>
+<%# submit_tag "送信" %>
+<%#end %>
+<% @items.each_with_index do |i, index| %>
+  <%== recursive_child_items_for_tag(i) %>
+<% end %>
+
+
+
+
