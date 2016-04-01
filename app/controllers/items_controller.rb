@@ -3,8 +3,8 @@ class ItemsController < ApplicationController
   include CarrierwaveBase64Uploader
 
   before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump]
-  before_action :set_item, only: [:show, :next_items, :next_images, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump]
-  before_action :can_show?, only: [:show, :next_items, :next_images, :timeline, :done_task, :showing_events, :edit, :update, :destroy]
+  before_action :set_item, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump]
+  before_action :can_show?, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy]
 
 
   def dummy
@@ -47,6 +47,12 @@ class ItemsController < ApplicationController
     get_next_images(from)
 
     sleep(5)
+  end
+
+  def item_image
+    @item_image = ItemImage.where(id: params[:image_id], item_id: @item.id).first
+    @user_id = (current_user.present? ? current_user.id : nil)
+    render json: { }, status: :unprocessable_entity unless @item_image.present?
   end
 
   def timeline
@@ -146,11 +152,6 @@ class ItemsController < ApplicationController
       end
 
       # グラフのための情報を更新
-      # グラフは今のところリストからしか参照しないので、リストに関するイベントと
-      # リストに属するアイテムの個数変化のみ記録
-      # 1. 手放した状態での追加
-      # 2. リスト、アイテムの追加
-      # 3. リストの画像追加
       if @item.is_garbage
         @item.change_count(0, dump_from_list_event)
       else
@@ -158,6 +159,9 @@ class ItemsController < ApplicationController
           @item.change_count(0, new_item_event, @item)
         else
           @item.change_count(0, new_item_event)
+
+          @item.tags.reload
+          Chart.add_item_to_total_chart(item: @item, count: @item.count)
         end
       end
 
@@ -183,6 +187,7 @@ class ItemsController < ApplicationController
     private_type_before_update = @item.private_type
     item_count_before_update = @item.count
     list_id_before_update = @item.list_id
+    tags_before_update = @item.tags.map(&:id)
 
     set_posted_image_data
 
@@ -207,9 +212,14 @@ class ItemsController < ApplicationController
       pli = parent.get_parent_list_ids
     end
 
+    pp parent_list_ids
+    pp Item.where(id: params[:item][:list_id]).first.get_parent_list_ids
+
     # respond_to do |format|
     if @item.update(item_params)
 
+      # 属するリストを変更、且つその対象リストが自分の子リストだった場合
+      # 再帰させないように処理
       if @item.is_list && !@item.get_parent_list_ids
         target_list_position = pli.index(@item.id)
         unless target_list_position
@@ -239,17 +249,74 @@ class ItemsController < ApplicationController
 
       if @item.count != item_count_before_update
         # アイテムの個数変化
+        pp "#item_count change #{@item.count} #{item_count_before_update}"
         @item.change_count(@item.count - item_count_before_update, count_changed)
-      elsif @item.is_list && (@item.list_id != list_id_before_update)
+      # elsif @item.is_list && (@item.list_id != list_id_before_update)
+      elsif (@item.list_id != list_id_before_update)
         # リストを別のリストに変更した時
+        current_parent_list_ids = @item.get_parent_list_ids
+
+        target_history = JSON.parse(@item.count_properties)
+
+        p "#"*20
+        p (parent_list_ids - current_parent_list_ids)
+        (parent_list_ids - current_parent_list_ids).each do |i|
+          p = Item.where(id: i).first
+          p.delete_events_history(target_history) if p.present?
+          p.reload
+        end
+        p "$"*20
+        p (current_parent_list_ids - parent_list_ids)
+        (current_parent_list_ids - parent_list_ids).each do |i|
+          p = Item.where(id: i).first
+          p.add_events_history(target_history) if p.present?
+          p.reload
+        end
+        pp "&"*20
+
+        @item.reload
         @item.change_count
         prev_parent = Item.where(id: list_id_before_update).first
         prev_parent.change_count if prev_parent.present?
       end
 
+
+      # アイテム個数の全体における割合計算
+      if !@item.is_garbage && !@item.is_list
+
+        tags = @item.tags.reload
+        tags_before_update = ActsAsTaggableOn::Tag.where(id: tags_before_update)
+
+        if !(tags - tags_before_update).empty? && @item.count != item_count_before_update
+          Chart.delete_item_to_total_chart(item: @item, count: item_count_before_update, tag: tags_before_update)
+          Chart.add_item_to_total_chart(item: @item, count: @item.count, tag: tags)
+
+        elsif !(tags - tags_before_update).empty?
+          # 一旦、前のタグに紐付いた値を消してから新しい物を追加
+          # Pコートタグをダッフルコートタグに変えたとしても
+          # 一旦Pコートとそれに関係する親の値も消してから
+          # 再度ダッフルコートを追加するので、タグの範囲が被ってても問題ない
+          Chart.delete_item_to_total_chart(item: @item, count: @item.count, tag: tags_before_update)
+          Chart.add_item_to_total_chart(item: @item, count: @item.count, tag: tags)
+        elsif @item.count != item_count_before_update
+          count_diff = @item.count - item_count_before_update
+
+          if count_diff > 0
+            Chart.add_item_to_total_chart(item: @item, count: count_diff)
+          else
+            Chart.delete_item_to_total_chart(item: @item, count: count_diff * (-1))
+          end
+
+        end
+      end
+
+
+
+      # 画像周りの変更
+      # TODO: updateメソッド内でやることが多すぎるので
+      #       画像変更は別APIにしたほうがいい?
       delete_image!
       added_image_event = create_image!(@posted_image_data)
-
       if params["item"]["image_metadata_for_update"].present?
         update_item_image_metadata(params["item"]["image_metadata_for_update"])
       end
@@ -274,24 +341,34 @@ class ItemsController < ApplicationController
     fellow_ids = params[:fellow_ids].present? ? params[:fellow_ids].map(&:to_i) : []
     if @item.update_attribute('is_deleted', true)
 
-      children = @item.child_items.countable
-      fellow_ids = params[:fellow_ids].present? ? params[:fellow_ids].map(&:to_i) : []
-      
-      delete_fellow_children, unchanged_children = children.partition do |c|
-        fellow_ids.include?(c.id)
+      Chart.delete_item_to_total_chart(item: @item, count: @item.count)
+
+      if @item.is_list
+        children = @item.child_items.countable
+        fellow_ids = params[:fellow_ids].present? ? params[:fellow_ids].map(&:to_i) : []
+        delete_fellow_children, unchanged_children = children.partition do |c|
+          fellow_ids.include?(c.id)
+        end
+
+        parent_item = @item.list
+        unchanged_children.each do |c|
+          c.list_id = parent_item.id
+          c.save
+        end
+
+        delete_fellow_children.each do |c|
+          Chart.delete_item_to_total_chart(item: c, count: c.count)
+          c.delete_recursive
+          delete_events(c.get_event_recursive)
+        end
       end
 
-      parent_item = @item.list
-      unchanged_children.each do |c|
-        c.list_id = parent_item.id
-        c.save
+      @item.get_parent_list_ids.each do |i|
+        p = Item.where(id: i).first
+        p.delete_events_history(target_history) if p.present?
+        p.reload
       end
-
-      delete_fellow_children.each do |c|
-        c.delete_recursive
-        delete_events(c.get_event_recursive)
-      end
-
+      @item.reload
       @item.change_count(0)
 
       delete_events(@item.get_item_related_event)
@@ -317,20 +394,25 @@ class ItemsController < ApplicationController
         }
       )
 
-      children = @item.child_items.countable
-      fellow_ids = params[:item][:fellow_ids].map(&:to_i)
-      dump_fellow_children, unchanged_children = children.partition do |c|
-        fellow_ids.include?(c.id)
-      end
+      Chart.delete_item_to_total_chart(item: @item, count: @item.count)
 
-      parent_item = @item.list
-      unchanged_children.each do |c|
-        c.list_id = parent_item.id
-        c.save
-      end
+      if @item.is_list
+        children = @item.child_items.countable
+        fellow_ids = params[:item][:fellow_ids].map(&:to_i)
+        dump_fellow_children, unchanged_children = children.partition do |c|
+          fellow_ids.include?(c.id)
+        end
 
-      dump_fellow_children.each do |c|
-        c.dump_recursive
+        parent_item = @item.list
+        unchanged_children.each do |c|
+          c.list_id = parent_item.id
+          c.save
+        end
+
+        dump_fellow_children.each do |c|
+          Chart.delete_item_to_total_chart(item: c, count: c.count)
+          c.dump_recursive
+        end
       end
 
       @item.change_count(0, dump_from_list_event)
@@ -347,7 +429,7 @@ class ItemsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_item
-      @item = Item.find(params[:id])
+      @item = Item.includes(child_items:[:tags, :item_images]).find(params[:id])
       @child_items = @item.child_items
     end
 
@@ -386,7 +468,12 @@ class ItemsController < ApplicationController
     def delete_image!
       if params[:item][:image_deleting]
         deleting_image_ids = params[:item][:image_deleting].map(&:to_i)
-        @item.delete_image_event_evidence_for_graph(deleting_image_ids)
+
+        deleting_event_ids = detect_deleting_image_event_from_image_id(deleting_image_ids)
+
+        # @item.delete_image_event_evidence_for_graph(deleting_image_ids)
+        @item.delete_image_event_evidence_for_graph(deleting_event_ids)
+
         @item.item_images.each do |image|
           if deleting_image_ids.include?(image.id)
             image.update_attribute('item_id', nil)
@@ -433,7 +520,8 @@ class ItemsController < ApplicationController
       end
 
       image_ids = params["item"]["image_metadata_for_update"].keys.map{|k|k.to_i}
-      event_ids = @item.delete_image_event_evidence_for_graph(image_ids)
+      event_ids = @item.detect_deleting_image_event_from_image_id(image_ids)
+      @item.delete_image_event_evidence_for_graph(event_ids)
       p event_ids
       p @item.count_properties
       @item.add_image_event_evidence_for_graph(event_ids)
@@ -480,12 +568,14 @@ class ItemsController < ApplicationController
 
     def get_next_items(from = 0)
       @next_items = @item.next_items(current_user, from)
-      @has_next_item = @next_items.size >= Item::SHOWING_ITEM && @item.has_next_item_from?(current_user, @next_items.last.id)
+      # @has_next_item = @next_items.size >= Item::SHOWING_ITEM && @item.has_next_item_from?(current_user, @next_items.last.id)
+      @has_next_item = @next_items.size >= Item::SHOWING_ITEM + 1
     end
 
     def get_next_images(from = 0)
       @next_images = @item.next_images(from)
-      @has_next_image = @next_images.size >= Item::SHOWING_ITEM && @item.has_next_images_from?(@next_images.last.id)
+      # @has_next_image = @next_images.size >= Item::SHOWING_ITEM && @item.has_next_images_from?(@next_images.last.id)
+      @has_next_image = @next_images.size >= Item::SHOWING_ITEM + 1
     end
 
 end

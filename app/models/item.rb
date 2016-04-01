@@ -33,6 +33,7 @@ class Item < ActiveRecord::Base
   has_many :item_images
 
   has_many :favorites
+  has_many :image_favorites
 
   has_many :comments
 
@@ -51,6 +52,8 @@ class Item < ActiveRecord::Base
   scope :as_list, -> { where(is_list: true) }
 
   scope :countable, -> { where(is_garbage: false) }
+
+  scope :dump, -> { where(is_garbage: true) }
 
   # before_create :set_default_value
 
@@ -99,9 +102,11 @@ class Item < ActiveRecord::Base
       i = Item
     end
 
-    relation_to_owner = get_relation_to_owner(user)
+    relation_to_owner = self.user.get_relation_to(user)
 
     i
+      .includes(:item_images, :tags, :favorites)
+      .countable
       .where(
         list_id: self.id
       )
@@ -130,6 +135,43 @@ class Item < ActiveRecord::Base
 
   def has_next_images_from?(from)
     next_images(from).size > 0
+  end
+
+  def self.dump_items(user, viewer = nil, from = 0, limit = SHOWING_ITEM)
+    if from != 0
+      from_option = Item.arel_table[:id].lt(from)
+      i = Item.where(from_option)
+    else 
+      i = Item
+    end
+
+    relation_to_owner = user.get_relation_to(viewer)
+
+    i
+      .includes(:item_images, :tags, :favorites)
+      .dump
+      .where(user_id: user.id)
+      .where("private_type <= ?", relation_to_owner)
+      .order("id DESC")
+      .limit(limit + 1)
+  end
+
+  def get_nested_child_item(from = 0)
+    nested_child_item_ids = []
+    items = Item.countable.includes(:child_items).where(user_id: self.user_id)
+
+    queue = self.child_items.to_a
+
+    while !queue.empty?
+      item = queue.shift
+      pp item
+      next unless item.present?
+      nested_child_item_ids << item.id
+      queue << item.child_items.to_a
+      queue.flatten!
+    end
+
+    return nested_child_item_ids
   end
 
   def is_already_listed_in?(list_id)
@@ -208,6 +250,179 @@ class Item < ActiveRecord::Base
     return item_events.uniq
   end
 
+  def delete_events_history(target_events)
+    properties = JSON.parse(self.count_properties)
+    properties.sort_by!{|pr|Date.parse(pr["date"])}
+    target_events.sort_by!{|pr|Date.parse(pr["date"])}
+    deleting_events = Marshal.load(Marshal.dump(target_events))
+
+    target = deleting_events.shift
+    next_target = deleting_events.shift
+    unless next_target
+      next_target = target
+      next_target["date"] = Date.today.to_s
+    end
+    first_added_date = Date.parse(target["date"])
+    prev_count = properties.first["count"]
+    deleting_props = []
+
+    # countも削除対象のアイテム数に応じて変える必要がある
+    # 対象アイテムの親リストはイベント履歴が対象アイテムより多いはずなので
+    # 1. 対象アイテムの記録日と親リストの記録日が同じ
+    # 2. 対象アイテムの記録日と親リストの記録日が違う
+    #    (親リストに属する別のアイテムの個数変化など）
+    # の2パターンが考えられる
+    # 削除したいイベント履歴日(A)とその次の削除したいイベント履歴日(B)の間に
+    # 2.のようなパターンがありえるので、それを2番目のelsif節で処理してる
+    # 4,5番目のelse節は今のところ考えられないけど、
+    # 考慮漏れなどのことも考えて入れておく
+    properties.each_with_index do |h, i|
+      date = Date.parse(h["date"])
+      target_date = Date.parse(target["date"])
+      next_target_date = Date.parse(next_target["date"])
+      # next unless first_added_date > date
+      if first_added_date > date
+        p "next #{first_added_date} #{date}"
+        next
+      end
+
+      if date == target_date
+        h["count"] = h["count"] - target["count"]
+        dup = h["events"] & target["events"]
+        if dup.present?
+          h["events"].delete_if{|e|dup.include?(e)}
+          deleting_props << h if h["events"].empty? && prev_count == h["count"]
+        end
+        p "same date target #{date}, #{next_target} "
+
+      elsif date > target_date && date < next_target_date
+        h["count"] = h["count"] - target["count"]
+        p "diff target #{date}, #{next_target} "
+
+      elsif date == next_target_date
+        h["count"] = h["count"] - next_target["count"]
+
+        dup = h["events"] & next_target["events"]
+        if dup.present?
+          h["events"].delete_if{|e|dup.include?(e)}
+          deleting_props << h if h["events"].empty? && prev_count == h["count"]
+        end
+
+        target = next_target
+        next_target = deleting_events.shift
+        unless next_target
+          next_target = target
+          next_target["date"] = Date.today.to_s
+        end
+
+        p "same date next_target #{date}, #{next_target}"
+
+      elsif date < target_date
+        h["count"] = h["count"] - target["count"]
+      else
+        h["count"] = h["count"] - target["count"]
+        logger.warn("something with wrong!")
+      end
+
+      prev_count = h["count"]
+
+    end
+
+    properties.delete_if{|prop|deleting_props.include?(prop)}
+
+    self.count_properties = properties.to_json
+    save
+  end
+
+  def add_events_history(target_events)
+    properties = JSON.parse(self.count_properties)
+    properties.sort_by!{|pr|Date.parse(pr["date"])}
+    target_events.sort_by!{|pr|Date.parse(pr["date"])}
+    adding_events = Marshal.load(Marshal.dump(target_events))
+
+    result = []
+    target = properties.shift
+    addings = adding_events.shift
+    prev_target = nil
+    prev_addings = nil
+
+    while target.present? || addings.present?
+
+      unless target.present?
+        target = {}
+        target["date"] = Date.today.to_s
+        target["events"] = []
+        target["count"] = 0
+      end
+
+      unless addings.present?
+        addings = {}
+        addings["date"] = Date.today.to_s
+        addings["events"] = []
+        addings["count"] = 0
+      end
+
+      last_count = (result.last.present? ? result.last["count"] : 0)
+
+      case Date.parse(target["date"]) <=> Date.parse(addings["date"])
+      when -1
+
+        if prev_target.nil?
+          result_count = last_count + target["count"]
+        elsif prev_addings.present?
+          result_count = target["count"] + prev_addings["count"]
+        end
+        result << {
+          "date"   => target["date"],
+          "count"  => result_count,
+          "events" => target["events"]
+        }
+        prev_target = target
+        target = properties.shift
+
+      when 0
+        result_events = (target["events"] + addings["events"]).flatten.uniq
+
+        prev_target_diff = prev_target.present? ? target["count"] - prev_target["count"] : target["count"]
+
+        prev_addings_diff = prev_addings.present? ? addings["count"] - prev_addings["count"] : addings["count"]
+
+        result_count = (result.last.present? ? result.last["count"] : 0) + prev_target_diff + prev_addings_diff
+
+        result << {
+          "date"   => target["date"],
+          "count"  => result_count,
+          "events" => result_events
+        }
+
+        prev_target = target
+        target = properties.shift
+        prev_addings = addings
+        addings = adding_events.shift
+
+      when 1
+
+        if prev_addings.nil?
+          result_count = last_count + addings["count"]
+        elsif prev_target.present?
+          result_count = addings["count"] + prev_target["count"]
+        end
+        result << {
+          "date"   => addings["date"],
+          "count"  => result_count,
+          "events" => addings["events"]
+        }
+        prev_addings = addings
+
+        addings = adding_events.shift
+
+      end
+    end
+
+    self.count_properties = result.to_json
+    save
+  end
+
   def change_count(count_diff = 0, event = nil, current_list = nil)
     count_diff = 0 unless count_diff.present?
     parent_list = self.list
@@ -226,7 +441,12 @@ class Item < ActiveRecord::Base
       hash["count"] = 0
     end
 
-    hash["count"] = self.user.item_tree(nil, self.id).first[:count] + count_diff rescue count_diff
+    if self.is_list
+      # hash["count"] = self.user.item_tree(start_at: self.id).first[:count] + count_diff rescue count_diff
+      hash["count"] = self.user.item_tree(start_at: self.id).first[:count]
+    else
+      hash["count"] = self.count
+    end
 
     hash["events"] << event.id if event.present?
     properties << hash
@@ -235,21 +455,28 @@ class Item < ActiveRecord::Base
     self.count = hash["count"].to_i
     self.save
 
-    if parent_list && !current_list
-      if event.present? && event.related_id == parent_list.id
-        parent_list.change_count(count_diff, event)
-      else
-        parent_list.change_count(count_diff)
-      end
-      # if self.is_list
-      #   parent_list.change_count(count_diff) unless current_list
-      # else
-      #   parent_list.change_count(count_diff, event) unless current_list
-      # end
+
+    if parent_list.present?
+      parent_list.change_count(count_diff, event)
     end
+
+
+
+    # if parent_list && !current_list
+    #   if event.present? && event.related_id == parent_list.id
+    #     parent_list.change_count(count_diff, event)
+    #   else
+    #     parent_list.change_count(count_diff)
+    #   end
+    #   # if self.is_list
+    #   #   parent_list.change_count(count_diff) unless current_list
+    #   # else
+    #   #   parent_list.change_count(count_diff, event) unless current_list
+    #   # end
+    # end
   end
 
-  def delete_image_event_evidence_for_graph(item_image_ids)
+  def detect_deleting_image_event_from_image_id(item_image_ids)
     properties = count_properties ? JSON.parse(count_properties) : []
     return [] if properties.empty?
 
@@ -269,23 +496,57 @@ class Item < ActiveRecord::Base
     end
     pp hash
 
-    deleted_events = []
+    return hash.keys
+
+  end
+
+
+  def delete_image_event_evidence_for_graph(event_ids)
+  # def delete_image_event_evidence_for_graph(item_image_ids)
+    # properties = count_properties ? JSON.parse(count_properties) : []
+    # return [] if properties.empty?
+
+    # events = Event.where(
+    #   event_type: Event.event_types["add_image"],
+    #   acter_id: self.user_id,
+    #   related_id: self.id
+    # )
+
+    # hash = {}
+    # 
+    # events.each do |e|
+    #   item_image_id = eval(e.properties)[:item_image_id]
+    #   if item_image_ids.include?(item_image_id)
+    #     hash[e.id] = item_image_id
+    #   end
+    # end
+    # pp hash
+
+    # deleted_events = []
 
     # 元々add_imageしかイベントがなかったのに
     # そのadd_imageが消された場合、その日は何もイベントが起きなかったことになる
     # なので、その日の値をpropから削除する
+    properties = count_properties ? JSON.parse(count_properties) : []
     deleting_props = []
 
     properties.each do |prop|
-      prop["events"].delete_if do |e|
-        result = hash.has_key?(e)
-        deleted_events.push(e) if result
-        if result && prop["events"].select{|a|a != e}.empty?
-          deleting_props << prop["date"] 
-        end
-        result
+
+      dup = prop["events"] & event_ids
+      if dup.present?
+        prop["events"] = prop["events"] - event_ids
+        deleting_props << prop["date"] if prop["events"].empty?
       end
-      pp prop
+
+      # prop["events"].delete_if do |e|
+      #   result = hash.has_key?(e)
+      #   deleted_events.push(e) if result
+      #   if result && prop["events"].select{|a|a != e}.empty?
+      #     deleting_props << prop["date"] 
+      #   end
+      #   result
+      # end
+      # pp prop
     end
     pp deleting_props
 
@@ -294,7 +555,9 @@ class Item < ActiveRecord::Base
     self.count_properties = properties.to_json
     save
 
-    return deleted_events
+    list.delete_image_event_evidence_for_graph(event_ids) if self.list
+
+    # return deleted_events
   end
 
   def add_image_event_evidence_for_graph(event_ids)
@@ -348,6 +611,8 @@ class Item < ActiveRecord::Base
     pp self
     save
 
+    list.add_image_event_evidence_for_graph(event_ids) if self.list
+
     # return deleted_events
   end
 
@@ -376,6 +641,7 @@ class Item < ActiveRecord::Base
       is_list: self.is_list,
       count:   self.count,
       image:   self.thumbnail,
+      list_id: self.list_id,
       path:    Rails.application.routes.url_helpers.item_path(self.id)
     }
   end
@@ -398,7 +664,8 @@ class Item < ActiveRecord::Base
           item_ids << eval(e.properties)[:item_id]
         end
       end
-      items = Item.where(id: item_ids)
+      item_ids.compact!
+      items = Item.includes(:item_images, :child_items).where(id: item_ids)
 
       # 日ごとに記録してるevent_idsをイベントオブジェクトに置き換え
       event_objects = []
@@ -408,8 +675,10 @@ class Item < ActiveRecord::Base
         if e.event_type == "add_image"
           item = items.detect{|i|i.id == e.related_id}
           image_id = eval(e.properties)[:item_image_id]
-          adding_image = ItemImage.where(id: image_id).first
-          adding_image = adding_image.image_url if adding_image
+
+          adding_image = item.item_images.detect{|i|i.id == image_id}
+
+          # adding_image = ItemImage.where(id: image_id, item_id: self.id).first
         elsif e.event_type == "change_count"
           next
         else
@@ -417,7 +686,8 @@ class Item < ActiveRecord::Base
         end
         hash["item"] = item.to_light if item.present?
         if adding_image.present?
-          hash["item"][:thumbnail] = adding_image 
+          hash["item"][:thumbnail] = adding_image.image_url
+          hash["item"][:item_image_id] = adding_image.id
         end
         event_objects << hash
       end
@@ -427,30 +697,30 @@ class Item < ActiveRecord::Base
   end
 
   def can_show?(user)
-    relation_to_owner = get_relation_to_owner(user)
+    relation_to_owner = self.user.get_relation_to(user)
 
     relation_to_owner >= Item.private_types[self.private_type]
   end
 
-  def get_relation_to_owner(user)
-    relation_to_owner = Relation::NOTHING unless user.present?
-    relation_to_owner = Relation::HIMSELF if user.present? && user.id == self.user_id
+  # def get_relation_to_owner(user)
+  #   relation_to_owner = Relation::NOTHING unless user.present?
+  #   relation_to_owner = Relation::HIMSELF if user.present? && user.id == self.user_id
 
-    unless relation_to_owner
-      followers = self.user.followed.map(&:id)
-      followings = self.user.following.map(&:id)
+  #   unless relation_to_owner
+  #     followers = self.user.followed.map(&:id)
+  #     followings = self.user.following.map(&:id)
 
-      if followers.include?(user.id) && followings.include?(user.id)
-        relation_to_owner = Relation::FRIEND
-      elsif followers.include?(user.id) && !followings.include?(user.id)
-        relation_to_owner = Relation::FOLLOWED
-      else
-        relation_to_owner = Relation::NOTHING
-      end
-    end
+  #     if followers.include?(user.id) && followings.include?(user.id)
+  #       relation_to_owner = Relation::FRIEND
+  #     elsif followers.include?(user.id) && !followings.include?(user.id)
+  #       relation_to_owner = Relation::FOLLOWED
+  #     else
+  #       relation_to_owner = Relation::NOTHING
+  #     end
+  #   end
 
-    return relation_to_owner
-  end
+  #   return relation_to_owner
+  # end
 
   def breadcrumb(include_self = false)
     return self.user.name + "さんの持ち物" unless list_id
@@ -463,6 +733,9 @@ class Item < ActiveRecord::Base
   end
 
   def get_parent_list_ids(ids = [])
+    # 同じ親要素が無いか調べる
+    # 属するリスト変更時に子リストを指定した場合に再帰がおきるので
+    # それをcountでチェックする
     return false if ids.detect{|e|ids.count(e) > 1}
 
     if self.list_id

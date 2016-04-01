@@ -15,6 +15,8 @@ class Comment < ActiveRecord::Base
   belongs_to :item
   belongs_to :user
 
+  default_scope -> { where(is_deleted: false) }
+
   def to_light
     {
       id:    self.item_id,

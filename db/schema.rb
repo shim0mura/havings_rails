@@ -11,14 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160120041839) do
+ActiveRecord::Schema.define(version: 20160331044439) do
+
+  create_table "charts", force: :cascade do |t|
+    t.integer  "user_id",      limit: 4,     null: false
+    t.text     "chart_detail", limit: 65535
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "charts", ["user_id"], name: "index_charts_on_user_id", unique: true, using: :btree
 
   create_table "comments", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4,     null: false
-    t.integer  "item_id",    limit: 4,     null: false
+    t.integer  "user_id",    limit: 4,                     null: false
+    t.integer  "item_id",    limit: 4,                     null: false
     t.text     "content",    limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.boolean  "is_deleted", limit: 1,     default: false, null: false
   end
 
   create_table "events", force: :cascade do |t|
@@ -55,6 +65,16 @@ ActiveRecord::Schema.define(version: 20160120041839) do
   add_index "follows", ["followed_user_id"], name: "index_follows_on_followed_user_id", using: :btree
   add_index "follows", ["following_user_id", "followed_user_id"], name: "index_follows_on_following_user_id_and_followed_user_id", unique: true, using: :btree
   add_index "follows", ["following_user_id"], name: "index_follows_on_following_user_id", using: :btree
+
+  create_table "image_favorites", force: :cascade do |t|
+    t.integer  "user_id",       limit: 4, null: false
+    t.integer  "item_id",       limit: 4, null: false
+    t.integer  "item_image_id", limit: 4, null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "image_favorites", ["user_id", "item_image_id"], name: "index_image_favorites_on_user_id_and_item_image_id", unique: true, using: :btree
 
   create_table "item_images", force: :cascade do |t|
     t.string   "image",      limit: 255

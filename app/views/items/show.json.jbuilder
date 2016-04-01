@@ -32,7 +32,9 @@ json.comment_count @item.comments.size
 json.owning_item_count @item.child_items.size
 json.image_count @item.item_images.size
 
-json.partial! 'item_image_list', locals: {images: @next_images, has_next: @has_next_image}
+json.item_images do
+  json.partial! 'item_image_list', locals: {images: @next_images, user_id: (current_user.present? ? current_user.id : nil), has_next: @has_next_image}
+end
 
 json.tags @item.tag_list
 json.tag_list @item.tag_list.to_s
@@ -43,4 +45,5 @@ json.partial! 'timer_lists', locals: {timers: @item.timers, can_add_timer: @item
 
 # eventsというkeyはItem.showing_itemで使うのでここでは別のものに変えておく
 # どうせクライアント側もevent_idsを利用しない
-json.count_properties JSON.parse(@item.count_properties).each{|e|e["event_ids"] = e["events"];e.delete("events")}
+# json.count_properties JSON.parse(@item.count_properties).each{|e|e["event_ids"] = e["events"];e.delete("events")}
+json.count_properties @item.showing_events

@@ -154,7 +154,7 @@ class Notification < ActiveRecord::Base
 
       next unless can_notify?(event, target, type)
 
-      result << get_notification_hash(event, target, type, is_unread)
+      result << get_notification_hash(event, target, type, is_unread, e.first.created_at)
     end
 
     return result
@@ -170,10 +170,13 @@ class Notification < ActiveRecord::Base
       acter = Timer
         .without_deleted
         .where(id: event.map(&:related_id))
-      target = nil
+      target = Item.where(id: acter.first.list_id)
     when :favorite
       acter = User.where(id: event.map(&:acter_id))
       target = Item.where(id: event.map(&:related_id))
+    when :image_favorite
+      acter = User.where(id: event.map(&:acter_id))
+      target = ItemImage.where(id: event.map(&:related_id))
     when :comment
       acter = User.where(id: event.map(&:acter_id))
       target = Item.where(id: event.map(&:related_id))
@@ -186,12 +189,13 @@ class Notification < ActiveRecord::Base
     [acter, target, type]
   end
 
-  def get_notification_hash(acter, target, type, is_unread)
+  def get_notification_hash(acter, target, type, is_unread, date)
     hash = {
       type:   type,
       unread: is_unread,
       acter:  [],
-      target: []
+      target: [],
+      date:   date
     }
 
     if acter && acter.first.respond_to?(:to_light)
@@ -212,9 +216,11 @@ class Notification < ActiveRecord::Base
   def can_notify?(acter, target, type)
     case type
     when :timer
-      return acter.present?
+      return acter.present? && target.present?
     when :favorite
       return acter.present? && target.present?
+    when :image_favorite
+      return acter.present? && target.present? && target.all?{|i|i.item_id.present?}
     when :comment
       return acter.present? && target.present?
     when :follow

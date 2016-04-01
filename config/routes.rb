@@ -13,6 +13,11 @@ Rails.application.routes.draw do
 
   get 'user/list_tree', to: 'user#list_tree'
   get 'user/:user_id', to: 'user#index', as: :user_page
+  get 'user/:user_id/item_list', to: 'user#item_list'
+  get 'user/:user_id/item_images', to: 'user#item_images'
+  get 'user/:user_id/favorite_items', to: 'user#favorite_items'
+  get 'user/:user_id/favorite_images', to: 'user#favorite_images'
+  get 'user/:user_id/dump_items', to: 'user#dump_items'
   get 'user/:user_id/timeline', to: 'user#timeline'
   get 'user/:user_id/following', to: 'user#following'
   get 'user/:user_id/followers', to: 'user#followers'
@@ -21,6 +26,7 @@ Rails.application.routes.draw do
 
   get 'home', to: 'welcome#home'
   get 'home/timeline', to: 'welcome#timeline'
+  get 'home/graph', to: 'welcome#item_graph'
 
   resources :items
   put '/items/:id/dump', to: 'items#dump'
@@ -30,16 +36,24 @@ Rails.application.routes.draw do
   get '/items/:id/timeline', to: 'items#timeline'
   get '/items/:id/showing_events', to: 'items#showing_events'
   get '/items/:id/favorite', to: 'favorite#index'
+  get '/items/:id/favorited_users', to: 'favorite#favorited_users'
   post '/items/:id/favorite', to: 'favorite#create'
   delete '/items/:id/favorite', to: 'favorite#destroy'
+  get '/items/:id/comment', to: 'comments#index'
   post '/items/:id/comment', to: 'comments#create'
   delete '/items/:id/comment/:comment_id', to: 'comments#destroy'
+  get '/items/:id/image/:image_id', to: 'items#item_image'
+  get '/items/image/:image_id/favorited_users', to: 'favorite#image_favorited_users'
+  post '/items/image/:image_id/favorite', to: 'favorite#image_favorite'
+  delete '/items/image/:image_id/favorite', to: 'favorite#image_unfavorite'
 
   resources :timers, only: [:index, :create, :update, :destroy]
   post '/timers/:id/done', to: 'timers#done', as: :timer_done
   post '/timers/:id/do_later', to: 'timers#do_later'
   post '/timers/:id/end', to: 'timers#end_timer'
 
+  get '/notification', to: 'notifications#index'
+  get '/notification/unread_count', to: 'notifications#unread_count'
   put '/notification/read', to: 'notifications#read'
 
   get '/tags/default_tag_migration/', to: 'tags#default_tag_migration'

@@ -85,15 +85,18 @@ module ApplicationHelper
   def recursive_category(obj)
     html = ""
     obj.each do |item|
-      next unless item[:item][:is_list]
+      # next unless item[:item][:is_list]
+      next unless item[:is_list]
       children = ""
-      item[:children].each do |child|
-        if child[:item][:is_list]
+      item[:owning_items].each do |child|
+        # if child[:item][:is_list]
+        if child[:is_list]
           children = children.html_safe + recursive_category([child])
         end
       end
       children = content_tag(:ul, children) unless children.empty?
-      current_html = content_tag(:li, link_to(item[:item][:name] + "(#{item[:count]})", item[:item][:path]) + children)
+      # current_html = content_tag(:li, link_to(item[:item][:name] + "(#{item[:count]})", item[:item][:path]) + children)
+      current_html = content_tag(:li, link_to(item[:name] + "(#{item[:count]})", item[:path]) + children)
 
       html = html.html_safe + current_html
     end
@@ -101,38 +104,39 @@ module ApplicationHelper
   end
 
   def repeating_task_to_str(props_by_json)
-    if props_by_json["repeat_by"] == "0"
-      case(props_by_json["repeat_by_day"]["month_interval"])
-      when("0")
+    if props_by_json["repeat_by"].to_i == 0
+      case(props_by_json["repeat_by_day"]["month_interval"].to_i)
+      when(0)
         month_interval = "毎月 "
-      when("1")
+      when(1)
         month_interval = "2ヶ月に1回 "
-      when("2")
+      when(2)
         month_interval = "3ヶ月に1回 "
-      when("3")
+      when(3)
         month_interval = "4ヶ月に1回 "
-      when("5")
+      when(5)
         month_interval = "半年に1回 "
       end
-      day = props_by_json["repeat_by_day"]["day"] + "日"
+      day = props_by_json["repeat_by_day"]["day"].to_s + "日"
       str = month_interval + day
     else
-      case(props_by_json["repeat_by_week"]["week"])
-      when("0")
+      case(props_by_json["repeat_by_week"]["week"].to_i)
+      when(0)
         week = "毎週 "
-      when("1")
+      when(1)
         week = "毎月第一週 "
-      when("2")
+      when(2)
         week = "毎月第二週 "
-      when("3")
+      when(3)
         week = "毎月第三週 "
-      when("4")
+      when(4)
         week = "毎月第四週 "
-      when("5")
+      when(5)
         week = "毎月最終週 "
       end
       wdays = ["日", "月", "火", "水", "木", "金", "土"]
       day_of_week = wdays[props_by_json["repeat_by_week"]["day_of_week"].to_i]
+
       str = week + day_of_week + "曜日"
     end
     return str + "に通知"

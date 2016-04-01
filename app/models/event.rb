@@ -17,16 +17,17 @@ class Event < ActiveRecord::Base
 
   include EnumType
 
-  CREATE_LIST = "create_list"
-  CREATE_ITEM = "create_item"
-  ADD_IMAGE   = "add_image"
-  DUMP        = "dump"
-  FAVORITE    = "favorite"
-  FOLLOW      = "follow"
-  COMMENT     = "comment"
-  TIMER       = "timer"
+  CREATE_LIST    = "create_list"
+  CREATE_ITEM    = "create_item"
+  ADD_IMAGE      = "add_image"
+  DUMP           = "dump"
+  FAVORITE       = "favorite"
+  IMAGE_FAVORITE = "image_favorite"
+  FOLLOW         = "follow"
+  COMMENT        = "comment"
+  TIMER          = "timer"
 
-  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count)
+  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count image_favorite)
 
   default_scope -> { where(is_deleted: false) }
 
@@ -67,7 +68,7 @@ class Event < ActiveRecord::Base
     return false unless self.event_type == target_event.event_type
 
     case self.event_type
-    when "favorite", "comment"
+    when FAVORITE, IMAGE_FAVORITE, COMMENT
       return self.related_id == target_event.related_id
     end
   end

@@ -17,6 +17,10 @@ class WelcomeController < ApplicationController
     render partial: 'shared/timeline', layout: false, locals: {timeline: timeline, has_next_event: @has_next_event, is_home: true}
   end
 
+  def item_graph
+    @chart_detail = JSON.parse(current_user.chart.chart_detail)
+  end
+
   private
   def following_timeline(from = 0, size = User::MAX_SHOWING_EVENTS)
     timeline = []

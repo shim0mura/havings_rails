@@ -39,6 +39,7 @@ class User < ActiveRecord::Base
   before_create :generate_token
   before_create :set_email_provider
   after_create  :create_notification
+  after_create  :create_chart_detail
   after_create  :create_home_list
 
   validates:token, uniqueness: true
@@ -54,8 +55,12 @@ class User < ActiveRecord::Base
   has_many :comments
 
   has_one :notification
+  has_one :chart
+
+  scope :countable, -> { where(is_garbage: false) }
 
   has_many :favorites
+  has_many :image_favorites
 
   has_many :follows_from, class_name: Follow, foreign_key: :followed_user_id, dependent: :destroy
   has_many :follows_to,   class_name: Follow, foreign_key: :following_user_id,   dependent: :destroy
@@ -139,7 +144,7 @@ class User < ActiveRecord::Base
   end
 
   def get_home_list
-    Item.where(
+    Item.includes(child_items:[:tags, :favorites, :item_images]).where(
       user_id: self.id,
       list_id: nil
     ).first
@@ -170,7 +175,7 @@ class User < ActiveRecord::Base
   def thumbnail
     # TODO:social_profileの画像をどうにかしてuserカラムの中に収めたい
     #      その分sqlを1本減らしたい
-    if image && image.file.exists?
+    if self.image.present? && image.file.exists?
       image.thumb.url
     elsif social_profiles.present?
       social_profiles.last.image_url
@@ -189,13 +194,39 @@ class User < ActiveRecord::Base
     }
   end
 
-  def item_tree(current = nil, start_at = nil, items = nil, queue = nil, result = nil)
+  def his_own_favorite_items(from = 0)
+    if from != 0
+      from_option = Favorite.arel_table[:id].lt(from)
+    else 
+      from_option = nil
+    end
+    self.favorites.where(from_option).limit(Item::SHOWING_ITEM + 1).order("id DESC")
+  end
+
+  def his_own_favorite_images(from = 0)
+    if from != 0
+      from_option = ImageFavorite.arel_table[:id].lt(from)
+    else 
+      from_option = nil
+    end
+    self.image_favorites.where(from_option).limit(ItemImage::MAX_SHOWING_USER_ITEM_IMAGES + 1).order("id DESC")
+  end
+
+  def item_tree(current: nil, start_at: nil, items: nil, queue: nil, result: nil, relation_to_owner: nil)
+
+    if relation_to_owner.nil?
+      relation_to_owner = Relation::NOTHING
+    end
+
     if start_at
       queue = Item.where(id: start_at).to_a
     end
 
     if items.nil?
-      items = Item.countable.where(user_id: self.id).to_a
+      items = Item.countable
+        .includes(:item_images)
+        .where(user_id: self.id)
+        .where("private_type <= ?", relation_to_owner).to_a
     end
 
     if queue.nil?
@@ -212,21 +243,27 @@ class User < ActiveRecord::Base
     while !queue.empty?
       parent_item = queue.shift
       child_queue = []
+      # hash = {
+      #   item: parent_item.to_light,
+      #   owning_items: nil,
+      #   current: (parent_item.id == current),
+      #   count: parent_item.count
+      # }
       hash = {
-        item: parent_item.to_light,
-        children: nil,
-        current: (parent_item.id == current),
-        count: parent_item.count
+        owning_items: nil,
+        current: (parent_item.id == current)
       }
+      hash.merge!(parent_item.to_light)
       items.delete_if do |item|
         if item.list_id == parent_item.id
           child_queue << item
           true
         end
       end
-      hash[:children] = item_tree(current, nil, items, child_queue, Marshal.load(Marshal.dump(result)))
-      children_count = hash[:children].inject(0){|sum, item| sum + item[:count]} || 0
-      if hash[:item][:is_list]
+      hash[:owning_items] = item_tree(current: current, start_at: nil, items: items, queue: child_queue, result: Marshal.load(Marshal.dump(result)), relation_to_owner: relation_to_owner)
+      children_count = hash[:owning_items].inject(0){|sum, item| sum + item[:count]} || 0
+      # if hash[:item][:is_list]
+      if hash[:is_list]
         hash[:count] = children_count
       else
         hash[:count] = hash[:count] + children_count
@@ -238,19 +275,21 @@ class User < ActiveRecord::Base
   end
 
   def list_tree(tree = nil, result = [], nest = 0)
-    tree = self.item_tree unless tree.present? 
+    tree = self.item_tree(relation_to_owner: Relation::HIMSELF) unless tree.present? 
     current_result = []
     tree.each do |i|
-      if i[:item][:is_list]
+      if i[:is_list]
         hash = {}
-        hash[:id]    = i[:item][:id]
-        hash[:name]  = i[:item][:name]
+        # hash[:id]    = i[:item][:id]
+        hash[:id]    = i[:id]
+        # hash[:name]  = i[:item][:name]
+        hash[:name]  = i[:name]
         hash[:count] = i[:count]
         hash[:nest]  = nest
-        current_result << hash if i[:item][:is_list]
+        current_result << hash if i[:is_list]
       end
-      if i[:children].present?
-        current_result.concat(list_tree(i[:children], Marshal.load(Marshal.dump(result)), nest + 1))
+      if i[:owning_items].present?
+        current_result.concat(list_tree(i[:owning_items], Marshal.load(Marshal.dump(result)), nest + 1))
       end
     end
     current_result
@@ -321,6 +360,26 @@ class User < ActiveRecord::Base
 
   def has_next_event_from?(from)
     get_related_event(from).size > 0
+  end
+
+  def get_relation_to(target_user)
+    relation_to_owner = Relation::NOTHING unless target_user.present?
+    relation_to_owner = Relation::HIMSELF if target_user.present? && target_user.id == self.id
+
+    unless relation_to_owner
+      followers = self.followed.map(&:id)
+      followings = self.following.map(&:id)
+
+      if followers.include?(target_user.id) && followings.include?(target_user.id)
+        relation_to_owner = Relation::FRIEND
+      elsif followers.include?(target_user.id) && !followings.include?(target_user.id)
+        relation_to_owner = Relation::FOLLOWED
+      else
+        relation_to_owner = Relation::NOTHING
+      end
+    end
+
+    return relation_to_owner
   end
 
   private
