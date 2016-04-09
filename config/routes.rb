@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   get 'home', to: 'welcome#home'
   get 'home/timeline', to: 'welcome#timeline'
   get 'home/graph', to: 'welcome#item_graph'
+  get 'popular/tag', to: 'welcome#popular_tag'
+  get 'popular/list', to: 'welcome#popular_list'
+  get 'pickup', to: 'welcome#pickup'
 
   resources :items
   put '/items/:id/dump', to: 'items#dump'
@@ -55,6 +58,8 @@ Rails.application.routes.draw do
   get '/notification', to: 'notifications#index'
   get '/notification/unread_count', to: 'notifications#unread_count'
   put '/notification/read', to: 'notifications#read'
+
+  get '/search/:search_type/', to: 'search#index'
 
   get '/tags/default_tag_migration/', to: 'tags#default_tag_migration'
   get '/tags/tag_migration/:migration_id', to: 'tags#tag_migration'

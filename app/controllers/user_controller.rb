@@ -43,6 +43,12 @@ class UserController < ApplicationController
   end
 
   def favorite_items
+    # TODO: kaminari形式に統一したい
+    #       タグ検索作ってる時にkaminariのが使い勝手良さそうだと思った
+    #       というかタグ検索作るまでにkaminariのこと忘れてた
+    #       必要機能はそろってるので、独自実装よりもそっちに合わせたい
+    #       他の独自実装もkaminariでなんとか出来そうだし合わせたい
+    #       http://qiita.com/nysalor/items/77b9d6bc5baa41ea01f3
     from = params[:from].to_i rescue 0
     favorites = @user.his_own_favorite_items(from)
     @favorite_items = Item.countable

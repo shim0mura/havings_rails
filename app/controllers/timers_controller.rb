@@ -4,6 +4,14 @@ class TimersController < ApplicationController
   before_action :set_timer, only: [:update, :destroy, :done, :do_later, :end_timer]
 
   def index
+    @timers = Timer
+      .includes(:list)
+      .where(user_id: current_user.id)
+      .order(over_due_from: :desc, next_due_at: :desc)
+
+    @timers = @timers.map{|timer| json_rendered_timer(timer)}
+
+    render json: @timers
   end
 
   def create
@@ -25,7 +33,7 @@ class TimersController < ApplicationController
     if @timer.save
       # render json: { status: :ok }
 
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
@@ -59,7 +67,7 @@ class TimersController < ApplicationController
         }.to_json
       )
 
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: @item.errors, status: :unprocessable_entity
     end
@@ -72,7 +80,7 @@ class TimersController < ApplicationController
     pp @timer
 
     if @timer.save
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
@@ -90,7 +98,7 @@ class TimersController < ApplicationController
     pp @timer
 
     if @timer.save
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
@@ -102,7 +110,7 @@ class TimersController < ApplicationController
     @timer.is_active = false
     @timer.events.each{|e|e.disable}
     if @timer.save
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
@@ -112,7 +120,7 @@ class TimersController < ApplicationController
     @timer.is_deleted = false
     @timer.is_active = false
     if @timer.save
-      render json: json_rendered_timer
+      render json: json_rendered_timer(@timer)
     else
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
@@ -159,17 +167,20 @@ class TimersController < ApplicationController
       Timer.where(list_id: list_id, user_id: current_user.id).count >= Timer::MAX_COUNT_PER_LIST
     end
 
-    def json_rendered_timer
-      rendered_timer = @timer.to_light
-      rendered_timer[:id] = @timer.id
-      rendered_timer[:list_id] = @timer.list_id
-      rendered_timer[:is_active] = @timer.is_active
-      rendered_timer[:is_deleted] = @timer.is_deleted
-      properties = JSON.parse(@timer.properties)
-      rendered_timer[:next_due_at] = @timer.next_due_at
-      rendered_timer[:latest_calc_at] = @timer.latest_calc_at
-      rendered_timer[:notice_hour] = properties["notice_hour"] ? properties["notice_hour"].to_i : @timer.next_due_at.hour
-      rendered_timer[:notice_minute] = properties["notice_minute"] ? properties["notice_minute"].to_i : @timer.next_due_at.min
+    def json_rendered_timer(timer)
+      # apiでjson形式で送るとき、propertiesの中身をそのままでは表現できないので
+      # バラしてちょっと違う形に変形する
+      rendered_timer = timer.to_light
+      rendered_timer[:id] = timer.id
+      rendered_timer[:list_id] = timer.list_id
+      rendered_timer[:list_name] = timer.list.name rescue nil
+      rendered_timer[:is_active] = timer.is_active
+      rendered_timer[:is_deleted] = timer.is_deleted
+      properties = JSON.parse(timer.properties)
+      rendered_timer[:next_due_at] = timer.next_due_at
+      rendered_timer[:latest_calc_at] = timer.latest_calc_at
+      rendered_timer[:notice_hour] = properties["notice_hour"] ? properties["notice_hour"].to_i : timer.next_due_at.hour
+      rendered_timer[:notice_minute] = properties["notice_minute"] ? properties["notice_minute"].to_i : timer.next_due_at.min
       rendered_timer[:repeat_by] = properties["repeat_by"].to_i
       rendered_timer[:repeat_month_interval] = properties["repeat_by_day"]["month_interval"].to_i
       rendered_timer[:repeat_day_of_month] = properties["repeat_by_day"]["day"].to_i

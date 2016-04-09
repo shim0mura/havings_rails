@@ -80,5 +80,7 @@ group :development, :test do
   gem 'awesome_print'
 
   gem 'httparty'
+
+  gem 'kaminari'
 end
 
