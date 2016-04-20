@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   # https://developer.chrome.com/multidevice/android/intents
   get "/android/signin/:token/:uid" => redirect("intent://signinbyoauth/#Intent;scheme=tswork_havings;package=work.t_s.shim0mura.havings;S.token=%{token};S.uid=%{uid};end"), as: :oauth_android_callback
 
+  get 'user/self', to: 'user#get_self'
   get 'user/list_tree', to: 'user#list_tree'
   get 'user/:user_id', to: 'user#index', as: :user_page
   get 'user/:user_id/item_list', to: 'user#item_list'
@@ -59,7 +60,8 @@ Rails.application.routes.draw do
   get '/notification/unread_count', to: 'notifications#unread_count'
   put '/notification/read', to: 'notifications#read'
 
-  get '/search/:search_type/', to: 'search#index'
+  get '/search/tag/', to: 'search#tag'
+  get '/search/user/', to: 'search#user'
 
   get '/tags/default_tag_migration/', to: 'tags#default_tag_migration'
   get '/tags/tag_migration/:migration_id', to: 'tags#tag_migration'

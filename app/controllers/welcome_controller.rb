@@ -13,8 +13,18 @@ class WelcomeController < ApplicationController
 
   def timeline
     @current_user = current_user
-    timeline = following_timeline(params[:from]) if @current_user
-    render partial: 'shared/timeline', layout: false, locals: {timeline: timeline, has_next_event: @has_next_event, is_home: true}
+    # TODO: beforeの取得
+    #       最終取得から1日経ったあとに最新のイベントを取得するとき
+    #       何件取得するか分からない
+    #       今のところ過去に取得したものを全消しして再度最初から
+    #       取得しなおしにしてるけど、いつか最新取得出来るようにしたい
+    from = params[:from].to_i rescue 0
+    @timeline = following_timeline(from) if @current_user
+
+    respond_to do |format|
+      format.html {render partial: 'shared/timeline', layout: false, locals: {timeline: @timeline, has_next_event: @has_next_event, is_home: true}}
+      format.json
+    end
   end
 
   def item_graph

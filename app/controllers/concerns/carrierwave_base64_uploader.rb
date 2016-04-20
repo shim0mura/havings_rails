@@ -31,4 +31,9 @@ module CarrierwaveBase64Uploader
       return nil
     end
   end
+
+  def is_base64_data?(uri_str)
+    return split_base64(uri_str) ? true : false
+  end
+
 end

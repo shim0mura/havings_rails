@@ -1,7 +1,15 @@
 class UserController < ApplicationController
 
   before_action :set_user, only: [:index, :timeline, :item_list, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
-  before_action :authenticate_user!, only: [:list_tree]
+  before_action :authenticate_user!, only: [:get_self, :list_tree]
+
+  def get_self
+    @user = current_user
+    @current_user = user_signed_in? ? current_user : nil
+    @home_list = @user.get_home_list
+    get_item_images
+    @background_image = (@next_images.first.present? ? @next_images.first.image_url : nil)
+  end
 
   def index
     @current_user = user_signed_in? ? current_user : nil

@@ -1,13 +1,12 @@
 class SearchController < ApplicationController
 
-  def index
-    # TODO: typeの値で検索対象切り替えできるように
-    #       ユーザーとか説明の全文検索つかう
+  def tag
     page = params[:page].to_i rescue 1
     tag  = params[:tag]
 
     unless tag.present?
       render json: { }, status: :unprocessable_entity
+      return
     end
 
     @items = Item
@@ -19,6 +18,26 @@ class SearchController < ApplicationController
     @current_page = @items.current_page
     @total_count = @items.total_count
     @has_next_page = !@items.last_page?
+  end
+
+  def user
+    page = params[:page].to_i rescue 1
+    name = params[:name]
+
+    unless name.present?
+      render json: { }, status: :unprocessable_entity
+    end
+
+    arel_name = SocialProfile.arel_table[:name]
+    arel_nickname = SocialProfile.arel_table[:nickname]
+    social_profiles = SocialProfile
+      .where(arel_name.matches("%#{name}%")
+      .or(arel_nickname.matches("%#{name}%")))
+
+    @users = User.where(id: social_profiles.map{|s|s.user.id})
+
+    sleep(5)
+
   end
 
 end
