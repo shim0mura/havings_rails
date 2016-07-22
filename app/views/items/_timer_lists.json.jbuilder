@@ -1,5 +1,5 @@
 json.timers timers do |timer|
-  json.extract! timer, :id, :name, :next_due_at, :over_due_from, :is_repeating, :latest_calc_at, :is_active, :is_deleted
+  json.extract! timer, :id, :name, :list_id, :next_due_at, :over_due_from, :is_repeating, :latest_calc_at, :is_active, :is_deleted
   properties = JSON.parse(timer.properties)
   json.notice_hour properties["notice_hour"].to_i
   json.notice_minute properties["notice_minute"].to_i

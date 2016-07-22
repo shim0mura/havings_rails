@@ -48,7 +48,7 @@ class WelcomeController < ApplicationController
   def following_timeline(from = 0, size = User::MAX_SHOWING_EVENTS)
     timeline = []
     @current_user.following.each do |user|
-      timeline.concat(user.timeline(@current_user, from))
+      timeline.concat(user.timeline(@current_user, from, size))
     end
     n = timeline.size
     0.upto(n - 2) do |i|
@@ -58,8 +58,8 @@ class WelcomeController < ApplicationController
         end
       end
     end
-    @has_next_event = (n >= size)
-    timeline.slice(0...size)
+    @has_next_event = (n.size > 0) ? true : false
+    timeline
   end
 
 

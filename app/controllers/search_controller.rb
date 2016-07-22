@@ -11,9 +11,11 @@ class SearchController < ApplicationController
 
     @items = Item
       .includes(:tags, :item_images, :favorites)
+      .where(private_type: 0)
       .tagged_with(tag)
       .page(page)
       .order(created_at: :desc)
+    # TODO: 閲覧権限設定
 
     @current_page = @items.current_page
     @total_count = @items.total_count

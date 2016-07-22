@@ -20,15 +20,15 @@ json.home_list do
 
   json.extract! @home_list, :id, :name, :description, :is_list, :is_garbage, :garbage_reason, :list_id, :count, :created_at, :updated_at
   json.item_images do
-    json.partial! 'items/item_image_list', locals: {images: @next_images, user_id: (current_user.present? ? current_user.id : nil), has_next: @has_next_image}
+    json.partial! 'items/item_image_list', locals: {images: @next_images, user_id: (current_user.present? ? current_user.id : nil), has_next: @has_next_image, next_page: @next_page_for_image, owner_id: @user.id}
   end
 
   json.thumbnail @home_list.thumbnail
 
   json.count_properties JSON.parse(@home_list.count_properties).each{|e|e["event_ids"] = e["events"];e.delete("events")}
 
-  json.partial! 'items/child_item_list', locals: {child_items: @next_items, has_next: @has_next_item}
+  # json.partial! 'items/child_item_list', locals: {child_items: @next_items, has_next: @has_next_item, next_page: @next_page_for_item}
 
 end
 
-json.nested_items @user.item_tree
+json.nested_item_from_home @user.item_tree(relation_to_owner: 3).first

@@ -48,11 +48,19 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       # http://blog.yasuoza.com/2012/08/16/devise-omniauth-facebook/
       # androidからきた時のcallback指定
       p "$"*20
-      store_location_for(:user, oauth_android_callback_path(token: @user.token, uid: @user.uid))
+      store_location_for(:user, oauth_android_callback_path(token: @user.token, uid: @user.uid, userid: @user.id))
       p session["user_return_to"]
       @social_profile.update_attribute(:user_id, @user.id)
       # sign_in @user, event: :authentication
       sign_in_and_redirect @user, event: :authentication
+    elsif @user.persisted? && request.env['omniauth.origin'] == "ios"
+      p "("*20
+      store_location_for(:user, oauth_ios_callback_path(token: @user.token, uid: @user.uid, userid: @user.id))
+      p session["user_return_to"]
+      @social_profile.update_attribute(:user_id, @user.id)
+      # sign_in @user, event: :authentication
+      sign_in_and_redirect @user, event: :authentication
+    
     elsif @user.persisted?
       p "="*20
       @social_profile.update_attribute(:user_id, @user.id)

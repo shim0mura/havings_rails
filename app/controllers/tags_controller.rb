@@ -47,7 +47,6 @@ class TagsController < ApplicationController
         updated_tags: updated_tags,
         migration_version: h.id
       }
-      pp @migrations
     end
   end
 

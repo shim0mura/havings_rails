@@ -23,6 +23,8 @@ class Item < ActiveRecord::Base
   ITEM_EVENTS = 20
   SHOWING_ITEM = 10
 
+  paginates_per 10
+
   include EnumType
 
   acts_as_taggable
@@ -94,67 +96,77 @@ class Item < ActiveRecord::Base
     events(from).size > 0
   end
 
-  def next_items(user = nil, from = 0, limit = SHOWING_ITEM)
-    if from != 0
-      from_option = Item.arel_table[:id].lt(from)
-      i = Item.where(from_option)
-    else 
-      i = Item
-    end
-
+  def next_items(user = nil, page = 0, limit = SHOWING_ITEM)
     relation_to_owner = self.user.get_relation_to(user)
 
-    i
-      .includes(:item_images, :tags, :favorites)
-      .countable
-      .where(
-        list_id: self.id
-      )
-      .where("private_type <= ?", relation_to_owner)
-      .order("id DESC")
-      .limit(limit)
+    Item
+       .includes(:item_images, :tags, :favorites)
+       .countable
+       .where(
+         list_id: self.id
+       )
+       .where("private_type <= ?", relation_to_owner)
+       .order("id DESC")
+       .page(page)
+
+    # if from != 0
+    #   from_option = Item.arel_table[:id].lt(from)
+    #   i = Item.where(from_option)
+    # else 
+    #   i = Item
+    # end
+
+    # relation_to_owner = self.user.get_relation_to(user)
+
+    # i
+    #   .includes(:item_images, :tags, :favorites)
+    #   .countable
+    #   .where(
+    #     list_id: self.id
+    #   )
+    #   .where("private_type <= ?", relation_to_owner)
+    #   .order("id DESC")
+    #   .limit(limit)
   end
 
-  def has_next_item_from?(user, from)
-    next_items(user, from).size > 0
+  def next_images(page = 0)
+    ItemImage
+        .where(item_id: self.id)
+        .order("id DESC")
+        .includes(:image_favorites)
+        .page(page)
+
+    # image = ItemImage.where(id: from).first if from != 0
+    # if image
+    #   from_time = image.created_at
+    # else 
+    #   from_time = Time.now
+    # end
+
+    # ItemImage.where(item_id: self.id)
+    #   .where("created_at < ?", from_time)
+    #   .order("created_at DESC")
+    #   .limit(limit)
   end
 
-  def next_images(from = 0, limit = SHOWING_ITEM)
-    image = ItemImage.where(id: from).first if from != 0
-    if image
-      from_time = image.created_at
-    else 
-      from_time = Time.now
-    end
+  # def self.dump_items(user, viewer = nil, from = 0, limit = SHOWING_ITEM)
+  #   if from != 0
+  #     from_option = Item.arel_table[:id].lt(from)
+  #     i = Item.where(from_option)
+  #   else 
+  #     i = Item
+  #   end
 
-    ItemImage.where(item_id: self.id)
-      .where("created_at < ?", from_time)
-      .order("created_at DESC")
-      .limit(limit)
-  end
+  #   relation_to_owner = user.get_relation_to(viewer)
 
-  def has_next_images_from?(from)
-    next_images(from).size > 0
-  end
-
-  def self.dump_items(user, viewer = nil, from = 0, limit = SHOWING_ITEM)
-    if from != 0
-      from_option = Item.arel_table[:id].lt(from)
-      i = Item.where(from_option)
-    else 
-      i = Item
-    end
-
-    relation_to_owner = user.get_relation_to(viewer)
-
-    i
-      .includes(:item_images, :tags, :favorites)
-      .dump
-      .where(user_id: user.id)
-      .where("private_type <= ?", relation_to_owner)
-      .order("id DESC")
-      .limit(limit + 1)
-  end
+  #   i
+  #     .includes(:item_images, :tags, :favorites)
+  #     .dump
+  #     .where(user_id: user.id)
+  #     .where("private_type <= ?", relation_to_owner)
+  #     .order("id DESC")
+  #     .limit(limit + 1)
+  # end
 
   def get_nested_child_item(from = 0)
     nested_child_item_ids = []
@@ -193,7 +205,7 @@ class Item < ActiveRecord::Base
       e = c.dump_recursive
     end
 
-    dump_event = Event.create(
+    dump_event = Event.create!(
       event_type: :dump,
       acter_id: self.user_id,
       related_id: self.list_id,
@@ -331,7 +343,7 @@ class Item < ActiveRecord::Base
     properties.delete_if{|prop|deleting_props.include?(prop)}
 
     self.count_properties = properties.to_json
-    save
+    save!
   end
 
   def add_events_history(target_events)
@@ -442,8 +454,7 @@ class Item < ActiveRecord::Base
     end
 
     if self.is_list
-      # hash["count"] = self.user.item_tree(start_at: self.id).first[:count] + count_diff rescue count_diff
-      hash["count"] = self.user.item_tree(start_at: self.id).first[:count]
+      hash["count"] = self.user.item_tree(start_at: self.id, relation_to_owner: Relation::HIMSELF).first[:count]
     else
       hash["count"] = self.count
     end
@@ -453,7 +464,7 @@ class Item < ActiveRecord::Base
 
     self.count_properties = properties.to_json
     self.count = hash["count"].to_i
-    self.save
+    self.save!
 
 
     if parent_list.present?
@@ -553,7 +564,7 @@ class Item < ActiveRecord::Base
     properties.delete_if{|prop|deleting_props.include?(prop["date"])}
 
     self.count_properties = properties.to_json
-    save
+    save!
 
     list.delete_image_event_evidence_for_graph(event_ids) if self.list
 
@@ -609,7 +620,7 @@ class Item < ActiveRecord::Base
 
     self.count_properties = properties.to_json
     pp self
-    save
+    save!
 
     list.add_image_event_evidence_for_graph(event_ids) if self.list
 
@@ -620,7 +631,7 @@ class Item < ActiveRecord::Base
     errors.add(:image, "cant be blank")
   end
 
-  def self.get_timestamp_without_millis(time)
+  def self.get_timestamp_without_millis(time = Time.now)
     time = time.to_s
     time = time.slice(0...10) if time.size > 10
     return time.to_i
@@ -642,6 +653,8 @@ class Item < ActiveRecord::Base
       count:   self.count,
       image:   self.thumbnail,
       list_id: self.list_id,
+      is_garbage: self.is_garbage,
+      private_type: Item.private_types[self.private_type],
       path:    Rails.application.routes.url_helpers.item_path(self.id)
     }
   end

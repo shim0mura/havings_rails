@@ -10,6 +10,7 @@ class Chart < ActiveRecord::Base
   TAG_TYPE_THING     = 2
   TAG_TYPE_ATTRIBUTE = 4
 
+  ETC_TAG_IDS = [1610]
   CLOTHING_TAG_IDS = [18, 574]
   FOOD_TAG_IDS     = [342, 962]
   LIVING_TAG_IDS   = [653, 788, 1049]
@@ -70,7 +71,7 @@ class Chart < ActiveRecord::Base
 
     chart_detail
     chart.chart_detail = chart_detail.to_json
-    chart.save
+    chart.save!
   end
 
   def self.delete_item_to_total_chart(item: , count: , tag: nil)
@@ -136,12 +137,17 @@ class Chart < ActiveRecord::Base
     end
 
     chart.chart_detail = chart_detail.to_json
-    chart.save
+    chart.save!
   end
 
-  private
+  # タグのうちの優先カテゴリを取得する
+  # 引数はItem.tagsを想定
+  # そのアイテムのタグが複数の優先カテゴリにまたがる場合
+  # (アイテムに"服"と"酒"がつけられてるなど)
+  # タグ自体の優先度と各カテゴリに属するタグの数で優先カテゴリを決定する
   def self.get_primary_category_ancestors(tags)
-    return CHART_TYPE_ETC if tags.nil? || tags.empty?
+    uncategorized_ancestors = ActsAsTaggableOn::Tag.where(id: ETC_TAG_IDS)
+    return [CHART_TYPE_ETC, uncategorized_ancestors] if tags.nil? || tags.empty?
 
     priority = {}
     priority[CHART_TYPE_CLOTHING] = {priority: 0, ancestors: []}
@@ -187,8 +193,8 @@ class Chart < ActiveRecord::Base
     end
 
     chart_type = 0
-    if priority.values.all?{|v| v == 0}
-      chart_type = CHART_TYPE_ETC
+    if priority.values.all?{|v| v[:priority] == 0}
+      return [CHART_TYPE_ETC, uncategorized_ancestors]
     else
       chart_type = priority.sort{|(k1, v1), (k2, v2)| v2[:priority] <=> v1[:priority]}.first.first
     end

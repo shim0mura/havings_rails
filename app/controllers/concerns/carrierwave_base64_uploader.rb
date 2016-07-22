@@ -20,7 +20,7 @@ module CarrierwaveBase64Uploader
   end
 
   def split_base64(uri_str)
-    if uri_str.match(%r{data:(.*?);(.*?),(.*)$})
+    if uri_str.match(/data:(.*?);(.*?),(.*)/m)
       uri = Hash.new
       uri[:type] = $1
       uri[:encoder] = $2

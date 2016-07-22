@@ -18,6 +18,7 @@ ja:
         record_invalid: "バリデーションに失敗しました。 %{errors}"
         too_short: "が短すぎます。"
         blank: "を入力してください。"
+        next_due_at: "あああああ"
       full_messages:
         format: "[%{attribute}]%{message}"
       models:
@@ -28,6 +29,9 @@ ja:
             password: パスワード
             password_confirmation: パスワード(確認)
             current_password: 現在のパスワード
+        timer:
+          attributes:
+            next_due_at: ああああ
     models:
       user: ユーザー
     attributes:
@@ -37,3 +41,5 @@ ja:
         password: パスワード
         password_confirmation: パスワード(確認)
         current_password: 現在のパスワード
+      timer:
+        next_due_at: 次回通知予定日

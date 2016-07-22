@@ -26,8 +26,9 @@ class Event < ActiveRecord::Base
   FOLLOW         = "follow"
   COMMENT        = "comment"
   TIMER          = "timer"
+  DELETE_IMAGE   = "delete_image"
 
-  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count image_favorite)
+  enum event_type: %i(create_list create_item add_image dump favorite follow comment timer done_task change_count image_favorite delete_image)
 
   default_scope -> { where(is_deleted: false) }
 
@@ -45,7 +46,7 @@ class Event < ActiveRecord::Base
   end
 
   def disable
-    update_attribute(:is_deleted, true)
+    update_attribute!(:is_deleted, true)
   end
 
   def item
@@ -58,8 +59,8 @@ class Event < ActiveRecord::Base
   end
 
   def item_images
-    item_image_ids = eval(self.properties)[:item_image_ids]
-    ItemImage.where(id: item_image_ids)
+    item_image_ids = eval(self.properties)[:item_image_id]
+    ItemImage.where(id: item_image_id)
   end
 
   # notificationの時に一緒に表示できるか判定

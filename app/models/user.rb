@@ -194,23 +194,23 @@ class User < ActiveRecord::Base
     }
   end
 
-  def his_own_favorite_items(from = 0)
-    if from != 0
-      from_option = Favorite.arel_table[:id].lt(from)
-    else 
-      from_option = nil
-    end
-    self.favorites.where(from_option).limit(Item::SHOWING_ITEM + 1).order("id DESC")
-  end
+  # def his_own_favorite_items(from = 0)
+  #   if from != 0
+  #     from_option = Favorite.arel_table[:id].lt(from)
+  #   else 
+  #     from_option = nil
+  #   end
+  #   self.favorites.where(from_option).limit(Item::SHOWING_ITEM + 1).order("id DESC")
+  # end
 
-  def his_own_favorite_images(from = 0)
-    if from != 0
-      from_option = ImageFavorite.arel_table[:id].lt(from)
-    else 
-      from_option = nil
-    end
-    self.image_favorites.where(from_option).limit(ItemImage::MAX_SHOWING_USER_ITEM_IMAGES + 1).order("id DESC")
-  end
+  # def his_own_favorite_images(from = 0)
+  #   if from != 0
+  #     from_option = ImageFavorite.arel_table[:id].lt(from)
+  #   else 
+  #     from_option = nil
+  #   end
+  #   self.image_favorites.where(from_option).limit(ItemImage::MAX_SHOWING_USER_ITEM_IMAGES + 1).order("id DESC")
+  # end
 
   def item_tree(current: nil, start_at: nil, items: nil, queue: nil, result: nil, relation_to_owner: nil)
 
@@ -224,7 +224,7 @@ class User < ActiveRecord::Base
 
     if items.nil?
       items = Item.countable
-        .includes(:item_images)
+        .includes(:item_images, :tags, :favorites)
         .where(user_id: self.id)
         .where("private_type <= ?", relation_to_owner).to_a
     end
@@ -254,6 +254,9 @@ class User < ActiveRecord::Base
         current: (parent_item.id == current)
       }
       hash.merge!(parent_item.to_light)
+      hash[:description] = parent_item.description
+      hash[:tags] = parent_item.tags.map{|t|t.name}
+      hash[:favorite_count] = parent_item.favorites.size
       items.delete_if do |item|
         if item.list_id == parent_item.id
           child_queue << item
@@ -285,6 +288,9 @@ class User < ActiveRecord::Base
         # hash[:name]  = i[:item][:name]
         hash[:name]  = i[:name]
         hash[:count] = i[:count]
+
+        hash[:private_type] = i[:private_type]
+
         hash[:nest]  = nest
         current_result << hash if i[:is_list]
       end
@@ -299,12 +305,13 @@ class User < ActiveRecord::Base
     # TODO: get_showing_notificationと同じような構造なので
     # 同じにできないか？
     # TODO: add_imageはthumbnailを渡す
+    pp limit
     events = get_related_event(from, limit)
     item_ids = []
     followed_user_ids = []
     events.each do |e|
       case(e.event_type)
-      when "create_list", "create_item"
+      when "create_list", "create_item", "image_favorite"
         next unless e.properties
         item_ids << eval(e.properties)[:item_id]
       when "add_image", "dump", "favorite", "comment"
@@ -343,10 +350,27 @@ class User < ActiveRecord::Base
         item = items.detect{|i|i.id == item_id}
         next unless item.present?
         next unless item.can_show?(showing_user)
-        item_images = ItemImage.where(id: eval(e.properties)[:item_image_ids])
-        light_item = item.to_light
-        light_item[:image] = item_images.map{|i|i.image_url} if item_images.present?
-        hash[:target] << light_item
+        item_images = ItemImage.where(id: eval(e.properties)[:item_image_id])
+        # light_item_image = item_images.first.to_light if item_images.present?
+        if item_images.present?
+          light_item_image = item_images.first.to_light
+        else
+          next
+        end
+        hash[:target] << light_item_image
+      when "image_favorite"
+        item_id = eval(e.properties)[:item_id]
+        item = items.detect{|i|i.id == item_id}
+        next unless item.present?
+        next unless item.can_show?(showing_user)
+        item_images = ItemImage.where(id: e.related_id)
+        # light_item[:image] = item_images.first.image_url if item_images.present?
+        if item_images.present?
+          light_item_image = item_images.first.to_light
+        else
+          next
+        end
+        hash[:target] << light_item_image
       when "follow"
         followed_user_id = e.suffered_user_id
         user = followed_users.detect{|i|i.id == followed_user_id}
@@ -385,7 +409,7 @@ class User < ActiveRecord::Base
   private
   def get_related_event(from = 0, limit = MAX_SHOWING_EVENTS)
     event_type = Event.event_types.select{|type|
-      ["create_list", "create_item", "add_image", "dump", "favorite", "follow", "comment"].include?(type)
+      ["create_list", "create_item", "add_image", "dump", "favorite", "follow", "comment", "image_favorite"].include?(type)
     }.values
 
     if from && from != 0

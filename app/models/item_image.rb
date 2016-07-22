@@ -12,6 +12,7 @@
 class ItemImage < ActiveRecord::Base
 
   MAX_SHOWING_USER_ITEM_IMAGES = 10
+  paginates_per 5
 
   belongs_to :item
   has_many :image_favorites
@@ -42,8 +43,8 @@ class ItemImage < ActiveRecord::Base
     {
       id:               self.id,
       image:            self.image_url,
-      belong_item_id:   self.item_id,
-      belong_item_name: self.item.name
+      item_id:          self.item_id,
+      item_name:        self.item.name
     }
   end
 

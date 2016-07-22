@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   # トークンによる認証
   def authenticate_user_from_token!
     if request.headers['HTTP_X_UID'].present? && request.headers['HTTP_X_ACCESS_TOKEN'].present?
+
       user = User.find_by(uid: request.headers['HTTP_X_UID'])
       request.env['devise.skip_trackable'] = true
       if Devise.secure_compare(user.try(:token), request.headers['HTTP_X_ACCESS_TOKEN'])

@@ -9,7 +9,7 @@ class CommentsController < ApplicationController
 
   def create
     unless @item.can_show?(current_user)
-      render json: { }, status: :unprocessable_entity
+      render json: { errors: {can_not_comment: ["."]} }, status: :unprocessable_entity
     end
 
     @comment = Comment.new(
@@ -18,20 +18,24 @@ class CommentsController < ApplicationController
       content: params[:comment][:content]
     )
 
-    if @comment.save
-      event = Event.create(
-        event_type: :comment,
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item.id,
-        properties: {
-          comment_id: @comment.id
-        }
-      )
-      @item.user.notification.add_unread_event(event)
+    begin
+      ActiveRecord::Base.transaction do
+        @comment.save!
+        event = Event.create!(
+          event_type: :comment,
+          acter_id: current_user.id,
+          suffered_user_id: @item.user_id,
+          related_id: @item.id,
+          properties: {
+            comment_id: @comment.id
+          }
+        )
+        @item.user.notification.add_unread_event(event)
+      end
 
       render json: json_rendered_comment
-    else
+    rescue => e
+      logger.error("comment_to_item_failed, item_id: #{@item.id}, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
       render json: {errors: @comment.errors }, status: :unprocessable_entity
     end
 
@@ -42,21 +46,25 @@ class CommentsController < ApplicationController
 
     @comment.is_deleted = true
 
-    if @comment.save
-      event = Event.where(
-        event_type: Event.event_types[Event::COMMENT],
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item.id
-      ).select{|e|
-        eval(e.properties)[:comment_id] == @comment.id
-      }.first
+    begin
+      ActiveRecord::Base.transaction do
+        @comment.save!
+        event = Event.where(
+          event_type: Event.event_types[Event::COMMENT],
+          acter_id: current_user.id,
+          suffered_user_id: @item.user_id,
+          related_id: @item.id
+        ).select{|e|
+          eval(e.properties)[:comment_id] == @comment.id
+        }.first
 
-      event.update_attribute("is_deleted", true)
+        event.update!(is_deleted: true)
+      end
 
       render json: json_rendered_comment
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("comment_delete_failed, item_id: #{@item.id}, comment_id: #{@comment.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
   end
 

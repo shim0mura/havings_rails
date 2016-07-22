@@ -17,43 +17,54 @@ class FavoriteController < ApplicationController
       item_id: @item.id
     )
 
-    if favorite.save
+    begin
+      ActiveRecord::Base.transaction do
+        favorite.save!
 
-      event = Event.create(
-        event_type: :favorite,
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item.id,
-        properties: {
-          favorite_id: favorite.id
-        }
-      )
-      @item.user.notification.add_unread_event(event)
+        event = Event.create!(
+          event_type: :favorite,
+          acter_id: current_user.id,
+          suffered_user_id: @item.user_id,
+          related_id: @item.id,
+          properties: {
+            favorite_id: favorite.id
+          }
+        )
+        @item.user.notification.add_unread_event(event)
+      end
 
       render json: { status: :ok }
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("favorite_item_failed, item_id: #{@item.id}, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
 
   end
 
   def destroy
-    favorite = Favorite.where(
-      user_id: current_user.id,
-      item_id: @item.id
-    ).first.destroy
-
-    if favorite.destroyed?
-      Event.where(
-        event_type: Event.event_types[Event::FAVORITE],
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item.id
-      ).update_all(is_deleted: true)
+    begin
+      ActiveRecord::Base.transaction do
+        favorite = Favorite.where(
+          user_id: current_user.id,
+          item_id: @item.id
+        ).first.destroy
+        if favorite.destroyed?
+          result = Event.where(
+            event_type: Event.event_types[Event::FAVORITE],
+            acter_id: current_user.id,
+            suffered_user_id: @item.user_id,
+            related_id: @item.id
+          ).update_all(is_deleted: true)
+          raise if result <= 0
+        else
+          raise
+        end
+      end
 
       render json: { status: :ok }
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("un_favorite_item_failed, item_id: #{@item.id}, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
+      render json: {}, status: 500
     end
   end
 
@@ -64,8 +75,8 @@ class FavoriteController < ApplicationController
 
   def image_favorite
     @item = @item_image.item
-    if !@item.present? || !@item.can_show?(current_user)
-      render json: { }, status: :unprocessable_entity
+    if !@item.present?
+      render json: { errors: {image_not_found: ["."]} }, status: :unprocessable_entity
     end
 
     image_favorite = ImageFavorite.new(
@@ -76,23 +87,27 @@ class FavoriteController < ApplicationController
 
     pp image_favorite
 
-    if image_favorite.save
+    begin
+      ActiveRecord::Base.transaction do
+        image_favorite.save!
 
-      event = Event.create(
-        event_type: :image_favorite,
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item_image.id,
-        properties: {
-          image_favorite_id: image_favorite.id,
-          item_id: @item.id
-        }
-      )
-      @item.user.notification.add_unread_event(event)
+        event = Event.create!(
+          event_type: :image_favorite,
+          acter_id: current_user.id,
+          suffered_user_id: @item.user_id,
+          related_id: @item_image.id,
+          properties: {
+            image_favorite_id: image_favorite.id,
+            item_id: @item.id
+          }
+        )
+        @item.user.notification.add_unread_event(event)
+      end
 
       render json: { status: :ok }
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("favorite_item_image_failed, item_id: #{@item_image.id}, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
   end
 
@@ -100,26 +115,37 @@ class FavoriteController < ApplicationController
     @item = @item_image.item
 
     unless @item.present?
-      render json: { }, status: :unprocessable_entity
+      render json: { errors: {image_not_found: ["."]} }, status: :unprocessable_entity
     end
 
-    image_favorite = ImageFavorite.where(
-      user_id: current_user.id,
-      item_image_id: @item_image.id
-    ).first.destroy
+    begin
+      ActiveRecord::Base.transaction do
 
-    if image_favorite.destroyed?
-      Event.where(
-        event_type: Event.event_types[Event::IMAGE_FAVORITE],
-        acter_id: current_user.id,
-        suffered_user_id: @item.user_id,
-        related_id: @item_image.id
-      ).update_all(is_deleted: true)
+        image_favorite = ImageFavorite.where(
+          user_id: current_user.id,
+          item_image_id: @item_image.id
+        ).first.destroy
 
+        if image_favorite.destroyed?
+          result = Event.where(
+            event_type: Event.event_types[Event::IMAGE_FAVORITE],
+            acter_id: current_user.id,
+            suffered_user_id: @item.user_id,
+            related_id: @item_image.id
+          ).update_all(is_deleted: true)
+          raise if result <= 0
+
+        else
+          raise
+        end
+
+      end
       render json: { status: :ok }
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("unfavorite_item_image_failed, item_id: #{@item_image.id}, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
+
   end
 
   def image_favorited_users

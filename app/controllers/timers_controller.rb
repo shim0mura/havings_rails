@@ -25,8 +25,9 @@ class TimersController < ApplicationController
     @timer.user_id = current_user.id
     set_timer_props
 
+    pp @timer
     if over_timer_count?(params[:timer][:list_id])
-      render json: { }, status: :unprocessable_entity 
+      render json: {errors: {"このリストではこれ以上タイマーを作成できません" => ["."]}}, status: :unprocessable_entity 
       return
     end
 
@@ -39,6 +40,9 @@ class TimersController < ApplicationController
     end
   end
 
+  # already_doneの場合もこのメソッドで処理
+  # already_doneの場合は行った時間を
+  # params[:timer][:done_at]で指定
   def done
 
     if @timer.is_repeating
@@ -55,20 +59,25 @@ class TimersController < ApplicationController
     @timer.over_due_from = nil
     pp @timer
 
-    if @timer.save
-      done_date = params[:timer][:done_at].present? ? Time.at(Item.get_timestamp_without_millis(params[:timer][:done_at])) : Time.now
+    begin
+      ActiveRecord::Base.transaction do
 
-      Event.create(
-        event_type: :done_task,
-        acter_id: current_user.id,
-        related_id: @timer.id,
-        properties: {
-          done_date: done_date
-        }.to_json
-      )
+        @timer.save!
+        done_date = params[:timer][:done_at].present? ? Time.at(Item.get_timestamp_without_millis(params[:timer][:done_at])) : Time.now
+
+        Event.create!(
+          event_type: :done_task,
+          acter_id: current_user.id,
+          related_id: @timer.id,
+          properties: {
+            done_date: done_date
+          }.to_json
+        )
+      end
 
       render json: json_rendered_timer(@timer)
-    else
+    rescue => e
+      logger.error("timer_done_failed, item_id: #{@item.id}, timer_id: #{@timer.id}, #{e}, #{e.backtrace}")
       render json: @item.errors, status: :unprocessable_entity
     end
   end
@@ -79,9 +88,13 @@ class TimersController < ApplicationController
     @timer.latest_calc_at = Time.now
     pp @timer
 
-    if @timer.save
+    begin
+      ActiveRecord::Base.transaction do
+        @timer.save!
+      end
       render json: json_rendered_timer(@timer)
-    else
+    rescue => e
+      logger.error("timer_do_later_failed, item_id: #{@item.id}, timer_id: #{@timer.id}, #{e}, #{e.backtrace}")
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
 
@@ -97,9 +110,13 @@ class TimersController < ApplicationController
 
     pp @timer
 
-    if @timer.save
+    begin
+      ActiveRecord::Base.transaction do
+        @timer.save!
+      end
       render json: json_rendered_timer(@timer)
-    else
+    rescue => e
+      logger.error("timer_update_failed, item_id: #{@item.id}, timer_id: #{@timer.id}, #{e}, #{e.backtrace}")
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
 
@@ -108,10 +125,14 @@ class TimersController < ApplicationController
   def destroy
     @timer.is_deleted = true
     @timer.is_active = false
-    @timer.events.each{|e|e.disable}
-    if @timer.save
+    begin
+      ActiveRecord::Base.transaction do
+        @timer.save!(validate: false)
+        @timer.events.each{|e|e.disable}
+      end
       render json: json_rendered_timer(@timer)
-    else
+    rescue => e
+      logger.error("timer_destroy_failed, item_id: #{@item.id}, timer_id: #{@timer.id}, #{e}, #{e.backtrace}")
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
   end
@@ -119,9 +140,14 @@ class TimersController < ApplicationController
   def end_timer
     @timer.is_deleted = false
     @timer.is_active = false
-    if @timer.save
+    pp @timer
+    begin
+      ActiveRecord::Base.transaction do
+        @timer.save!(validate: false)
+      end
       render json: json_rendered_timer(@timer)
-    else
+    rescue => e
+      logger.error("timer_end_failed, item_id: #{@item.id}, timer_id: #{@timer.id}, #{e}, #{e.backtrace}")
       render json: {errors: @timer.errors}, status: :unprocessable_entity
     end
 

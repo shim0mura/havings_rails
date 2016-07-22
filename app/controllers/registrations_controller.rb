@@ -14,6 +14,7 @@ class RegistrationsController < Devise::RegistrationsController
     pp resource
     pp params
     p "1"*20
+
     if resource.encrypted_password.blank? # || params[:password].blank?
       # provider!=emailの場合
       # update時はcurrent_passwordなしで登録更新できるようにする
@@ -61,7 +62,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def configure_permitted_parameters_on_update
     devise_parameter_sanitizer.for(:account_update) do |u|
-      u.permit(:name, :email, :password, :password_confirmation, :current_password, :image, :image_cache, :remove_image, :image_for_update)
+      u.permit(:name, :email, :password, :password_confirmation, :current_password, :image, :image_cache, :remove_image, :image_for_update, :description)
     end
   end 
 

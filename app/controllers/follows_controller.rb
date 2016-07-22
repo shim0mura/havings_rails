@@ -8,12 +8,12 @@ class FollowsController < ApplicationController
   def create
 
     if current_user.id == params[:user_id].to_i || !user_exist?(params[:user_id].to_i)
-      render json: { }, status: :unprocessable_entity
+      render json: { errors: {user_not_found: ["."]} }, status: :unprocessable_entity
       return
     end
 
     if current_user.already_follow?(params[:user_id].to_i)
-      render json: { }, status: :unprocessable_entity
+      render json: { errors: {already_following: ["."]} }, status: :unprocessable_entity
       return
     end
 
@@ -22,43 +22,57 @@ class FollowsController < ApplicationController
       followed_user_id:  params[:user_id]
     )
 
-    if follow.save
-      event = Event.create(
-        event_type: :follow,
-        acter_id: current_user.id,
-        suffered_user_id: follow.followed_user_id,
-      )
-      @followed_user.notification.add_unread_event(event)
+    begin
+      ActiveRecord::Base.transaction do
+        follow.save!
+        event = Event.create!(
+          event_type: :follow,
+          acter_id: current_user.id,
+          suffered_user_id: follow.followed_user_id,
+        )
+        @followed_user.notification.add_unread_event(event)
+      end
 
       render json: { status: :ok }
-    else
-      render json: { }, status: :unprocessable_entity
+    rescue => e
+      logger.error("follow_failed, following_user_id: #{current_user.id}, target_user_id: #{@user.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
 
   end
 
   def destroy
     unless user_exist?(params[:user_id].to_i) && current_user.already_follow?(params[:user_id].to_i)
-      render json: { }, status: :unprocessable_entity
+      render json: { errors: {user_not_found: ["."]} }, status: :unprocessable_entity
       return
     end
 
-    follow = Follow.where(
-      following_user_id: current_user.id,
-      followed_user_id:  params[:user_id]
-    ).first.destroy
+    begin
+      ActiveRecord::Base.transaction do
 
+        follow = Follow.where(
+          following_user_id: current_user.id,
+          followed_user_id:  params[:user_id]
+        ).first.destroy
 
-    if follow.destroyed?
-      @followed_user
-      Event.where(
-        event_type: Event.event_types["follow"],
-        acter_id: current_user.id,
-        suffered_user_id: follow.followed_user_id
-      ).update_all(is_deleted: true)
+        if follow.destroyed?
+          result = Event.where(
+            event_type: Event.event_types["follow"],
+            acter_id: current_user.id,
+            suffered_user_id: follow.followed_user_id
+          ).update_all(is_deleted: true)
+
+          raise if result <= 0
+
+        else
+          raise
+        end
+      end
 
       render json: { status: :ok }
-    else
+    rescue => e
+      logger.error("unfollow_failed, following_user_id: #{current_user.id}, target_user_id: #{@user.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
       render json: { }, status: :unprocessable_entity
     end
   end

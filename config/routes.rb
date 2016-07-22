@@ -7,14 +7,17 @@ Rails.application.routes.draw do
   get 'admin/tags'
 
   get 'dummy', to: 'items#dummy'
+  get 'tes', to: 'items#tes'
 
   # https://developer.chrome.com/multidevice/android/intents
-  get "/android/signin/:token/:uid" => redirect("intent://signinbyoauth/#Intent;scheme=tswork_havings;package=work.t_s.shim0mura.havings;S.token=%{token};S.uid=%{uid};end"), as: :oauth_android_callback
+  get "/android/signin/:token/:uid/:userid" => redirect("intent://signinbyoauth/#Intent;scheme=tswork_havings;package=work.t_s.shim0mura.havings;S.token=%{token};S.uid=%{uid};S.userid=%{userid};end"), as: :oauth_android_callback
+  get "/ios/signin/:token/:uid/:userid" => redirect("ioshavings://test?token=%{token}&uid=%{uid}&userid=%{userid}"), as: :oauth_ios_callback
 
   get 'user/self', to: 'user#get_self'
   get 'user/list_tree', to: 'user#list_tree'
   get 'user/:user_id', to: 'user#index', as: :user_page
   get 'user/:user_id/item_list', to: 'user#item_list'
+  get 'user/:user_id/item_tree', to: 'user#item_tree'
   get 'user/:user_id/item_images', to: 'user#item_images'
   get 'user/:user_id/favorite_items', to: 'user#favorite_items'
   get 'user/:user_id/favorite_images', to: 'user#favorite_images'
@@ -47,6 +50,8 @@ Rails.application.routes.draw do
   post '/items/:id/comment', to: 'comments#create'
   delete '/items/:id/comment/:comment_id', to: 'comments#destroy'
   get '/items/:id/image/:image_id', to: 'items#item_image'
+  put '/items/:id/image/:image_id', to: 'items#update_image_metadata'
+  delete '/items/:id/image/:image_id', to: 'items#destroy_image'
   get '/items/image/:image_id/favorited_users', to: 'favorite#image_favorited_users'
   post '/items/image/:image_id/favorite', to: 'favorite#image_favorite'
   delete '/items/image/:image_id/favorite', to: 'favorite#image_unfavorite'

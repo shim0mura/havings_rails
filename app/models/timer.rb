@@ -47,7 +47,7 @@ class Timer < ActiveRecord::Base
   def is_valid_next_due_time?
     current = Time.now
     if current > next_due_at
-      errors.add(:next_due_at, "is invalid.")
+      errors.add(:next_due_at, " is invalid")
     end
   end
 
@@ -67,7 +67,10 @@ class Timer < ActiveRecord::Base
       }
       events = []
       tasks.each do |t|
-        events << t.properties if t.related_id == timer.id
+        # events << t.properties if t.related_id == timer.id
+        if t.related_id == timer.id
+          events << JSON.parse(t.properties)["done_date"]
+        end
       end
 
       # 削除済みのもので一度もタスクが行われてないもの
@@ -77,7 +80,8 @@ class Timer < ActiveRecord::Base
       n = events.size
       0.upto(n - 2) do |i|
         (n - 1).downto(i + 1) do |j|
-          if JSON.parse(events[j])["done_date"] < JSON.parse(events[j - 1])["done_date"]
+          # if JSON.parse(events[j])["done_date"] < JSON.parse(events[j - 1])["done_date"]
+          if events[j] < events[j - 1]
             events[j], events[j - 1] = events[j - 1], events[j]
           end
         end
@@ -166,17 +170,18 @@ class Timer < ActiveRecord::Base
 
       candidate_date = next_due_at
 
-      if candidate_date.day > candidate_day
-        candidate_date = candidate_date + (candidate_month + 1).month
-      elsif candidate_date.day == candidate_day
-        if before_candidate_date?(candidate_date, candidate_hour, candidate_minute)
-          candidate_date = candidate_date + (candidate_month + 1).month
-        else
-          candidate_date = candidate_date + candidate_month.month
-        end
-      else
-        candidate_date = candidate_date + candidate_month.month
-      end
+      # if candidate_date.day > candidate_day
+      #   candidate_date = candidate_date + (candidate_month + 1).month
+      # elsif candidate_date.day == candidate_day
+      #   if before_candidate_date?(candidate_date, candidate_hour, candidate_minute)
+      #     candidate_date = candidate_date + (candidate_month + 1).month
+      #   else
+      #     candidate_date = candidate_date + candidate_month.month
+      #   end
+      # else
+      #   candidate_date = candidate_date + candidate_month.month
+      # end
+      candidate_date = candidate_date + (candidate_month + 1).month
 
       last_day = candidate_date.end_of_month.day
 
@@ -247,6 +252,8 @@ class Timer < ActiveRecord::Base
   # timer_controller#json_rendered_timerも合わせて直す
   # webがid=list_id, timer_id=idで必要としてるっぽいのでそこから直す
   def to_light
+    properties = JSON.parse(self.properties)
+
     {
       id:    self.list_id,
       timer_id:    self.id,
@@ -254,7 +261,14 @@ class Timer < ActiveRecord::Base
       path:  Rails.application.routes.url_helpers.item_path(self.list_id),
       properties: self.properties,
       is_repeating: self.is_repeating,
-      is_active: self.is_active && !self.is_deleted
+      is_active: self.is_active && !self.is_deleted,
+      notice_hour: properties["notice_hour"].to_i,
+      notice_minute: properties["notice_minute"].to_i,
+      repeat_by: properties["repeat_by"].to_i,
+      repeat_month_interval: properties["repeat_by_day"]["month_interval"].to_i,
+      repeat_day_of_month: properties["repeat_by_day"]["day"].to_i,
+      repeat_week: properties["repeat_by_week"]["week"].to_i,
+      repeat_day_of_week: properties["repeat_by_week"]["day_of_week"].to_i
     }
   end
 

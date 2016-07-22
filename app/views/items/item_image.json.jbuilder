@@ -7,3 +7,4 @@ json.added_date @item_image.added_at
 json.memo @item_image.memo
 json.image_favorite_count @item_image.image_favorites.size
 json.is_favorited @item_image.is_favorited?(@user_id)
+json.user_id @item.user_id
