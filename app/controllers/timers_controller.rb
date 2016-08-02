@@ -58,6 +58,7 @@ class TimersController < ApplicationController
 
     @timer.over_due_from = nil
     pp @timer
+    raise
 
     begin
       ActiveRecord::Base.transaction do
@@ -205,6 +206,7 @@ class TimersController < ApplicationController
       properties = JSON.parse(timer.properties)
       rendered_timer[:next_due_at] = timer.next_due_at
       rendered_timer[:latest_calc_at] = timer.latest_calc_at
+      rendered_timer[:over_due_from] = timer.over_due_from
       rendered_timer[:notice_hour] = properties["notice_hour"] ? properties["notice_hour"].to_i : timer.next_due_at.hour
       rendered_timer[:notice_minute] = properties["notice_minute"] ? properties["notice_minute"].to_i : timer.next_due_at.min
       rendered_timer[:repeat_by] = properties["repeat_by"].to_i

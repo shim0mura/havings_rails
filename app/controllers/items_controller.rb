@@ -2,9 +2,10 @@ class ItemsController < ApplicationController
 
   include CarrierwaveBase64Uploader
 
-  before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :update_image_metadata, :destroy_image]
-  before_action :set_item, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump, :update_image_metadata, :destroy_image]
+  before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
+  before_action :set_item, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
   before_action :can_show?, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :update_image_metadata, :destroy_image]
+  before_action :can_edit?, only: [:update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
 
   def dummy
     seconds = params[:seconds].to_i || 3
@@ -31,6 +32,12 @@ class ItemsController < ApplicationController
     # to_aすればARをloadしない
     # @lista = @list.to_a
     @timer = Timer.new(list_id: @item.id)
+
+    @done_tasks = 0
+    if @item.user_id == current_user.id
+      task = Timer.done_tasks(@item.user_id, @item.id)
+      @done_tasks = task.map{|t|t[:events].size}.sum
+    end
 
     get_next_items
 
@@ -103,8 +110,6 @@ class ItemsController < ApplicationController
     @item.user_id = current_user.id
     @item.count = 0 if @item.is_list
 
-    pp @posted_image_data
-    pp @item
 
     unless @item.list_id
       @item.list_id = current_user.get_home_list.id
@@ -125,63 +130,72 @@ class ItemsController < ApplicationController
 
     @item.is_garbage = false if @item.is_garbage.nil?
 
-    if @item.save
-      new_item_event = Event.create(
-        event_type: (@item.is_list ? :create_list : :create_item),
-        acter_id: current_user.id,
-        related_id: @item.list_id,
-        properties: {
-          item_id: @item.id
-        }
-      )
+    pp @posted_image_data
+    pp @item
 
-      if @item.is_garbage
-        # list側から捨てたことを知りたいのと
-        # item側から手放されたことを知りたいので2つイベントを入れる
-        # 設計ミス…
-        # => dump_from_list_eventをitemとそれを内包するlistに持たせるから
-        # わざわざ2つ作る必要はない？
-        dump_from_list_event = Event.create(
-          event_type: :dump,
+    begin
+      ActiveRecord::Base.transaction do
+
+        @item.save!
+        new_item_event = Event.create!(
+          event_type: (@item.is_list ? :create_list : :create_item),
           acter_id: current_user.id,
           related_id: @item.list_id,
           properties: {
             item_id: @item.id
           }
         )
-        # dump_as_item_event = Event.create(
-        #   event_type: :dump,
-        #   acter_id: current_user.id,
-        #   related_id: @item.id
-        # )
-      end
 
-      # グラフのための情報を更新
-      if @item.is_garbage
-        @item.change_count(0, dump_from_list_event)
-      else
-        if @item.is_list
-          @item.change_count(0, new_item_event, @item)
-        else
-          @item.change_count(0, new_item_event)
-
-          @item.tags.reload
-          Chart.add_item_to_total_chart(item: @item, count: @item.count)
+        if @item.is_garbage
+          # list側から捨てたことを知りたいのと
+          # item側から手放されたことを知りたいので2つイベントを入れる
+          # 設計ミス…
+          # => dump_from_list_eventをitemとそれを内包するlistに持たせるから
+          # わざわざ2つ作る必要はない？
+          dump_from_list_event = Event.create!(
+            event_type: :dump,
+            acter_id: current_user.id,
+            related_id: @item.list_id,
+            properties: {
+              item_id: @item.id
+            }
+          )
+          # dump_as_item_event = Event.create(
+          #   event_type: :dump,
+          #   acter_id: current_user.id,
+          #   related_id: @item.id
+          # )
         end
-      end
 
-      image_event = create_image!(@posted_image_data)
-      # if (image_event.present? && @item.is_list)
-      #   @item.change_count(0, image_event, @item)
-      # end
+        # グラフのための情報を更新
+        if @item.is_garbage
+          @item.change_count(0, dump_from_list_event)
+        else
+          if @item.is_list
+            @item.change_count(0, new_item_event, @item)
+          else
+            @item.change_count(0, new_item_event)
+
+            @item.tags.reload
+            Chart.add_item_to_total_chart(item: @item, count: @item.count)
+          end
+        end
+
+        create_image!(@posted_image_data)
+        end
 
       render json: json_rendered_item
       # format.html { redirect_to @item, notice: 'Item was successfully created.' }
       # format.json { render :show, status: :created, location: @item }
-    else
-      render json: {errors: @item.errors}, status: :unprocessable_entity
-      # format.html { render :new }
-      # format.json { render json: @item.errors, status: :unprocessable_entity }
+
+
+    rescue => e
+      logger.error("item_create_failed, user_id: #{current_user.id}, #{e}, #{e.backtrace}")
+      if @item.errors.messages.present?
+        render json: {errors: @item.errors}, status: :unprocessable_entity
+      else
+        render json: { }, status: 500
+      end
     end
   end
 
@@ -193,6 +207,7 @@ class ItemsController < ApplicationController
     item_count_before_update = @item.count
     list_id_before_update = @item.list_id
     tags_before_update = @item.tags.map(&:id)
+    dump_before_update = @item.is_garbage
 
     set_posted_image_data
 
@@ -222,6 +237,10 @@ class ItemsController < ApplicationController
     pp parent_list_ids
     pp Item.where(id: params[:item][:list_id]).first.get_parent_list_ids
 
+    if @item.is_garbage
+      params[:item].delete(:count)
+    end
+
     # respond_to do |format|
     begin
       ActiveRecord::Base.transaction do
@@ -246,13 +265,14 @@ class ItemsController < ApplicationController
 
 
         if @item.count != item_count_before_update
-          count_changed = Event.create(
+          count_changed = Event.create!(
             event_type: :change_count,
             acter_id: current_user.id,
             related_id: @item.id,
             properties: {
               before: item_count_before_update,
-              after: @item.count
+              after: @item.count,
+              is_garbage: @item.is_garbage
             }
           )
         end
@@ -320,17 +340,6 @@ class ItemsController < ApplicationController
           end
         end
 
-
-
-        # 画像周りの変更
-        # TODO: updateメソッド内でやることが多すぎるので
-        #       画像変更は別APIにしたほうがいい?
-        delete_image!
-        added_image_event = create_image!(@posted_image_data)
-        if params["item"]["image_metadata_for_update"].present?
-          update_item_image_metadata(params["item"]["image_metadata_for_update"])
-        end
-
         unless private_type_before_update == @item.private_type
           if @item.private_type > 0
             synchronize_with_list
@@ -365,7 +374,17 @@ class ItemsController < ApplicationController
     
         @item.update_attributes!(is_deleted: true)
 
-        Chart.delete_item_to_total_chart(item: @item, count: @item.count)
+        # dumpしてるものは既にchartからカウント対象として外されてるので
+        # 二重に計算しないようにする
+        unless @item.is_garbage
+          Chart.delete_item_to_total_chart(item: @item, count: @item.count)
+        end
+
+        @item.timers.each do |t|
+          t.is_deleted = true
+          t.is_active = false
+          t.save!
+        end
 
         if @item.is_list
           children = @item.child_items.countable
@@ -381,7 +400,16 @@ class ItemsController < ApplicationController
           end
 
           delete_fellow_children.each do |c|
-            Chart.delete_item_to_total_chart(item: c, count: c.count)
+            unless c.is_garbage
+              Chart.delete_item_to_total_chart(item: c, count: c.count)
+            end
+
+            c.timers.each do |t|
+              t.is_deleted = true
+              t.is_active = false
+              t.save!
+            end
+
             c.delete_recursive
             delete_events(c.get_event_recursive)
           end
@@ -402,7 +430,7 @@ class ItemsController < ApplicationController
       end
       respond_to do |format|
         format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
-        format.json json_rendered_item
+        format.json {render json: json_rendered_item}
       end
     rescue => e
       # render json: json_rendered_item, status: 500
@@ -434,6 +462,11 @@ class ItemsController < ApplicationController
 
         Chart.delete_item_to_total_chart(item: @item, count: @item.count)
 
+        @item.timers.each do |t|
+          t.is_active = false
+          t.save!
+        end
+
         if @item.is_list && params[:item][:fellow_ids].present?
           children = @item.child_items.countable
           fellow_ids = params[:item][:fellow_ids].map(&:to_i)
@@ -448,7 +481,13 @@ class ItemsController < ApplicationController
           end
 
           dump_fellow_children.each do |c|
-            Chart.delete_item_to_total_chart(item: c, count: c.count)
+            unless c.is_garbage
+              Chart.delete_item_to_total_chart(item: c, count: c.count)
+            end
+            c.timers.each do |t|
+              t.is_active = false
+              t.save!
+            end
             c.dump_recursive
           end
         end
@@ -465,6 +504,25 @@ class ItemsController < ApplicationController
       else
         render json: { }, status: 500
       end
+    end
+
+  end
+
+  def add_image
+    set_posted_image_data(has_image_data: true)
+
+    begin
+      item_image_ids = []
+      ActiveRecord::Base.transaction do
+        item_image_ids = create_image!(@posted_image_data)
+      end
+
+      @next_images = ItemImage.where(id: item_image_ids)
+      @has_next_image = false
+      @next_page_for_item = 0
+    rescue => e
+      logger.error("add_image_failed, item_id: #{@item.id}, #{e}, #{e.backtrace}")
+      render json: { }, status: 500
     end
 
   end
@@ -583,22 +641,22 @@ class ItemsController < ApplicationController
 
     # TODO: destroy_imageに統合
     #       androidがupdateの中でまだこのAPIを使ってる
-    def delete_image!
-      if params[:item][:image_deleting]
-        deleting_image_ids = params[:item][:image_deleting].map(&:to_i)
+    # def delete_image!
+    #   if params[:item][:image_deleting]
+    #     deleting_image_ids = params[:item][:image_deleting].map(&:to_i)
 
-        deleting_event_ids = detect_deleting_image_event_from_image_id(deleting_image_ids)
+    #     deleting_event_ids = detect_deleting_image_event_from_image_id(deleting_image_ids)
 
-        # @item.delete_image_event_evidence_for_graph(deleting_image_ids)
-        @item.delete_image_event_evidence_for_graph(deleting_event_ids)
+    #     # @item.delete_image_event_evidence_for_graph(deleting_image_ids)
+    #     @item.delete_image_event_evidence_for_graph(deleting_event_ids)
 
-        @item.item_images.each do |image|
-          if deleting_image_ids.include?(image.id)
-            image.update_attribute('item_id', nil)
-          end
-        end
-      end
-    end
+    #     @item.item_images.each do |image|
+    #       if deleting_image_ids.include?(image.id)
+    #         image.update_attribute('item_id', nil)
+    #       end
+    #     end
+    #   end
+    # end
 
     def create_image!(uploaded_images = [])
       return false unless uploaded_images.present?
@@ -614,7 +672,7 @@ class ItemsController < ApplicationController
       end
 
       event_ids = item_image_ids.map do |ii|
-        Event.create(
+        Event.create!(
           event_type: :add_image,
           acter_id: current_user.id,
           related_id: @item.id,
@@ -625,27 +683,28 @@ class ItemsController < ApplicationController
       end
 
       @item.add_image_event_evidence_for_graph(event_ids)
+      return item_image_ids
     end
 
     # TODO: update_image_metadataに統合
     #       androidがupdateの中でまだこのAPIを使ってる
-    def update_item_image_metadata(meta_data)
-      meta_data.each do |image_id, values|
-        image = ItemImage.where(id: image_id.to_i).first
-        next unless image
-        image.update_attributes!(
-          memo: values["memo"],
-          added_at: Time.at(Item.get_timestamp_without_millis(values["timestamp"]))
-        )
-      end
+    # def update_item_image_metadata(meta_data)
+    #   meta_data.each do |image_id, values|
+    #     image = ItemImage.where(id: image_id.to_i).first
+    #     next unless image
+    #     image.update_attributes!(
+    #       memo: values["memo"],
+    #       added_at: Time.at(Item.get_timestamp_without_millis(values["timestamp"]))
+    #     )
+    #   end
 
-      image_ids = params["item"]["image_metadata_for_update"].keys.map{|k|k.to_i}
-      event_ids = @item.detect_deleting_image_event_from_image_id(image_ids)
-      @item.delete_image_event_evidence_for_graph(event_ids)
-      p event_ids
-      p @item.count_properties
-      @item.add_image_event_evidence_for_graph(event_ids)
-    end
+    #   image_ids = params["item"]["image_metadata_for_update"].keys.map{|k|k.to_i}
+    #   event_ids = @item.detect_deleting_image_event_from_image_id(image_ids)
+    #   @item.delete_image_event_evidence_for_graph(event_ids)
+    #   p event_ids
+    #   p @item.count_properties
+    #   @item.add_image_event_evidence_for_graph(event_ids)
+    # end
 
     def delete_events(event_ids)
       Event.where(id: event_ids)
@@ -660,6 +719,9 @@ class ItemsController < ApplicationController
       end
     end
 
+    # 親リストが非公開の場合
+    # その子孫アイテム/リストも非公開になる
+    # 親リストが非公開で子孫アイテムが公開として設定されていた場合に修正
     def synchronize_private_type_by_parent
       list = Item.find(@item.list_id)
       if list.private_type > @item.private_type
@@ -670,6 +732,13 @@ class ItemsController < ApplicationController
     def can_show?
       unless @item.can_show?(current_user)
         redirect_to user_page_path(@item.user_id)
+      end
+    end
+
+    def can_edit?
+      unless @item.user_id == current_user.id
+        render json: { }, status: 500
+        return
       end
     end
 

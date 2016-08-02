@@ -205,6 +205,11 @@ class Item < ActiveRecord::Base
       e = c.dump_recursive
     end
 
+    self.timers.each do |t|
+      t.is_active = false
+      t.save!
+    end
+
     dump_event = Event.create!(
       event_type: :dump,
       acter_id: self.user_id,
@@ -221,6 +226,13 @@ class Item < ActiveRecord::Base
 
   def delete_recursive
     self.is_deleted = true
+
+    self.timers.each do |t|
+      t.is_deleted = true
+      t.is_active = false
+      t.save!
+    end
+
     self.child_items.countable.each do |c|
       c.delete_recursive
     end
@@ -454,7 +466,8 @@ class Item < ActiveRecord::Base
     end
 
     if self.is_list
-      hash["count"] = self.user.item_tree(start_at: self.id, relation_to_owner: Relation::HIMSELF).first[:count]
+      tree = self.user.item_tree(start_at: self.id, relation_to_owner: Relation::HIMSELF).first
+      hash["count"] = tree.present? ? tree[:count] : 0
     else
       hash["count"] = self.count
     end
@@ -619,7 +632,6 @@ class Item < ActiveRecord::Base
     end
 
     self.count_properties = properties.to_json
-    pp self
     save!
 
     list.add_image_event_evidence_for_graph(event_ids) if self.list

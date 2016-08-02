@@ -31,11 +31,13 @@ Rails.application.routes.draw do
   get 'home', to: 'welcome#home'
   get 'home/timeline', to: 'welcome#timeline'
   get 'home/graph', to: 'welcome#item_graph'
+  get 'home/all_done_task', to: 'welcome#all_done_task'
   get 'popular/tag', to: 'welcome#popular_tag'
   get 'popular/list', to: 'welcome#popular_list'
   get 'pickup', to: 'welcome#pickup'
 
   resources :items
+  post '/items/:id/image', to: 'items#add_image'
   put '/items/:id/dump', to: 'items#dump'
   get '/items/:id/next_items', to: 'items#next_items'
   get '/items/:id/next_images', to: 'items#next_images'

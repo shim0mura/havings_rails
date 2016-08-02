@@ -33,8 +33,10 @@ class UserController < ApplicationController
   end
 
   def item_tree
+    include_dump_value = params[:include_dump].to_i rescue 0
+    include_dump = (include_dump_value == 1) ? true : false
     @relation = (@user == current_user) ? Relation::HIMSELF : Relation::NOTHING
-    @item_tree = @user.item_tree(relation_to_owner: @relation).first
+    @item_tree = @user.item_tree(relation_to_owner: @relation, include_dump: include_dump).first
   end
 
   def item_list

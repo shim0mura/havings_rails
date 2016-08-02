@@ -28,16 +28,16 @@ end
 json.favorite_count @item.favorites.size
 json.is_favorited @item.is_favorited?(current_user)
 json.comment_count @item.comments.size
+json.done_count @done_tasks
 
-json.owning_item_count @item.child_items.size
+json.owning_item_count @item.child_items.select{|i|!i.is_garbage}.size
 json.image_count @item.item_images.size
 
 json.item_images do
   json.partial! 'item_image_list', locals: {images: @next_images, user_id: (current_user.present? ? current_user.id : nil), has_next: @has_next_image, next_page: @next_page_for_image, owner_id: @item.user_id}
 end
 
-json.tags @item.tag_list
-json.tag_list @item.tag_list.to_s
+json.tags @item.tags.map{|t|t.name}
 
 json.partial! 'child_item_list', locals: {child_items: @next_items, has_next: @has_next_item, next_page: @next_page_for_item}
 

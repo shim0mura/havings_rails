@@ -247,16 +247,11 @@ class Timer < ActiveRecord::Base
     Time.parse(props["start_at"])
   end
 
-  # TODO: idとtimer_idを変更する
-  # idはtimerのidを、timerの属するlistのidはlist_idとして設定
-  # timer_controller#json_rendered_timerも合わせて直す
-  # webがid=list_id, timer_id=idで必要としてるっぽいのでそこから直す
   def to_light
     properties = JSON.parse(self.properties)
-
     {
-      id:    self.list_id,
-      timer_id:    self.id,
+      id:    self.id,
+      list_id: self.list_id,
       name:  self.name,
       path:  Rails.application.routes.url_helpers.item_path(self.list_id),
       properties: self.properties,

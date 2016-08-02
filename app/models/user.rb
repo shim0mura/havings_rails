@@ -212,7 +212,7 @@ class User < ActiveRecord::Base
   #   self.image_favorites.where(from_option).limit(ItemImage::MAX_SHOWING_USER_ITEM_IMAGES + 1).order("id DESC")
   # end
 
-  def item_tree(current: nil, start_at: nil, items: nil, queue: nil, result: nil, relation_to_owner: nil)
+  def item_tree(current: nil, start_at: nil, items: nil, queue: nil, result: nil, relation_to_owner: nil, include_dump: false)
 
     if relation_to_owner.nil?
       relation_to_owner = Relation::NOTHING
@@ -223,10 +223,17 @@ class User < ActiveRecord::Base
     end
 
     if items.nil?
-      items = Item.countable
-        .includes(:item_images, :tags, :favorites)
-        .where(user_id: self.id)
-        .where("private_type <= ?", relation_to_owner).to_a
+      if include_dump
+        items = Item
+          .includes(:item_images, :tags, :favorites)
+          .where(user_id: self.id)
+          .where("private_type <= ?", relation_to_owner).to_a
+      else
+        items = Item.countable
+          .includes(:item_images, :tags, :favorites)
+          .where(user_id: self.id)
+          .where("private_type <= ?", relation_to_owner).to_a
+      end
     end
 
     if queue.nil?
@@ -263,7 +270,7 @@ class User < ActiveRecord::Base
           true
         end
       end
-      hash[:owning_items] = item_tree(current: current, start_at: nil, items: items, queue: child_queue, result: Marshal.load(Marshal.dump(result)), relation_to_owner: relation_to_owner)
+      hash[:owning_items] = item_tree(current: current, start_at: nil, items: items, queue: child_queue, result: Marshal.load(Marshal.dump(result)), relation_to_owner: relation_to_owner, include_dump: include_dump)
       children_count = hash[:owning_items].inject(0){|sum, item| sum + item[:count]} || 0
       # if hash[:item][:is_list]
       if hash[:is_list]

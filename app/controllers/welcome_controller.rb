@@ -31,6 +31,21 @@ class WelcomeController < ApplicationController
     @chart_detail = JSON.parse(current_user.chart.chart_detail)
   end
 
+  def all_done_task
+    all_tasks = Timer.done_tasks(current_user.id)
+    list_ids = all_tasks.map{|t| t[:timer][:list_id]}
+    lists = Item.where(id: list_ids)
+
+    @array = lists.map do |list|
+      hash = {}
+      tasks = all_tasks.select{|t| t[:timer][:list_id] == list.id}
+      hash[:list] = list
+      hash[:tasks] = tasks
+      hash
+    end
+
+  end
+
   def pickup
     @popular_tag = get_popular_tag
     @popular_list = get_popular_list
@@ -58,7 +73,7 @@ class WelcomeController < ApplicationController
         end
       end
     end
-    @has_next_event = (n.size > 0) ? true : false
+    @has_next_event = (n > 0) ? true : false
     timeline
   end
 
