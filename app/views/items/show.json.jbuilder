@@ -46,4 +46,4 @@ json.partial! 'timer_lists', locals: {timers: @item.timers, can_add_timer: @item
 # eventsというkeyはItem.showing_itemで使うのでここでは別のものに変えておく
 # どうせクライアント側もevent_idsを利用しない
 # json.count_properties JSON.parse(@item.count_properties).each{|e|e["event_ids"] = e["events"];e.delete("events")}
-json.count_properties @item.showing_events
+json.count_properties @item.showing_events(@relation)

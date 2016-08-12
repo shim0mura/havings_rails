@@ -1,7 +1,7 @@
 class UserController < ApplicationController
 
+  before_action :authenticate_user!
   before_action :set_user, only: [:index, :timeline, :item_list, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
-  before_action :authenticate_user!, only: [:get_self, :list_tree]
 
   def get_self
     @user = current_user
@@ -14,6 +14,7 @@ class UserController < ApplicationController
   def index
     @current_user = user_signed_in? ? current_user : nil
     @home_list = @user.get_home_list
+    @relation = (@user == current_user) ? Relation::HIMSELF : Relation::NOTHING
 
     get_item_images
 
@@ -44,26 +45,14 @@ class UserController < ApplicationController
     from = params[:from].to_i rescue 0
 
     get_user_items(from)
-
-    sleep(3)
   end
 
   def item_images
     page = params[:page].to_i rescue 0
     get_item_images(page)
-
-    sleep(5)
   end
 
   def favorite_items
-    # favorites = @user.his_own_favorite_items(from)
-    # @favorite_items = Item.countable
-    #   .includes(:user, :tags, :item_images)
-    #   .where(id: favorites.map(&:item_id))
-    # @has_next_item = @favorite_items.count >= Item::SHOWING_ITEM + 1
-    # @last_favorite_id = favorites.last.id rescue 0
-
-
     page = params[:page].to_i rescue 0
     # private_typeが公開のものしか取得しない
     # アイテムとそのownerとのrelationをいちいち取得するのが面倒なのと

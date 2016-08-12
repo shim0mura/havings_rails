@@ -2,6 +2,7 @@ class TimersController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_timer, only: [:update, :destroy, :done, :do_later, :end_timer]
+  before_action :can_edit?, only: [:update, :destroy, :done, :do_later, :end_timer]
 
   def index
     @timers = Timer
@@ -25,7 +26,6 @@ class TimersController < ApplicationController
     @timer.user_id = current_user.id
     set_timer_props
 
-    pp @timer
     if over_timer_count?(params[:timer][:list_id])
       render json: {errors: {"このリストではこれ以上タイマーを作成できません" => ["."]}}, status: :unprocessable_entity 
       return
@@ -57,8 +57,6 @@ class TimersController < ApplicationController
     end
 
     @timer.over_due_from = nil
-    pp @timer
-    raise
 
     begin
       ActiveRecord::Base.transaction do
@@ -87,7 +85,6 @@ class TimersController < ApplicationController
     @timer.next_due_at = Time.at(Item.get_timestamp_without_millis(params[:timer][:next_due_at]))
     @timer.over_due_from = nil
     @timer.latest_calc_at = Time.now
-    pp @timer
 
     begin
       ActiveRecord::Base.transaction do
@@ -109,7 +106,6 @@ class TimersController < ApplicationController
     set_timer_props
     @timer.over_due_from = nil if @timer.next_due_at != prev_next_due_at
 
-    pp @timer
 
     begin
       ActiveRecord::Base.transaction do
@@ -158,6 +154,13 @@ class TimersController < ApplicationController
 
     def set_timer
       @timer = Timer.find(params[:id])
+    end
+
+    def can_edit?
+      unless @timer.user_id == current_user.id
+        render json: { }, status: 500
+        return
+      end
     end
 
     def set_timer_props

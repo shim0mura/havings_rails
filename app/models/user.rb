@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
   before_create :generate_token
   before_create :set_email_provider
   after_create  :create_notification
-  after_create  :create_chart_detail
+  after_create  :create_chart
   after_create  :create_home_list
 
   validates:token, uniqueness: true

@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   get 'home/timeline', to: 'welcome#timeline'
   get 'home/graph', to: 'welcome#item_graph'
   get 'home/all_done_task', to: 'welcome#all_done_task'
+  get 'home/item_count', to: 'welcome#item_count'
   get 'popular/tag', to: 'welcome#popular_tag'
   get 'popular/list', to: 'welcome#popular_list'
   get 'pickup', to: 'welcome#pickup'
@@ -73,6 +74,10 @@ Rails.application.routes.draw do
   get '/tags/default_tag_migration/', to: 'tags#default_tag_migration'
   get '/tags/tag_migration/:migration_id', to: 'tags#tag_migration'
   get '/tags/current_migration_version/', to: 'tags#tag_migration_version'
+
+  post '/device_token/:type/', to: 'device_tokens#create'
+  put '/device_token/:type/', to: 'device_tokens#update'
+  put '/device_token/state/:type/:value', to: 'device_tokens#change_state'
 
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks',

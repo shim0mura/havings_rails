@@ -28,7 +28,12 @@ class WelcomeController < ApplicationController
   end
 
   def item_graph
-    @chart_detail = JSON.parse(current_user.chart.chart_detail)
+    @chart_detail = JSON.parse(current_user.chart.chart_detail) rescue []
+  end
+
+  def item_count
+    render json: current_user.get_home_list.showing_events(Relation::HIMSELF)
+
   end
 
   def all_done_task

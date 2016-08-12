@@ -16,10 +16,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     generic_callback( 'hatena' )
   end
 
-  def instagram
-    generic_callback( 'instagram' )
-  end
-
   def generic_callback(provider)
     p "#"*20
     p request.env['omniauth.origin']

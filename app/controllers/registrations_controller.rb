@@ -10,10 +10,6 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def update_resource(resource, params)
-    p "&"*20
-    pp resource
-    pp params
-    p "1"*20
 
     if resource.encrypted_password.blank? # || params[:password].blank?
       # provider!=emailの場合

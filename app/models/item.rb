@@ -252,11 +252,17 @@ class Item < ActiveRecord::Base
       list_events.push(event.id) if item_id == self.id
     end
 
-    item_events = Event.where(
+    item_event = Event.where(
       acter_id: self.user_id,
       related_id: self.id,
       event_type: Event.item_related_event_types
-    ).collect{|e|e.id}
+    )
+    item_events = []
+    list_event.each do |event|
+      next unless event.properties
+      item_id = eval(event.properties)[:item_id] rescue nil
+      item_events.push(event.id) if item_id == self.id
+    end
 
     item_events.concat(list_events)
     return item_events
@@ -664,6 +670,7 @@ class Item < ActiveRecord::Base
       is_list: self.is_list,
       count:   self.count,
       image:   self.thumbnail,
+      thumbnail: self.thumbnail,
       list_id: self.list_id,
       is_garbage: self.is_garbage,
       private_type: Item.private_types[self.private_type],
@@ -690,7 +697,10 @@ class Item < ActiveRecord::Base
         end
       end
       item_ids.compact!
-      items = Item.includes(:item_images, :child_items).where(id: item_ids)
+      items = Item
+        .includes(:item_images, :child_items)
+        .where(id: item_ids)
+        .where("private_type <= ?", relation_with_owner)
 
       # 日ごとに記録してるevent_idsをイベントオブジェクトに置き換え
       event_objects = []
@@ -699,6 +709,7 @@ class Item < ActiveRecord::Base
         hash["event_type"] = e.event_type
         if e.event_type == "add_image"
           item = items.detect{|i|i.id == e.related_id}
+          next unless item.present?
           image_id = eval(e.properties)[:item_image_id]
 
           adding_image = item.item_images.detect{|i|i.id == image_id}
@@ -708,6 +719,7 @@ class Item < ActiveRecord::Base
           next
         else
           item = items.detect{|i|i.id == eval(e.properties)[:item_id]}
+          next unless item.present?
         end
         hash["item"] = item.to_light if item.present?
         if adding_image.present?
@@ -749,6 +761,11 @@ class Item < ActiveRecord::Base
 
   def breadcrumb(include_self = false)
     return self.user.name + "さんの持ち物" unless list_id
+    unless self.list.present?
+      return self.user.name + "さんの持ち物"
+
+    end
+
     if include_self
       result = self.list.breadcrumb(include_self) + " > " + self.name
     else

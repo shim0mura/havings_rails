@@ -2,7 +2,8 @@ class ItemsController < ApplicationController
 
   include CarrierwaveBase64Uploader
 
-  before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
+  # before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
+  before_action :authenticate_user!
   before_action :set_item, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
   before_action :can_show?, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :update_image_metadata, :destroy_image]
   before_action :can_edit?, only: [:update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
@@ -32,6 +33,8 @@ class ItemsController < ApplicationController
     # to_aすればARをloadしない
     # @lista = @list.to_a
     @timer = Timer.new(list_id: @item.id)
+
+    @relation = (current_user.present? && current_user.id == @item.user_id) ? Relation::HIMSELF : Relation::NOTHING
 
     @done_tasks = 0
     if @item.user_id == current_user.id
@@ -594,7 +597,7 @@ class ItemsController < ApplicationController
 
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+
     def set_item
       @item = Item.includes(child_items:[:tags, :item_images]).find(params[:id])
       @child_items = @item.child_items
@@ -639,25 +642,6 @@ class ItemsController < ApplicationController
       end
     end
 
-    # TODO: destroy_imageに統合
-    #       androidがupdateの中でまだこのAPIを使ってる
-    # def delete_image!
-    #   if params[:item][:image_deleting]
-    #     deleting_image_ids = params[:item][:image_deleting].map(&:to_i)
-
-    #     deleting_event_ids = detect_deleting_image_event_from_image_id(deleting_image_ids)
-
-    #     # @item.delete_image_event_evidence_for_graph(deleting_image_ids)
-    #     @item.delete_image_event_evidence_for_graph(deleting_event_ids)
-
-    #     @item.item_images.each do |image|
-    #       if deleting_image_ids.include?(image.id)
-    #         image.update_attribute('item_id', nil)
-    #       end
-    #     end
-    #   end
-    # end
-
     def create_image!(uploaded_images = [])
       return false unless uploaded_images.present?
 
@@ -685,26 +669,6 @@ class ItemsController < ApplicationController
       @item.add_image_event_evidence_for_graph(event_ids)
       return item_image_ids
     end
-
-    # TODO: update_image_metadataに統合
-    #       androidがupdateの中でまだこのAPIを使ってる
-    # def update_item_image_metadata(meta_data)
-    #   meta_data.each do |image_id, values|
-    #     image = ItemImage.where(id: image_id.to_i).first
-    #     next unless image
-    #     image.update_attributes!(
-    #       memo: values["memo"],
-    #       added_at: Time.at(Item.get_timestamp_without_millis(values["timestamp"]))
-    #     )
-    #   end
-
-    #   image_ids = params["item"]["image_metadata_for_update"].keys.map{|k|k.to_i}
-    #   event_ids = @item.detect_deleting_image_event_from_image_id(image_ids)
-    #   @item.delete_image_event_evidence_for_graph(event_ids)
-    #   p event_ids
-    #   p @item.count_properties
-    #   @item.add_image_event_evidence_for_graph(event_ids)
-    # end
 
     def delete_events(event_ids)
       Event.where(id: event_ids)

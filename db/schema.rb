@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160331044439) do
+ActiveRecord::Schema.define(version: 20160808130456) do
 
   create_table "charts", force: :cascade do |t|
     t.integer  "user_id",      limit: 4,     null: false
@@ -30,6 +30,18 @@ ActiveRecord::Schema.define(version: 20160331044439) do
     t.datetime "updated_at",                               null: false
     t.boolean  "is_deleted", limit: 1,     default: false, null: false
   end
+
+  create_table "device_tokens", force: :cascade do |t|
+    t.integer  "user_id",     limit: 4
+    t.string   "token",       limit: 255
+    t.integer  "device_type", limit: 4
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_enable",   limit: 1,   default: true, null: false
+  end
+
+  add_index "device_tokens", ["user_id", "token"], name: "index_device_tokens_on_user_id_and_token", unique: true, using: :btree
+  add_index "device_tokens", ["user_id"], name: "index_device_tokens_on_user_id", using: :btree
 
   create_table "events", force: :cascade do |t|
     t.integer  "event_type",       limit: 4,                     null: false
