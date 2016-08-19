@@ -12,5 +12,8 @@ production: &production
     key: 63546e803daa4e4a9a368a30cc68ad4f
     secret: 795be510c4644246b574c550d8031a69
 
+staging: &staging
+  <<: *production
+
 development: &development
   <<: *production
