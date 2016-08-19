@@ -54,7 +54,7 @@ namespace :deploy do
   task :map_rake do
     SSHKit.config.command_map[:rake] = "sudo docker run -rm rake"
   end
-  before 'bundler:install', 'deploy:map_rake'
+  before 'deploy:updated', 'deploy:map_rake'
 
   desc "START server"
   task :start do
