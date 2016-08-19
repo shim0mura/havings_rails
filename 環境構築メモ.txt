@@ -1,0 +1,11 @@
+stagingとproductionはdocker上
+dockerホスト上にはgitとrbenvが必要
+
+
+sudo yum install make gcc bzip2 openssl-devel readline-devel zlib-devel libyaml-devel zlib-devel openssl-libs libffi-devel git
+sudo yum install libxml2-devel ImageMagick ImageMagick-devel mysql-devel
+rbenvはsystem wideじゃなくてもいい
+rbenvはcapistranoでbundler installをするためなので、rails本体は必要ない
+ただし、bundlerでインストールするので結局native extensionの部分は必要にな
+る....
+compileとかはコンテナ上でやるのでいい
