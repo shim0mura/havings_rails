@@ -48,6 +48,7 @@ set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rben
 set :rbenv_map_bins, %w{rake gem bundle ruby rails}
 set :rbenv_roles, :all # default value
 
+after 'deploy:publishing', 'deploy:restart'
 namespace :deploy do
 
   desc 'Make rake run in container'
@@ -68,32 +69,24 @@ namespace :deploy do
 
   desc "START server"
   task :start do
-    on roles(:app) do 
-      run "cd /home/shimomura/compose && docker-compose up"
-      run "docker-compose up"
+    on roles(:app, :web) do 
     end
   end
 
   desc "STOP server"
   task :stop do
-    on roles(:app) do 
-      run "kill `cat #{deploy_to}/tmp/pids/server.pid`"
+    on roles(:app, :web) do 
     end
   end
 
   desc "RESTART server"
   task :restart do
-    # run "kill -USR2 `cat #{deploy_to}/shared/pids/unicorn.pid`"
-    # TODO: rescue関連のリスタート
-    # run "cd #{current_path} && RAILS_ENV=development QUEUE='*' PIDFILE=#{current_path}/tmp/pids/resque_.pid VERBOSE=1 bundle exec rake environment resque:work"
-    # 1.upto(worker.to_i) do |i|
-    #   p "#{current_path}/tmp/pids/resque_#{i}.pid"
-    #   if File.exists?("#{current_path}/tmp/pids/resque_#{i}.pid")
-    #     run "kill -9 `#{current_path}/tmp/pids/resque_#{i}.pid"
-    #     run "rm #{current_path}/tmp/pids/resque_#{i}.pid"
-    #   end
-    #   # run "cd #{current_path} && RAILS_ENV=development QUEUE='*' PIDFILE=#{current_path}/tmp/pids/resque_#{i}.pid VERBOSE=1 nohup bundle exec rake environment resque:work > log/nohup_#{i}.out 2>&1 < /dev/null &"
-    # end
+    on roles(:app) do |host|
+       invoke 'unicorn:restart'
+      # puts "#{shared_path}"
+      # puts "#{fetch(:unicorn_pid)}"
+      # execute :kill, "-s USR2 $(< #{shared_path}/tmp/pids/unicorn.pid)"
+    end
   end
 
   # desc "copy database.yml"
