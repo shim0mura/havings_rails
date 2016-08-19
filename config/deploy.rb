@@ -15,7 +15,7 @@ set :runner, "shim0mura"
 
 # Default value for :scm is :git
 # set :scm, :git
-set :conditionally_migrate, true
+# set :conditionally_migrate, true
 
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
@@ -54,7 +54,17 @@ namespace :deploy do
   task :map_rake do
     SSHKit.config.command_map[:rake] = "sudo docker run -rm rake"
   end
-  before 'deploy:updated', 'deploy:map_rake'
+  # before 'deploy:updated', 'deploy:map_rake'
+
+  task :db_create do
+    on roles(:db) do |host|
+      with rails_env: fetch(:rails_env) do
+        within current_path do
+          execute :bundle, :exec, :rake, 'db:create'
+      end
+      end
+    end
+  end
 
   desc "START server"
   task :start do
