@@ -1,11 +1,45 @@
-stagingとproductionはdocker上
-dockerホスト上にはgitとrbenvが必要
-
+rbenvはとりあえずユーザーshim0muraのみ
 
 sudo yum install make gcc bzip2 openssl-devel readline-devel zlib-devel libyaml-devel zlib-devel openssl-libs libffi-devel git
 sudo yum install libxml2-devel ImageMagick ImageMagick-devel mysql-devel
-rbenvはsystem wideじゃなくてもいい
-rbenvはcapistranoでbundler installをするためなので、rails本体は必要ない
-ただし、bundlerでインストールするので結局native extensionの部分は必要にな
-る....
-compileとかはコンテナ上でやるのでいい
+
+
+
+mysql:
+http://weblabo.oscasierra.net/installing-mysql56-centos7-yum/
+mysql5.6をインストール
+my.cnfもちょっと変える
+
+redis:
+epelからインストール
+http://www.kakiro-web.com/linux/epel-install.html
+yum install redis
+
+nginx
+yum install nginx
+
+
+kakasi ruby
+タグの日本語とローマ字の読み追加する(development)
+http://qiita.com/GATAKAWAKACHICO/items/cda91715b78a808d36ef
+
+gzip -dc kakasi-2.3.5.tar.gz | tar xvf -
+cd kakasi-2.3.5
+./configure
+make
+su
+make install
+
+git clone https://github.com/eitoball/kakasi-ruby.git
+cd kakasi-ruby
+ruby extconf.rb --with-opt-include=/usr/local/include/ --with-opt-lib=/usr/local/lib
+mv kakasi.c kakasi.c.org 
+cat kakasi.c.org | sed "s/RSTRING\(([^)]*)\)->len/RSTRING_LEN\\1/" | sed "s/RSTRING\(([^)]*)\)->ptr/RSTRING_PTR\\1/" > kakasi.c
+make
+make install
+
+postfix
+http://kajuhome.com/postfix.shtml
+smtp-authのためにsaslauthdの設定も行う
+追加設定のurlは忘れた...
+

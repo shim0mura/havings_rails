@@ -86,5 +86,7 @@ group :development, :test do
 
   gem 'httparty'
 
+  gem 'seed_dump'
+
 end
 

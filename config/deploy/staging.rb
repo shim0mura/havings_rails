@@ -5,7 +5,7 @@
 
 # server 'example.com', user: 'deploy', roles: %w{app db web}, my_property: :my_value
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
-server 'havings_staging', user: 'shim0mura', roles: %w{app web db}
+server 'staging.havings.me', user: 'shim0mura', roles: %w{app web db}
 
 set :deploy_to, "/home/shimomura/havings/staging"
 

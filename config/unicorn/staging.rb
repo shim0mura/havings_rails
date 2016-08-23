@@ -4,7 +4,7 @@ preload_app true # 更新時ダウンタイム無し
 
 app_path = '/home/shimomura/havings/staging'
 app_shared_path = "#{app_path}/shared"
-working_directory "#{app_path}/current/"
+working_directory = "#{app_path}/current/"
 
 listen "#{app_shared_path}/tmp/sockets/unicorn.sock"
 pid "#{app_shared_path}/tmp/pids/unicorn.pid"
@@ -26,7 +26,7 @@ before_fork do |server, worker|
     ActiveRecord::Base.connection.disconnect!
 
 
-  ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', current_path)
+  ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', working_directory)
   old_pid = "#{server.config[:pid]}.oldbin"
   if File.exists?(old_pid) && server.pid != old_pid
     begin

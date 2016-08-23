@@ -38,7 +38,8 @@ append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/syst
 
 # Default value for keep_releases is 5
 set :keep_releases, 5
-set :unicorn_pid, "#{shared_path}/tmp/pids/unicorn.pid"
+set :unicorn_pid, -> { "#{shared_path}/tmp/pids/unicorn.pid" }
+set :unicorn_rack_env, 'deployment'
 
 
 set :rbenv_type, :user # or :system, depends on your rbenv setup
@@ -48,7 +49,8 @@ set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rben
 set :rbenv_map_bins, %w{rake gem bundle ruby rails}
 set :rbenv_roles, :all # default value
 
-after 'deploy:publishing', 'deploy:restart'
+SSHKit.config.command_map[:rake] = 'bundle exec rake'
+
 namespace :deploy do
 
   desc 'Make rake run in container'
@@ -56,6 +58,16 @@ namespace :deploy do
     SSHKit.config.command_map[:rake] = "sudo docker run -rm rake"
   end
   # before 'deploy:updated', 'deploy:map_rake'
+
+  task :db_seed do
+    on roles(:db) do |host|
+      within current_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'db:seed'
+        end
+      end
+    end
+  end
 
   task :db_create do
     on roles(:db) do |host|
@@ -82,10 +94,7 @@ namespace :deploy do
   desc "RESTART server"
   task :restart do
     on roles(:app) do |host|
-       invoke 'unicorn:restart'
-      # puts "#{shared_path}"
-      # puts "#{fetch(:unicorn_pid)}"
-      # execute :kill, "-s USR2 $(< #{shared_path}/tmp/pids/unicorn.pid)"
+      execute :kill, "-s USR2 $(< #{shared_path}/tmp/pids/unicorn.pid)"
     end
   end
 
