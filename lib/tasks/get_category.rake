@@ -1,5 +1,6 @@
-require "kakasi.so"
-include Kakasi
+# 本番以外だと使わない上に邪魔なので除外
+# require "kakasi.so"
+# include Kakasi
 
 namespace :get_category do
 
