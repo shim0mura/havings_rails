@@ -4,8 +4,10 @@ namespace :tag_migration do
   task :add_tag_migration_history => :environment do
 
     last_migration = TagMigrationHistory.last
+    min = last_migration.tag_changed_at rescue Time.new(2016,1,1)
     changed_tags = ActsAsTaggableOn::Tag.where(is_default_tag: true)
-      .where("updated_at > ?", last_migration.tag_changed_at)
+      .where("updated_at > ?", min)
+      #.where("updated_at > ?", last_migration.tag_changed_at)
 
     added = []
     updated = []

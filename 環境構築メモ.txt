@@ -43,3 +43,5 @@ http://kajuhome.com/postfix.shtml
 smtp-authのためにsaslauthdの設定も行う
 追加設定のurlは忘れた...
 
+ssl
+http://zuntan02.hateblo.jp/entry/2015/06/15/163736

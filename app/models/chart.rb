@@ -10,11 +10,17 @@ class Chart < ActiveRecord::Base
   TAG_TYPE_THING     = 2
   TAG_TYPE_ATTRIBUTE = 4
 
-  ETC_TAG_IDS = [1610]
-  CLOTHING_TAG_IDS = [18, 574]
-  FOOD_TAG_IDS     = [342, 962]
-  LIVING_TAG_IDS   = [653, 788, 1049]
-  HOBBY_TAG_IDS    = [1282, 1554]
+  # タグidからrootカテゴリ決定
+  # 分類なし
+  ETC_TAG_IDS = [1340]
+  # 衣: ファッション、コスメ
+  CLOTHING_TAG_IDS = [1, 392]
+  # 食: 食品、キッチン用品
+  FOOD_TAG_IDS     = [326, 769]
+  # 住: 家電、家具、日用品
+  LIVING_TAG_IDS   = [469, 599, 856]
+  # その他: 趣味、本
+  HOBBY_TAG_IDS    = [1042, 1305]
 
   belongs_to :user
 
