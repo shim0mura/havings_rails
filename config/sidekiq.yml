@@ -3,3 +3,4 @@
 :queues:
   - timer
 :daemon: true
+:concurrency: 3

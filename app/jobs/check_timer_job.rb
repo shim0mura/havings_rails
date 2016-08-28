@@ -53,7 +53,7 @@ class CheckTimerJob < ActiveJob::Base
 
           apn.push(notification)
           if notification.error
-            logger.error(notification.error
+            logger.error(notification.error)
           end
         end
 

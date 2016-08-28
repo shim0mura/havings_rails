@@ -46,6 +46,7 @@ class Timer < ActiveRecord::Base
 
   def is_valid_next_due_time?
     current = Time.now
+    return if !is_active || is_deleted
     if current > next_due_at
       errors.add(:next_due_at, " is invalid")
     end
@@ -115,12 +116,18 @@ class Timer < ActiveRecord::Base
     # TODO: ここのwhileに入った場合のログを取る
     #       基本的に定期実行ジョブが死んでない限りここには入らないはずだけど
     #       何かを見落としてここに入る場合があるかも
-    while self.next_due_at < now do
-      self.latest_calc_at = next_due_at
-      self.next_due_at = get_next_due_at
+    if self.is_repeating
+      while self.next_due_at < now do
+        self.latest_calc_at = next_due_at
+        self.next_due_at = get_next_due_at
+      end
     end
 
-    self.save!
+    if self.is_repeating
+      self.save!
+    else
+      self.save!(validate: false)
+    end
 
     event = Event.create(
       event_type: :timer,
