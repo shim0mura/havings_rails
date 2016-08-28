@@ -28,7 +28,7 @@ class CheckTimerJob < ActiveJob::Base
               'Accept' => 'application/json'
             },
               body: {
-              'to' => device_token.token
+              'to' => device_token.token,
               'data' => {message: timer.name + "の期限が切れました", id: timer.list_id, type: 0}
             }.to_json
           })
@@ -37,11 +37,11 @@ class CheckTimerJob < ActiveJob::Base
 
         else
           if Rails.env == 'staging'
-            APN = Houston::Client.development
-            APN.certificate = File.read("apns_development.pem")
+            apn = Houston::Client.development
+            apn.certificate = File.read("apns_development.pem")
           else
-            APN = Houston::Client.production
-            APN.certificate = File.read("apns_production.pem")
+            apn = Houston::Client.production
+            apn.certificate = File.read("apns_production.pem")
           end
 
           notification = Houston::Notification.new(device: device_token.token)
@@ -51,12 +51,12 @@ class CheckTimerJob < ActiveJob::Base
           notification.content_available = true
           notification.custom_data = {item: timer.list_id}
 
-          APN.push(notification)
+          apn.push(notification)
           if notification.error
             logger.error(notification.error
           end
-
         end
+
       end
     end
   end
