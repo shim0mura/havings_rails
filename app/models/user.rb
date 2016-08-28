@@ -107,7 +107,7 @@ class User < ActiveRecord::Base
         provider: social_profile.provider,
         uid: social_profile.uid,
         name: social_profile.name,
-        image: social_profile.image_url,
+        image: social_profile.image_url.sub(/^http/, "https"),
         description: social_profile.description
       )
       user.save!

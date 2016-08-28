@@ -90,6 +90,8 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     columnize (0.9.0)
+    commander (4.4.0)
+      highline (~> 1.7.2)
     connection_pool (2.0.0)
     debug_inspector (0.0.2)
     devise (3.5.1)
@@ -114,6 +116,10 @@ GEM
       request_store (>= 1.0)
     google_visualr (2.5.1)
     hashie (3.4.2)
+    highline (1.7.8)
+    houston (2.2.3)
+      commander (~> 4.1)
+      json
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -317,6 +323,7 @@ DEPENDENCIES
   enumerize
   gon
   google_visualr
+  houston
   httparty
   jbuilder (~> 2.0)
   jquery-fileupload-rails

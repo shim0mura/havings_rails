@@ -2,6 +2,8 @@ class DeviceTokensController < ApplicationController
   before_action :authenticate_user!
 
   def create
+    # type 0 : android
+    #      1 : iOS
     type = params[:type].to_i
     @device_token = DeviceToken.new(token_params)
     @device_token.user_id = current_user.id

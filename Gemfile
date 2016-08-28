@@ -71,6 +71,9 @@ gem 'capistrano-faster-assets'
 gem 'capistrano-sidekiq'
 gem 'capistrano-rbenv'
 
+gem 'houston'
+gem 'httparty'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -83,8 +86,6 @@ group :development, :test do
 
   gem 'annotate'
   gem 'awesome_print'
-
-  gem 'httparty'
 
   gem 'seed_dump'
 
