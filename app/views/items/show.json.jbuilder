@@ -20,6 +20,8 @@ json.extract! @item, :id, :name, :description, :is_list, :is_garbage, :garbage_r
 json.breadcrumb @item.breadcrumb
 json.thumbnail @item.thumbnail
 json.private_type Item.private_types[@item.private_type]
+json.path Rails.application.routes.url_helpers.item_path(@item.id)
+
 
 json.owner do
   json.extract! @item.user.to_light, :id, :name, :image
