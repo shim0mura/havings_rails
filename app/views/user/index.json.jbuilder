@@ -1,5 +1,5 @@
 json.extract! @user, :id, :name, :description
-json.path Rails.application.routes.url_helpers.item_path(@user.id)
+json.path Rails.application.routes.url_helpers.user_page_path(@user.id)
 json.image @user.thumbnail
 json.count @home_list.count
 
