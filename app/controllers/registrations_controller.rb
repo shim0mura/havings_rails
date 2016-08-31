@@ -43,7 +43,30 @@ class RegistrationsController < Devise::RegistrationsController
       resource.update_without_password(params)
     else
       # provider=emailの場合
-      resource.update_with_password(params)
+      p "!"*20
+      p "with email"
+      # TODO: パスワードの変更
+      pp current_user
+      if current_user.present?
+        resource.email = current_user.email
+
+        if params[:image].present? && is_base64_data?(params[:image])
+          resource.image = base64_conversion(params[:image])
+          params.delete("image")
+        end
+
+        # resource.name = params["name"]
+        # params.delete("name")
+        # resource.description = params["description"]
+        # params.delete("description")
+        # pp resource
+        pp params
+
+        params[:email] = current_user.email
+      end
+
+      # resource.update_without_password(params)
+      resource.update_without_password(params)
     end
   end
 
