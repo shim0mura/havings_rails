@@ -44,7 +44,8 @@ class ItemImage < ActiveRecord::Base
       id:               self.id,
       image:            self.image_url,
       item_id:          self.item_id,
-      item_name:        self.item.name
+      item_name:        self.item.name,
+      name:             self.item.name
     }
   end
 

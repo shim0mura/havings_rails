@@ -322,10 +322,14 @@ class User < ActiveRecord::Base
       when "create_list", "create_item", "image_favorite"
         next unless e.properties
         item_ids << eval(e.properties)[:item_id]
-      when "add_image", "dump", "favorite", "comment"
+      when "add_image", "favorite", "comment"
         item_ids << e.related_id
       when "follow"
         followed_user_ids << e.suffered_user_id
+      when "dump"
+        next unless e.properties
+        item_ids << e.related_id
+        item_ids << eval(e.properties)[:item_id]
       end
     end
     items = Item.where(id: item_ids)
@@ -347,8 +351,14 @@ class User < ActiveRecord::Base
         next unless item.present?
         next unless item.can_show?(showing_user)
         hash[:target] << item.to_light
-      when "dump", "favorite", "comment"
+      when "favorite", "comment"
         item_id = e.related_id
+        item = items.detect{|i|i.id == item_id}
+        next unless item.present?
+        next unless item.can_show?(showing_user)
+        hash[:target] << item.to_light
+      when "dump"
+        item_id = eval(e.properties)[:item_id]
         item = items.detect{|i|i.id == item_id}
         next unless item.present?
         next unless item.can_show?(showing_user)
