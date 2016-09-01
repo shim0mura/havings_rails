@@ -1,6 +1,6 @@
 class UserController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, only:[:timeline, :list_tree, :item_list, :item_tree]
   before_action :set_user, only: [:index, :timeline, :item_list, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
 
   def get_self
@@ -21,7 +21,7 @@ class UserController < ApplicationController
     @user_item_image_count = get_user_item_images_count
     @background_image = (@next_images.first.present? ? @next_images.first.image_url : nil)
 
-    @user_timeline = @user.timeline(current_user)
+    @user_timeline = @user.timeline(@current_user)
     @has_next_event = @user.has_next_event_from?(@user_timeline.last[:event_id])
   end
 

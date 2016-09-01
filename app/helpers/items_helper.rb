@@ -1,5 +1,21 @@
 module ItemsHelper
 
+  def breadcrumb_html(item, include_self = false)
+    return link_to(item.user.name, user_page_path(item.user_id)) + "さんの持ち物" unless item.list_id
+    unless item.list.present?
+      return link_to(item.user.name, user_page_path(item.user_id)) + "さんの持ち物"
+
+    end
+
+    if include_self
+      result = breadcrumb_html(item.list, include_self) + " > " + tag("br") + link_to(item.name, items_path(item.id))
+    else
+      result = breadcrumb_html(item.list, true) + " > " + tag("br")
+    end
+    return result
+  end
+  
+
   def due_date_in_ja(time)
     time.strftime("%Y年%-m月%e日(#{%w(日 月 火 水 木 金 土)[time.wday]})%k時%M分")
   end

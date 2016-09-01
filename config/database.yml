@@ -56,5 +56,3 @@ test:
 production:
   <<: *default
   database: havings_production
-  username: havings
-  password: <%= ENV['HAVINGS_DATABASE_PASSWORD'] %>

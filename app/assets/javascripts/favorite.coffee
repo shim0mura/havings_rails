@@ -4,7 +4,7 @@
 $ ->
   already_favorite = "already-favorite"
 
-  $(document).on "click", "i.favorite", (e)->
+  $(document).on "click", "span.button-favorite", (e)->
     if $(@).hasClass("not-sigined-in")
       alert("お気に入りをするにはログインしてください。")
     else

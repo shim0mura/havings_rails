@@ -82,12 +82,14 @@ namespace :deploy do
   desc "START server"
   task :start do
     on roles(:app, :web) do 
+      invoke 'unicorn:start'
     end
   end
 
   desc "STOP server"
   task :stop do
     on roles(:app, :web) do 
+      invoke 'unicorn:stop'
     end
   end
 

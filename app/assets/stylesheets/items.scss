@@ -4,7 +4,7 @@
 
 
 .item-title {
-  margin-top: -10px;
+  margin-top: 0px;
   margin-bottom: 0px;
 }
 
@@ -36,6 +36,18 @@ h2 .item-unit {
 .circle .item-unit {
   color: black;
 }
+.inner-ribbon .circle {
+  float: left;
+}
+.inner-ribbon .item-name-wrapper {
+  float: left;
+}
+.item-title .item-icon {
+  width: 40px;
+  height: 40px;
+  margin-top: -10px;
+  margin-right: -10px;
+}
 .item-meta-data {
   display: table;
 }
@@ -55,7 +67,9 @@ h2 .item-unit {
 }
 
 .meta-data-ribbon {
-  background: #795548;
+  background: #A48174;
+}
+.meta-data-ribbon.is-list {
   padding-bottom: 5vh;
 }
 
@@ -70,6 +84,12 @@ h2 .item-unit {
 }
 .item-meta-data .item-meta-fab span {
   font-size: 20px;
+}
+.item-meta-data .item-meta-fab .button-favorite {
+  font-size: 15px;
+}
+.item-meta-data .item-meta-fab .already-favorite {
+  color: rgb(255,64,129);
 }
 .item-meta-data .item-meta-fab .favorite {
   cursor: pointer;
@@ -170,16 +190,21 @@ div.list-item-image img {
 }
 
 div.list-item-image .list-item-image-alt {
-  line-height: 90px;
+
+  line-height: 60px;
   text-align: center;
 }
-div.list-item-image .list-item-image-alt i {
-  font-size: 40px;
-  color: #fff;
+div.list-item-image .list-item-image-alt img {
+  width: 40px;
+  height: 40px;
 }
 div.list-item-text {
   display: table-cell;
   vertical-align: top;
+}
+div.list-item-text img {
+  width: 24px;
+  height: 24px;
 }
 div.list-item-text h5 {
   margin-top: 2px;
@@ -339,6 +364,7 @@ ul.timeline {
   border: 1px solid #B6B6B6;
   overflow: hidden;
   background: #795548;
+  line-height: 60px;
 }
 .timeline .event-text h5 .image-circle img {
   width:100%;

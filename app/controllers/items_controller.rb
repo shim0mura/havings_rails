@@ -2,8 +2,8 @@ class ItemsController < ApplicationController
 
   include CarrierwaveBase64Uploader
 
-  # before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
-  before_action :authenticate_user!
+  before_action :authenticate_user!, only: [:done_task, :create, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
+  #before_action :authenticate_user!
   before_action :set_item, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
   before_action :can_show?, only: [:show, :next_items, :next_images, :item_image, :timeline, :done_task, :showing_events, :edit, :update, :destroy, :update_image_metadata, :destroy_image]
   before_action :can_edit?, only: [:update, :destroy, :dump, :add_image, :update_image_metadata, :destroy_image]
@@ -37,7 +37,7 @@ class ItemsController < ApplicationController
     @relation = (current_user.present? && current_user.id == @item.user_id) ? Relation::HIMSELF : Relation::NOTHING
 
     @done_tasks = 0
-    if @item.user_id == current_user.id
+    if user_signed_in? && @item.user_id == current_user.id
       task = Timer.done_tasks(@item.user_id, @item.id)
       @done_tasks = task.map{|t|t[:events].size}.sum
     end
@@ -47,6 +47,7 @@ class ItemsController < ApplicationController
     get_next_images
 
     line_chart
+
   end
 
   def next_items
@@ -599,7 +600,7 @@ class ItemsController < ApplicationController
   private
 
     def set_item
-      @item = Item.includes(child_items:[:tags, :item_images]).find(params[:id])
+      @item = Item.includes(child_items:[:tags, :item_images, :favorites]).find(params[:id])
       @child_items = @item.child_items
     end
 

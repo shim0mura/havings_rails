@@ -55,13 +55,6 @@ class RegistrationsController < Devise::RegistrationsController
           params.delete("image")
         end
 
-        # resource.name = params["name"]
-        # params.delete("name")
-        # resource.description = params["description"]
-        # params.delete("description")
-        # pp resource
-        pp params
-
         params[:email] = current_user.email
       end
 
