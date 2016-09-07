@@ -18,6 +18,7 @@
 
 class Timer < ActiveRecord::Base
 
+  MAX_SHOWING_TIMER = 4
   MAX_COUNT_PER_LIST = 3
 
   belongs_to :list, :foreign_key => "list_id", :class_name => "Item"

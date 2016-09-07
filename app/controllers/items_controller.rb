@@ -601,7 +601,7 @@ class ItemsController < ApplicationController
 
     def set_item
       @item = Item.includes(child_items:[:tags, :item_images, :favorites]).find(params[:id])
-      @child_items = @item.child_items
+      #@child_items = @item.child_items
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

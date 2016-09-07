@@ -1,7 +1,7 @@
 class UserController < ApplicationController
 
-  before_action :authenticate_user!, only:[:timeline, :list_tree, :item_list, :item_tree]
-  before_action :set_user, only: [:index, :timeline, :item_list, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
+  before_action :authenticate_user!, only:[:timeline, :list_tree, :user_items, :item_tree]
+  before_action :set_user, only: [:index, :timeline, :user_items, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
 
   def get_self
     @user = current_user
@@ -16,13 +16,16 @@ class UserController < ApplicationController
     @home_list = @user.get_home_list
     @relation = (@user == current_user) ? Relation::HIMSELF : Relation::NOTHING
 
+    get_user_items
     get_item_images
 
     @user_item_image_count = get_user_item_images_count
     @background_image = (@next_images.first.present? ? @next_images.first.image_url : nil)
 
-    @user_timeline = @user.timeline(@current_user)
-    @has_next_event = @user.has_next_event_from?(@user_timeline.last[:event_id])
+    # @user_timeline = @user.timeline(@current_user)
+    # @has_next_event = @user.has_next_event_from?(@user_timeline.last[:event_id])
+    gon.item = @home_list.showing_events
+    
   end
 
   def timeline
@@ -40,11 +43,15 @@ class UserController < ApplicationController
     @item_tree = @user.item_tree(relation_to_owner: @relation, include_dump: include_dump).first
   end
 
-  def item_list
-    @home_list = @user.get_home_list
-    from = params[:from].to_i rescue 0
+  # def item_list
+  #   @home_list = @user.get_home_list
+  #   from = params[:from].to_i rescue 0
 
-    get_user_items(from)
+  #   get_user_items(from)
+  # end
+  def user_items
+    page = params[:page].to_i rescue 0
+    get_user_items(page)
   end
 
   def item_images
@@ -144,16 +151,14 @@ class UserController < ApplicationController
     end
   end
 
-  # TODO: 削除
-  #       まだandroid側が使ってる
-  def get_user_items(from = 0)
-    @next_items = Item.countable
-                    .includes(:tags, :item_images, :favorites)
-                    .where(user_id: @user.id)
-                    .where("id > ?", from)
-    #.limit(Item::SHOWING_ITEM + 1)
+  def get_user_items(page = 0)
+    relation = (current_user.present? && (@user.id == current_user.id)) ? Relation::HIMSELF : Relation::NOTHING
 
-    @has_next_item = @next_items.size >= Item::SHOWING_ITEM + 1
+    @next_items = Item.countable
+      .includes(:tags, :item_images, :favorites)
+      .where(user_id: @user.id)
+      .where("private_type <= ?", relation)
+      .page(page)
   end
 
   def get_item_images(page = 0)

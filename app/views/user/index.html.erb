@@ -1,27 +1,51 @@
 <%# TODO: userの一番Likeが多い画像をbgにする %>
-<div class="ribbon" style="background-image:url(<%= @user.items.last.item_images.last.image_url if @user.items.present? && @user.items.last.item_images.present? %>)">
+<div class="ribbon" style="background-image:url(<%= @background_image if @background_image.present? %>)">
 
   <div class="ribbon-gradation">
   </div>
   <div class="inner-ribbon user-profile-wrapper">
     <div class="user-profile">
       <div class="user-caption">
-        <div class="circle"></div>
+        <div class="circle" style="background-image:url(<%= @user.thumbnail if @user.thumbnail.present? %>)"></div>
         <div class="user-data">
-          <h3 class="user-name">ユーザー名</h3>
-          <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
-            <i class="material-icons">person_add</i>
-            フォロー
-          </button>
+          <h3 class="user-name"><%= @user.name %></h3>
+
+
+
+                <% unless user_signed_in? && current_user.id == @user.id %>
+                  <%= form_tag({controller: "follows", action: "create", user_id: @user.id}, {class: "follow-user"}) do %>
+                  <% end %>
+                  <%= form_tag({controller: "follows", action: "destroy", user_id: @user.id}, {class: "unfollow-user", method: :delete}) do %>
+                  <% end %>
+
+
+                  <% follow_class = "follow" %>
+                  <% follow_class = follow_class + " not-sigined-in" unless user_signed_in? %>
+                  <% if user_signed_in? && current_user.already_follow?(@user.id) %>
+                    <% follow_class = follow_class + " already-follow" %>
+                    <% icon = "person" %>
+                    <% follow_span = "フォロー中" %>
+                  <% else %>
+                    <% icon = "person_add" %>
+                    <% follow_span = "フォロー" %>
+                  <% end %>
+
+
+                  <div class="<%= follow_class %> mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                    <i class="material-icons"><%= icon %></i>
+                    <span><%= follow_span %></span>
+                  </div>
+                <% end %>
+
         </div>
       </div>
       <div class="user-meta-data">
         <div class="following">
-          1000
+          <%= @user.following.count %>
           <div class="meta-data-unit">following</div>
         </div>
         <div class="follower">
-          1000
+          <%= @user.following.count %>
           <div class="meta-data-unit">following</div>
         </div>
       </div>
@@ -38,92 +62,55 @@
       <div class="mdl-tabs__tab-bar">
         <a href="#item-list" class="mdl-tabs__tab is-active">
           <div class="tab-caption">リスト</div>
-          <div class="tab-name">100</div>
+          <div class="tab-name"><%= @user.items.countable.count %></div>
         </a>
         <a href="#image-list" class="mdl-tabs__tab">
           <div class="tab-caption">画像一覧</div>
-          <div class="tab-name">100</div>
+          <div class="tab-name"><%= @user_item_image_count %></div>
         </a>
-        <a href="#timeline" class="mdl-tabs__tab">
-          <div class="tab-caption">履歴</div>
-          <div class="tab-name">100</div>
+        <a href="#graph" class="mdl-tabs__tab">
+          <div class="tab-caption">グラフ</div>
+          <div class="tab-name"></div>
         </a>
-        <a href="#like" class="mdl-tabs__tab">
-          <div class="tab-caption">like</div>
-          <div class="tab-name">1000</div>
-        </a>
+
+        <% if false %>
+          <a href="#timeline" class="mdl-tabs__tab">
+            <div class="tab-caption">履歴</div>
+            <div class="tab-name"><%= @user_timeline.size %></div>
+          </a>
+        <% end %>
+        <% if false %>
+          <a href="#like" class="mdl-tabs__tab">
+            <div class="tab-caption">like</div>
+            <div class="tab-name">1000</div>
+          </a>
+        <% end %>
       </div>
 
       <!-- item list -->
       <div class="mdl-tabs__panel is-active" id="item-list">
-        <ul class="list-items">
-          <% @user.items.each do |item| %>
-            <li>
-              <!-- item-image -->
-              <div class="list-item-image">
-                <% unless item.item_images.empty? %>
-                  <div class="image-circle">
-                    <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
-                  </div>
-                <% else %>
-                  <%= link_to item_path(id: item.id) do %>
-                    <div class="image-circle list-item-image-alt">
-                      <% if item.is_list %>
-                        <i class="material-icons">folder</i>
-                      <% else %>
-                        <i class="material-icons">attachment</i>
-                      <% end %>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
+        <ul class="list-items" id="owning_items">
 
-              <!-- item-text -->
-              <div class="list-item-text">
-                <h5>
-                  <%= link_to item_path(id: item.id) do %>
-                    <% if item.is_list %>
-                      <i class="material-icons">folder</i>
-                    <% else %>
-                      <i class="material-icons">attachment</i>
-                    <% end %>
-                    <%= item.name %>
-                  <% end %>
-                </h5>
-                <div class="addings">
-                  <div class="item-count">
-                    <%= item.count %><span>items</span>
-                  </div>
-                  <p class="tags">
-                    <% item.tag_list.each do |tag| %>
-                      <span class="tag"><%= tag %></span>
-                    <% end %>
-                  </p>
-                </div>
-              </div>
+          <%= render partial: 'items/child_item_list', locals: {child_items: @next_items, is_user_page: true } %>
 
-              <!-- item-fabs -->
-              <div class="list-item-meta">
-                <i class="material-icons">favorite</i><span>100</span>
-              </div>
-            </li>
-          <% end %>
         </ul>
       </div>
 
       <!-- item images -->
       <div class="mdl-tabs__panel" id="image-list">
-        <div class="mdl-grid">
-          <% @user.items.each do |item| %>
-            <div class="mdl-cell mdl-cell--4-col">
-              <div class="card-image mdl-card mdl-shadow--2dp" style="background-image:url('<%= item.item_images.last.image_url if item.item_images.present? %>')">
-              </div>
-            </div>
-          <% end %>
+        <%= render partial: 'items/item_image_list', locals: {next_images: @next_images, is_user_page: true } %>
+
+      </div>
+
+      <!-- item graph -->
+      <div class="mdl-tabs__panel" id="graph">
+
+        <div id="chart">
         </div>
       </div>
 
       <!-- item timeline -->
+      <% if false %>
       <div class="mdl-tabs__panel" id="timeline">
         <div class="start-circle">
         </div>
@@ -132,8 +119,10 @@
           <%= render 'shared/timeline', timeline: @user_timeline, has_next_event: @has_next_event %>
         </ul>
       </div>
+      <% end %>
 
       <!-- liked item -->
+      <% if false %>
       <div class="mdl-tabs__panel" id="like">
 
 
@@ -194,18 +183,27 @@
 
 
       </div>
+      <% end %>
 
     </div>
 
   </div>
 
   <!-- secondary card -->
-  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top"></div>
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+  
+  
+    <%= render 'shared/social', name: @user.name %>
+
+    <div>
+      <h6>リスト一覧</h6>
+      <nav class="category-nav">
+
+        <%== category_list(@user.item_tree(relation_to_owner: @relation)) %>
+      </nav>
+    </div>
+    
+  
+  </div>
 </section>
 
-
-
-
-
-<h1>User#index</h1>
-<p>Find me in app/views/user/index.html.erb</p>

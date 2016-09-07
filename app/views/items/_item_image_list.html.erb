@@ -1,0 +1,46 @@
+<div class="mdl-grid item-image-list">
+
+  <% unless next_images.present? %>
+    <div class="mdl-cell mdl-cell--4-col">
+      画像はありません
+    </div>
+  <% end %>
+
+  <% next_images.each do |image| %>
+    <div class="mdl-cell mdl-cell--4-col">
+      <div class="card-image mdl-card mdl-shadow--2dp" style="background-image:url('<%= image.image_url %>')">
+
+      <a class="fancybox" href="<%= image.image_url %>"><img class="thumb" src="<%= image.image_url %>"></a>
+      <div class="image-layer <%= "is-user-page" if is_user_page.present? && is_user_page %>"></div>
+        <div class="item-image-label <%= "is-user-page" if is_user_page.present? && is_user_page %>">
+          <div class="image-date"><%= date_to_str(image.added_at) %></div>
+          <% if is_user_page.present? && is_user_page %>
+            <div class="item-link"><%= link_to image.item.name, Rails.application.routes.url_helpers.item_path(image.item_id) %></div>
+          <% end %>
+          <div class="image-favorite-count">
+            <i class="material-icons">favorite_border</i><%= image.image_favorites.size %>
+          </div>
+
+              <%= form_tag({controller: "favorite", action: "image_favorite", image_id: image.id}, {class: "favorite-item"}) do %>
+              <% end %>
+              <%= form_tag({controller: "favorite", action: "image_unfavorite", image_id: image.id}, {class: "unfavorite-item", method: :delete}) do %>
+              <% end %>
+              <% favorite_class = "favorite" %>
+              <% favorite_class = favorite_class + " not-sigined-in" unless user_signed_in? %>
+          
+          <div class="image-favorite <%= favorite_class + (user_signed_in? && image.is_favorited?(current_user.id) ? " already-favorite" : "") %>">
+            <i class="material-icons">favorite</i>
+            いいね!
+          </div>
+
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<% if is_user_page.present? && is_user_page %>
+  <%= paginate next_images, remote: true, params: {controller: 'user', action: 'item_images'}%>
+<% else %>
+  <%= paginate next_images, remote: true, params: {controller: 'items', action: 'next_images'}%>
+<% end %>

@@ -7,7 +7,7 @@
       <div class="mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet ">
 
         <div class="circle">
-          <div class="item-count"><%= @child_items.size %></div>
+          <div class="item-count"><%= @item.child_items.size %></div>
           <div class="item-unit">items</div>
         </div>
         <div class="item-name-wrapper">
@@ -84,7 +84,7 @@
                   <% due_at = timer.over_due_from ? timer.over_due_from : timer.next_due_at %>
                   <% start_at = timer.latest_calc_at %>
                   <div class="progressbar bar bar1" style="width: <%= remaining_percent(due_at, start_at) %>%; background-color:hsl(<%= remaining_bar_style(due_at, start_at) %>, 100%, 70%);"></div>
-                <div class="progressbar bar remaining-time"><%= remaining_time_string(due_at) %></div>
+                  <div class="progressbar bar remaining-time"><%= remaining_time_string(due_at) %></div>
                 </div>
               </div>
             </div>
@@ -130,97 +130,39 @@
 
     <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
       <div class="mdl-tabs__tab-bar">
-        <a href="#item-list" class="mdl-tabs__tab is-active">
-          <div class="tab-caption">モノリスト</div>
-          <div class="tab-name"><%= @child_items.size %></div>
-        </a>
-        <a href="#image-list" class="mdl-tabs__tab">
+        <% if @item.is_list %>
+          <a href="#item-list" class="mdl-tabs__tab is-active">
+            <div class="tab-caption">モノリスト</div>
+            <div class="tab-name"><%= @item.child_items.size %></div>
+          </a>
+        <% end %>
+        <a href="#image-list" class="mdl-tabs__tab <%= "is-active" unless @item.is_list %>">
           <div class="tab-caption">画像一覧</div>
           <div class="tab-name"><%= @item.item_images.size %></div>
         </a>
         <!--
         <a href="#timeline" class="mdl-tabs__tab">
           <div class="tab-caption">履歴</div>
-          <div class="tab-name"><%= @item.item_images.size %></div>
+          <div class="tab-name"><%# @item.item_images.size %></div>
         </a>
         -->
         <a href="#graph" class="mdl-tabs__tab">
           <div class="tab-caption">グラフ</div>
-          <div class="tab-name"><%= @item.item_images.size %></div>
         </a>
       </div>
 
       <!-- item list -->
-      <div class="mdl-tabs__panel is-active" id="item-list">
-        <ul class="list-items">
-          <% @child_items.each do |item| %>
-            <li>
-              <!-- item-image -->
-              <div class="list-item-image">
-                <% unless item.item_images.empty? %>
-                  <div class="image-circle">
-                    <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
-                  </div>
-                <% else %>
-                  <%= link_to item_path(id: item.id) do %>
-                    <div class="image-circle list-item-image-alt">
-                      <% if item.is_list %>
-                        <%= image_tag("list_icon_white.png") %>
-                        <!--<i class="material-icons">folder</i> -->
-                      <% else %>
-                        <%= image_tag("item_icon_white.png") %>
-                        <!--<i class="material-icons">attachment</i>-->
-                      <% end %>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-
-              <!-- item-text -->
-              <div class="list-item-text">
-                <h5>
-                  <%= link_to item_path(id: item.id) do %>
-                    <% if item.is_list %>
-                      <%= image_tag("list_icon.png") %>
-                    <% else %>
-                      <%= image_tag("item_icon.png") %>
-                    <% end %>
-                    <%= item.name %>
-                  <% end %>
-                </h5>
-                <div class="addings">
-                  <div class="item-count">
-                    <%= item.count %><span>items</span>
-                  </div>
-                  <p class="tags">
-                    <% item.tag_list.each do |tag| %>
-                      <span class="tag"><%= tag %></span>
-                    <% end %>
-                  </p>
-                </div>
-              </div>
-
-              <!-- item-fabs -->
-              <div class="list-item-meta">
-                <i class="material-icons">favorite</i><span><%= item.favorites.size %></span>
-              </div>
-            </li>
-          <% end %>
-        </ul>
-        <%= paginate @next_items, :remote => true %>
-        
-      </div>
+      <% if @item.is_list %>
+        <div class="mdl-tabs__panel is-active" id="item-list">
+          <ul class="list-items" id="owning_items">
+            <%= render partial: 'child_item_list', locals: {child_items: @next_items , is_user_page: false} %>
+          </ul>
+        </div>
+      <% end %>
 
       <!-- item images -->
-      <div class="mdl-tabs__panel" id="image-list">
-        <div class="mdl-grid">
-          <% @item.item_images.each do |image| %>
-            <div class="mdl-cell mdl-cell--4-col">
-              <div class="card-image mdl-card mdl-shadow--2dp" style="background-image:url('<%= image.image_url %>')">
-              </div>
-            </div>
-          <% end %>
-        </div>
+      <div class="mdl-tabs__panel <%= "is-active" unless @item.is_list %>" id="image-list">
+        <%= render partial: 'item_image_list', locals: {next_images: @next_images , is_user_page: false} %>
       </div>
 
       <!-- item timeline -->
@@ -241,9 +183,6 @@
       </div>
 
     </div>
-
-<%= link_to 'Edit', edit_item_path(@item) %> |
-<%= link_to 'Back', items_path %>
 
   </div>
 
@@ -306,14 +245,9 @@
     <p class="description">
       <%= @item.description %>
     </p>
-    <div class="share">
-      <h6>共有する</h6>
-      <div class="share-button">
-        <%= image_tag "twitter-logo.png" %>
-        <%= image_tag "hatenabookmark-logo.svg" %>
-        <%= image_tag "facebook-logo.png", class: "fb" %>
-      </div>
-    </div>
+
+    <%= render 'shared/social', name: @item.name %>
+
     <div class="comment">
       <h6>コメント</h6>
       <div class="comment-wrapper">
@@ -384,7 +318,7 @@
   </div>
 </section>
 
-
+<!--
 <div id="fab-button" class="fab-wrapper">
   <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
     <i class="material-icons">add</i>
@@ -447,6 +381,7 @@
 
   </div>
 </div>
+-->
 
 <div id="fab-action-form">
   <div id="add_list">

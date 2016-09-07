@@ -1,7 +1,104 @@
-<h1>Welcome#index</h1>
-<p>Find me in app/views/welcome/index.html.erb</p>
 <% flash.each do |key, value| %>
   <h5 class="text-center alert alert-<%= key %>">
     <%= value %>
   </h5>
 <% end %>
+
+
+
+<div class="welcome" style="background-image:url(<%= asset_path("topbg.jpeg") %>)">
+  <div class="layer"></div>
+  <div class="inner mdl-grid section--center">
+
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--6-col-tablet">
+      <div class="phone">
+        <%= image_tag("iphone") %>
+      </div>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--6-col-tablet welcome-description">
+      <div>自動でグラフ化、持ちモノの把握を簡単に</div>
+      <h5>お部屋の片付け・お掃除サポートアプリ</h5>
+      <h2><%= image_tag("list_icon_white.png") %> Havings</h2>
+    </div>
+  </div>
+
+</div>
+
+<div>
+  <div class="mdl-grid section--center welcome-introduction">
+    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+      <h5>グラフ化でモノを把握</h5>
+      <div class="intro">片付けたい場所、その中にあるモノの情報を入力すれば、モノの個数やカテゴリをグラフ化。何をどれだけ持っているかの把握が簡単に。</div>
+    </div>
+    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+      <h5>タイマーで定期的に掃除</h5>
+      <div class="intro">片付けたい場所ごとにタイマーを登録可能。通知だけでなく掃除記録も保存されるので、記録を見返して楽しみながらお掃除できるかも！</div>
+    </div>
+    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+      <h5>モノを手放して部屋を綺麗に</h5>
+      <div class="intro">「手放す」からモノを捨てた記録が可能。モノを捨てても、思い出やそのモノの写真を保存しておくことができます。</div>
+    </div>
+
+  </div>
+</div>
+
+
+<div>
+  <div class="mdl-grid section--center">
+    <div class="mdl-card mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet">
+      <div class="popular-tag-wrapper">
+        <h4>
+          <i class="material-icons">label</i>
+          人気のタグ
+        </h4>
+        <div class="mdl-card__supporting-text">
+          <div class="popular-list">
+            <% 3.times do |i| %>
+              <% tag_hash = @popular_tag[i] %>
+              <div class="popular">
+                <% tag_hash[:item].each do |item| %>
+                  <%= image_tag(item.thumbnail) %>
+                <% end %>
+                <div class="popular-layer"></div>
+                <div class="popular-label"><%= link_to tag_hash[:tag_name], search_tag_path(tag: tag_hash[:tag_name]) %></div>
+              
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div>
+  <div class="mdl-grid section--center">
+    <div class="mdl-card mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet">
+      <div class="popular-list-wrapper">
+        <h4>
+          <i class="material-icons">trending_up</i>
+          人気のリスト
+        </h4>
+        <div class="mdl-card__supporting-text">
+          <div class="popular-list list">
+            <% @popular_list.each do |item| %>
+              <div class="popular" style="background-image:url(<%= asset_path(item.thumbnail) %>)">
+                <div class="popular-layer"></div>
+                <div class="popular-label"><%= item.name %></div>
+                <%= link_to item_path(item.id) do %>
+                <% end %>
+              
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+</div>
+

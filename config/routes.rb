@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   get 'user/self', to: 'user#get_self'
   get 'user/list_tree', to: 'user#list_tree'
   get 'user/:user_id', to: 'user#index', as: :user_page
-  get 'user/:user_id/item_list', to: 'user#item_list'
+  get 'user/:user_id/user_items', to: 'user#user_items'
   get 'user/:user_id/item_tree', to: 'user#item_tree'
   get 'user/:user_id/item_images', to: 'user#item_images'
   get 'user/:user_id/favorite_items', to: 'user#favorite_items'
@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   resources :items
   post '/items/:id/image', to: 'items#add_image'
   put '/items/:id/dump', to: 'items#dump'
-  get '/items/:id/next_items', to: 'items#next_items'
+  get '/items/:id/next_items', to: 'items#next_items', as: 'next_item'
   get '/items/:id/next_images', to: 'items#next_images'
   get '/items/:id/done_task', to: 'items#done_task'
   get '/items/:id/timeline', to: 'items#timeline'

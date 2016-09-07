@@ -1,0 +1,68 @@
+
+  <% unless child_items.present? %>
+    このリストに属するアイテムやリストはありません。
+  <% end %>
+
+  <% child_items.each do |item| %>
+    <li>
+      <!-- item-image -->
+      <div class="list-item-image">
+        <% unless item.item_images.empty? %>
+          <div class="image-circle">
+            <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
+          </div>
+        <% else %>
+          <%= link_to item_path(id: item.id) do %>
+            <div class="image-circle list-item-image-alt">
+              <% if item.is_list %>
+                <%= image_tag("list_icon_white.png") %>
+              <% else %>
+                <%= image_tag("item_icon_white.png") %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- item-text -->
+      <div class="list-item-text">
+        <h5>
+          <%= link_to item_path(id: item.id) do %>
+            <% if item.is_list %>
+              <%= image_tag("list_icon.png") %>
+            <% else %>
+              <%= image_tag("item_icon.png") %>
+            <% end %>
+            <%= item.name %>
+
+            <% if item.private_type == "secret" %>
+              <i class="material-icons">lock</i>
+            <% end %>
+          <% end %>
+        </h5>
+        <div class="addings">
+          <div class="item-count">
+            <%= item.count %><span>items</span>
+          </div>
+          <p class="tags">
+            <% item.tags.each do |tag| %>
+              <span class="tag"><%= tag.name %></span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+
+      <!-- item-fabs -->
+      <div class="list-item-meta">
+        <i class="material-icons">favorite</i><span><%= item.favorites.size %></span>
+      </div>
+    </li>
+  <% end %>
+
+<% if !child_items.respond_to?(:current_page) %>
+
+<% elsif is_user_page.present? && is_user_page %>
+  <%= paginate child_items, remote: true, params: {controller: 'user', action: 'user_items'}%>
+<% else %>
+  <%= paginate child_items, remote: true, params: {controller: 'items', action: 'next_items'}%>
+<% end %>

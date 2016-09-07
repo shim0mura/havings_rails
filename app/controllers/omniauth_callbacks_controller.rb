@@ -20,8 +20,10 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     p "#"*20
     p request.env['omniauth.origin']
     @social_profile = SocialProfile.find_for_oauth(env["omniauth.auth"])
+    pp @social_profile
 
     @user = @social_profile.user || current_user
+    pp @user
     if @user.nil?
       # @user = User.create( email: @identity.email || "" )
       @user = User.first_or_create_with_oauth(@social_profile)

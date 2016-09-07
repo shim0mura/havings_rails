@@ -101,13 +101,14 @@ class User < ActiveRecord::Base
 
   def self.first_or_create_with_oauth(social_profile)
     user = social_profile.user
+    image_url = social_profile.image_url.sub(/^http/, "https")
+
     unless user
       user = new(
         create_with_oauth: true,
         provider: social_profile.provider,
         uid: social_profile.uid,
         name: social_profile.name,
-        image: social_profile.image_url.sub(/^http/, "https"),
         description: social_profile.description
       )
       user.save!

@@ -1,14 +1,27 @@
 class WelcomeController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, only: [:home, :timeline, :item_graph, :item_count, :all_done_task, :pickup, :popular_tag, :popular_list]
 
   def index
     @current_user = current_user
+    @popular_tag = get_popular_tag
+    @popular_list = get_popular_list
   end
 
   def home
     @current_user = current_user
     @timeline = following_timeline(nil, 5) if @current_user
+    @home_list = current_user.get_home_list
+    @background_image = ItemImage.joins(item:[:user])
+      .where("users.id = ?", current_user.id)
+      .where("items.private_type <= ?", Relation::HIMSELF)
+      .order("item_images.added_at DESC")
+      .limit(1)
+      .first
+    @all_timers = Timer.all_timers(current_user.id)
+    gon.item = @home_list.showing_events
+    @popular_list = get_popular_list
+    
   end
 
   def timeline

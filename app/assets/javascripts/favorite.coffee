@@ -4,7 +4,7 @@
 $ ->
   already_favorite = "already-favorite"
 
-  $(document).on "click", "span.button-favorite", (e)->
+  $(document).on "click", "span.button-favorite, div.image-favorite", (e)->
     if $(@).hasClass("not-sigined-in")
       alert("お気に入りをするにはログインしてください。")
     else
@@ -30,4 +30,7 @@ $ ->
           else
             count.html((count.html() - 0) - 1)
       }
+
+  $ ->
+    $(".fancybox").fancybox()
 

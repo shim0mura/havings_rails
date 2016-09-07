@@ -38,6 +38,15 @@ header .mdl-badge[data-badge]:after {
 .already-read.mdl-badge[data-badge]:after {
   display: none;
 }
+header a.title:visited {
+  color: white;
+}
+header a.title:hover {
+  color: white;
+}
+header.mdl-layout__header a.mdl-navigation__link {
+  color: white;
+}
 
 footer {
   margin-top: 50px;
@@ -761,4 +770,10 @@ i.favorite.already-favorite + span {
 .nothing-in-generic-list {
   text-align: center;
   line-height: 12;
+}
+.pagination {
+  text-align: center;
+}
+.pagination span.page {
+  margin: 5px;
 }

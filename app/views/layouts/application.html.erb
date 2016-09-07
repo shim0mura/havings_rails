@@ -3,9 +3,12 @@
 <head>
   <title>Havings</title>
   <script src='https://www.google.com/jsapi'></script>
+
+  
   <%= stylesheet_link_tag    'application', media: 'all' %>
   <%= include_gon %>
   <%= javascript_include_tag 'application' %>
+
   <%= stylesheet_link_tag "https://fonts.googleapis.com/icon?family=Material+Icons" %>
   <link rel="stylesheet" href="https://code.getmdl.io/1.2.0/material.brown-amber.min.css" />
   <%= csrf_meta_tags %>
@@ -17,7 +20,7 @@
   <header class="docs-layout-header mdl-layout__header is-casting-shadow">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title">Title</span>
+      <span class="mdl-layout-title"><%= image_tag("list_icon_white.png", style: "height: 30px;") %><%= link_to "Havings", root_path, class: "title" %></span>
       <!-- Add spacer, to align navigation to the right -->
       <div class="mdl-layout-spacer"></div>
 
@@ -33,8 +36,10 @@
       <!--<div class="docs-navigation__container navigation-container">-->
       <div class="docs-navigation__container">
         <nav class="docs-navigation mdl-navigation">
-          <a class="mdl-navigation__link" href="">Link</a>
-          <a class="mdl-navigation__link" href="">Link</a>
+          <% unless user_signed_in? %>
+            <%= link_to "新規登録/ログイン", new_user_session_path, class: "mdl-navigation__link" %>
+          <% end %>
+
           <% if user_signed_in? %>
             <% notifications = current_user.notification.get_showing_notification %>
             <% unread_notifications = notifications.count{|e|e[:unread]} %>
@@ -67,6 +72,7 @@
       </div>
     </div>
   </header>
+  <!--
   <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">Title</span>
     <nav class="mdl-navigation">
@@ -76,6 +82,7 @@
       <a class="mdl-navigation__link" href="">Link</a>
     </nav>
   </div>
+  -->
   <main class="mdl-layout__content">
     <div class="page-content md-layout__tab-panel is-active">
     
@@ -85,6 +92,7 @@
     </div>
 
     <footer class="mdl-mega-footer">
+      <!--
       <div class="mdl-mega-footer__middle-section">
 
         <div class="mdl-mega-footer__drop-down-section">
@@ -131,12 +139,13 @@
         </div>
 
       </div>
+      -->
 
       <div class="mdl-mega-footer__bottom-section">
-        <div class="mdl-logo">Title</div>
+        <!--<div class="mdl-logo">Havings</div>-->
         <ul class="mdl-mega-footer__link-list">
-          <li><a href="#">Help</a></li>
-          <li><a href="#">Privacy & Terms</a></li>
+          <li><%= link_to "Havings", root_path %></li>
+          <li>Copyright (C) 2016 Havings All Rights Reserved.</li>
         </ul>
       </div>
 

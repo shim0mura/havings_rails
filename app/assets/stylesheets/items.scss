@@ -184,6 +184,7 @@ div.list-item-image .image-circle{
   border: 1px solid #B6B6B6;
   overflow: hidden;
   background: #795548;
+  line-height: 60px;
 }
 div.list-item-image img {
   width:100%;
@@ -253,6 +254,54 @@ div.list-item-meta span {
   width: initial;
 }
 
+div.item-image-list .card-image {
+  position: relative;
+  overflow: hidden;
+}
+div.item-image-list div.image-layer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  height: 60px;
+  opacity: 0.5;
+  background: black;
+}
+div.item-image-list div.item-image-label {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  height: 60px;
+  color: white;
+  clear: both;
+}
+div.item-image-list div.item-image-label .image-date {
+  padding: 10px 10px 5px 10px;
+}
+div.item-image-list div.item-image-label .image-favorite-count {
+  padding-left: 10px;
+}
+div.item-image-list div.item-image-label .image-favorite-count i {
+  font-size: 14px;
+}
+div.item-image-list div.item-image-label .image-favorite {
+  padding-right: 0px;
+  position: absolute;
+  right: 10px;
+  top: 20px;
+  cursor: pointer;
+}
+div.item-image-list div.item-image-label .image-favorite.already-favorite {
+  color: rgb(255,64,129);
+}
+div.item-image-list div.item-image-label .image-favorite i {
+  font-size: 14px;
+  margin-right: -5px;
+}
+div.item-image-list .fancybox img {
+  visibility: hidden;
+  width: 100%;
+  max-height: 300px;
+}
 
 div.start-circle{
   width: 20px;
@@ -364,7 +413,7 @@ ul.timeline {
   border: 1px solid #B6B6B6;
   overflow: hidden;
   background: #795548;
-  line-height: 60px;
+  line-height: 25px;
 }
 .timeline .event-text h5 .image-circle img {
   width:100%;
@@ -515,6 +564,7 @@ ul.timeline {
   height: 25px;
   float: none;
   margin-right: 0px;
+  line-height: 20px;
 }
 /*
 .secondary-card .comment .commenter .commenter-image {

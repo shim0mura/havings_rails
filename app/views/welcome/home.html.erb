@@ -1,22 +1,22 @@
-<div class="ribbon" style="background-image:url(<%= asset_path "bg2.jpeg" %>)">
+<div class="ribbon" style="background-image:url(<%= @background_image.image_url %>)">
 
   <div class="ribbon-gradation">
   </div>
   <div class="inner-ribbon user-profile-wrapper">
     <div class="user-profile">
       <div class="user-caption">
-        <div class="circle"></div>
+        <div class="circle" style="background-image:url(<%= @current_user.thumbnail %>)"></div>
         <div class="user-data">
-          <h3 class="user-name">ユーザー名</h3>
+        <h3 class="user-name"><%= @current_user.name %></h3>
         </div>
       </div>
       <div class="user-meta-data">
         <div class="following">
-          1000
+          <%= @home_list.count %>
           <div class="meta-data-unit">items</div>
         </div>
         <div class="follower">
-          1000
+          <%= Timer.done_task_count(@current_user.id) %>
           <div class="meta-data-unit">こなしたタスク数</div>
         </div>
       </div>
@@ -37,14 +37,14 @@
         <i class="material-icons">access_time</i>
         タイマー
         <div class="timer-meta-data">
-          <span class="set-timer">100件のタイマー</span>
-          <span class="overflow-timer">100件のタイマー</span>
+          <span class="set-timer"><%= @all_timers.size %>件のタイマー</span>
+          <!--<span class="overflow-timer">100件のタイマー</span>-->
         </div>
       </h4>
 
-
       <div class="mdl-card__supporting-text">
 
+        <% if false %>
         <div class="timer item-meta-data">
           <div class="timer-data">
             <div class="timer-desc">
@@ -61,33 +61,39 @@
             </button>
           </div>
         </div>
+        <% end %>
 
-        <div class="timer item-meta-data">
-          <div class="timer-data">
-            <div class="timer-desc">
-              <div class="timer-task"><i class="material-icons">folder</i>すごいリスト > <i class="material-icons">event</i>部屋の片付け(あと7ヶ月)</div>
-              <div id="timer1" class="mdl-progress mdl-js-progress timer-bar"></div>
+        <% timer_count = @all_timers.size > Timer::MAX_SHOWING_TIMER ? Timer::MAX_SHOWING_TIMER : @all_timers.size %>
+        <% timer_count.times do |i| %>
+          <% timer = @all_timers[i] %>
+          <div class="timer item-meta-data">
+            <div class="timer-data">
+              <div class="timer-desc">
+                <div class="timer-task"><%= link_to timer.name, item_path(timer.list_id) %></div>
+                <div class="mdl-progress mdl-js-progress timer-bar">
+                
+                
+                  <% due_at = timer.over_due_from ? timer.over_due_from : timer.next_due_at %>
+                  <% start_at = timer.latest_calc_at %>
+                  <div class="progressbar bar bar1" style="width: <%= remaining_percent(due_at, start_at) %>%; background-color:hsl(<%= remaining_bar_style(due_at, start_at) %>, 100%, 70%);"></div>
+                  <div class="progressbar bar remaining-time"><%= remaining_time_string(due_at) %></div>
+                
+                
+                </div>
+              </div>
             </div>
           </div>
-          <div class="timer-action">
-            <button class="mdl-button mdl-js-button mdl-button--icon">
-              <i class="material-icons">check</i>
-            </button>
-            <button class="mdl-button mdl-js-button mdl-button--icon">
-              <i class="material-icons">settings</i>
-            </button>
-          </div>
-        </div>
+        <% end %>
 
       </div>
 
-
-
       <div class="mdl-card__actions mdl-card--border text-right">
+        <!--
         <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
           <i class="material-icons">add</i>
           タイマーを追加する
         </button>
+        -->
         　
         <%= link_to "もっと見る", "#" %>
       </div>
@@ -99,7 +105,7 @@
     <!-- graph -->
     <div class="graph-wrapper">
       <h4>
-        <i class="material-icons">assessment</i>
+        <i class="material-icons">timeline</i>
         アイテムグラフ
       </h4>
       <div id="chart">
@@ -120,57 +126,9 @@
     
       <div class="mdl-card__supporting-text">
         <ul class="list-items">
-          <% @current_user.items.each do |item| %>
-            <li>
-              <!-- item-image -->
-              <div class="list-item-image">
-                <% unless item.item_images.empty? %>
-                  <div class="image-circle">
-                    <%= link_to image_tag(item.item_images.last.image_url), item_path(id: item.id) %>
-                  </div>
-                <% else %>
-                  <%= link_to item_path(id: item.id) do %>
-                    <div class="image-circle list-item-image-alt">
-                      <% if item.is_list %>
-                        <i class="material-icons">folder</i>
-                      <% else %>
-                        <i class="material-icons">attachment</i>
-                      <% end %>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
 
-              <!-- item-text -->
-              <div class="list-item-text">
-                <h5>
-                  <%= link_to item_path(id: item.id) do %>
-                    <% if item.is_list %>
-                      <i class="material-icons">folder</i>
-                    <% else %>
-                      <i class="material-icons">attachment</i>
-                    <% end %>
-                    <%= item.name %>
-                  <% end %>
-                </h5>
-                <div class="addings">
-                  <div class="item-count">
-                    <%= item.count %><span>items</span>
-                  </div>
-                  <p class="tags">
-                    <% item.tag_list.each do |tag| %>
-                      <span class="tag"><%= tag %></span>
-                    <% end %>
-                  </p>
-                </div>
-              </div>
+          <%= render partial: 'items/child_item_list', locals: {child_items: @popular_list.slice(0...4), is_user_page: false } %>
 
-              <!-- item-fabs -->
-              <div class="list-item-meta">
-                <i class="material-icons">favorite</i><span>100</span>
-              </div>
-            </li>
-          <% end %>
         </ul>
 
       </div>
@@ -213,7 +171,7 @@
       <h6>カテゴリリスト</h6>
       <nav class="category-nav">
 
-        <%== category_list(current_user.item_tree) %>
+        <%== category_list(current_user.item_tree(relation_to_owner: Relation::HIMSELF)) %>
       </nav>
     </div>
 

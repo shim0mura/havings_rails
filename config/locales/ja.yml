@@ -43,3 +43,8 @@ ja:
         current_password: 現在のパスワード
       timer:
         next_due_at: 次回通知予定日
+  views:
+    pagination:
+      previous: "« 前ページ"
+      next: "次ページ »"
+      truncate: "..."
