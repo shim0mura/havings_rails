@@ -1,7 +1,7 @@
 production: &production
-#   facebook:
-#     key: xxxxxxxxxxx
-#     secret: XXXXXXXXXXXXXXXXXXXXXXXXX
+  facebook:
+    key: 334595646876237
+    secret: 80b9541f90023d4ac1ca67994a342b1c
   hatena:
     key: RIb0TU1KelLarQ==
     secret: RGq8K+Jzhejersfs3vxlNp9T/xg=

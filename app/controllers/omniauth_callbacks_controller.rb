@@ -19,6 +19,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def generic_callback(provider)
     p "#"*20
     p request.env['omniauth.origin']
+    p env["omniauth.auth"]
     @social_profile = SocialProfile.find_for_oauth(env["omniauth.auth"])
     pp @social_profile
 

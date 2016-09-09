@@ -267,7 +267,7 @@ Devise.setup do |config|
 
   # https://github.com/mkdynamic/omniauth-facebook
   # https://developers.facebook.com/docs/concepts/login/
-  #config.omniauth :facebook, OAUTH_CONFIG[:facebook]['key'], OAUTH_CONFIG[:facebook]['secret'], scope: 'email,publish_stream,user_birthday'
+  config.omniauth :facebook, OAUTH_CONFIG[:facebook]['key'], OAUTH_CONFIG[:facebook]['secret'], scope: 'public_profile', secure_image_url: true
 
   # https://github.com/mururu/omniauth-hatena
   # http://developer.hatena.ne.jp/ja/documents/auth/apis/oauth
