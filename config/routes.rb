@@ -79,6 +79,8 @@ Rails.application.routes.draw do
   put '/device_token/:type/', to: 'device_tokens#update'
   put '/device_token/state/:type/:value', to: 'device_tokens#change_state'
 
+  get '/privacy-policy', to: 'welcome#privacy_policy'
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks',
     registrations: 'registrations'

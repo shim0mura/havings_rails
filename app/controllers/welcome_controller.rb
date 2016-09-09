@@ -77,6 +77,9 @@ class WelcomeController < ApplicationController
     @popular_list = get_popular_list
   end
 
+  def privacy_policy
+  end
+
   private
   def following_timeline(from = 0, size = User::MAX_SHOWING_EVENTS)
     timeline = []

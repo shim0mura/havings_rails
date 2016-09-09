@@ -44,7 +44,7 @@ class SocialProfile < ActiveRecord::Base
     self.name = info['name']
     self.nickname = info['nickname']
     self.description = info['description'].try(:truncate, 255)
-    self.image_url = info['image'].sub(/^http/, "https")
+    self.image_url = info['image'].sub(/^http:/, "https:")
 
     case provider.to_s
     when 'hatena'

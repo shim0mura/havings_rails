@@ -345,7 +345,7 @@ class ItemsController < ApplicationController
         end
 
         unless private_type_before_update == @item.private_type
-          if @item.private_type > 0
+          if Item.private_types[@item.private_type] > 0
             synchronize_with_list
           end
         end
@@ -679,7 +679,7 @@ class ItemsController < ApplicationController
     def synchronize_with_list
       if @item.is_list
         @item.child_items.each do |i|
-          i.update_attribute(:private_type, @item.private_type)
+          i.update_attribute(:private_type, Item.private_types[@item.private_type])
         end
       end
     end
@@ -689,8 +689,8 @@ class ItemsController < ApplicationController
     # 親リストが非公開で子孫アイテムが公開として設定されていた場合に修正
     def synchronize_private_type_by_parent
       list = Item.find(@item.list_id)
-      if list.private_type > @item.private_type
-        @item.private_type = list.private_type
+      if Item.private_types[list.private_type] > Item.private_types[@item.private_type]
+        Item.private_types[@item.private_type] = Item.private_types[list.private_type]
       end
     end
 
