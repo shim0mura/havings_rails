@@ -490,20 +490,6 @@ class Item < ActiveRecord::Base
       parent_list.change_count(count_diff, event)
     end
 
-
-
-    # if parent_list && !current_list
-    #   if event.present? && event.related_id == parent_list.id
-    #     parent_list.change_count(count_diff, event)
-    #   else
-    #     parent_list.change_count(count_diff)
-    #   end
-    #   # if self.is_list
-    #   #   parent_list.change_count(count_diff) unless current_list
-    #   # else
-    #   #   parent_list.change_count(count_diff, event) unless current_list
-    #   # end
-    # end
   end
 
   def detect_deleting_image_event_from_image_id(item_image_ids)

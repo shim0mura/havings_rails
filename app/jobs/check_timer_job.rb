@@ -21,9 +21,9 @@ class CheckTimerJob < ActiveJob::Base
         if device_token.device_type == DeviceToken::TYPE_ANDROID
 
 
-          a = HTTParty.post("https://gcm-http.googleapis.com/gcm/send", {
+          a = HTTParty.post("https://fcm.googleapis.com/fcm/send", {
             headers: {
-              'Authorization' => "key=AIzaSyAmUXUvErLEMy2ueIjKswdau90c250gJpM",
+              'Authorization' => "key=AIzaSyAfQrgQ5IZqYvgZN03EIZksGRcohKNnCRk",
               'Content-Type' => 'application/json',
               'Accept' => 'application/json'
             },

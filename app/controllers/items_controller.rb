@@ -242,14 +242,17 @@ class ItemsController < ApplicationController
     pp Item.where(id: params[:item][:list_id]).first.get_parent_list_ids
 
     if @item.is_garbage
-      params[:item].delete(:count)
+      params[:item][:is_garbage] = true
     end
+    pp item_params
+    pp @item
 
     # respond_to do |format|
     begin
       ActiveRecord::Base.transaction do
       
         @item.update!(item_params)
+        pp @item
 
         # 属するリストを変更、且つその対象リストが自分の子リストだった場合
         # 再帰させないように処理
@@ -283,10 +286,10 @@ class ItemsController < ApplicationController
 
         if @item.count != item_count_before_update
           # アイテムの個数変化
-          pp "#item_count change #{@item.count} #{item_count_before_update}"
           @item.change_count(@item.count - item_count_before_update, count_changed)
-        # elsif @item.is_list && (@item.list_id != list_id_before_update)
-        elsif (@item.list_id != list_id_before_update)
+        end
+
+        if (@item.list_id != list_id_before_update)
           # リストを別のリストに変更した時
           current_parent_list_ids = @item.get_parent_list_ids
 
