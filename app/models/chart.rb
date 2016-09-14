@@ -67,7 +67,12 @@ class Chart < ActiveRecord::Base
 
       category_detail["count"] = category_detail["count"] + count
       category = category_detail["childs"]
+
+      item.classed_tag_id = tag_ancestor.id
     end
+
+    # 分類タグの設定
+    item.save!
 
     total_count = chart_detail.map{|e|e["count"]}.sum{|i|i.to_i}
 

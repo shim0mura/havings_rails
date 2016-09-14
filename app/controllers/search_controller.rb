@@ -38,7 +38,6 @@ class SearchController < ApplicationController
 
     @users = User.where(id: social_profiles.map{|s|s.user.id})
 
-    sleep(5)
 
   end
 

@@ -42,6 +42,9 @@
 }
 .mdl-grid.welcome-introduction {
   padding-top: 3vh;
+  padding-bottom: 0px;
+}
+.mdl-grid.welcome-introduction-images {
   padding-bottom: 5vh;
 }
 .mdl-grid.welcome-introduction h5 {
@@ -49,6 +52,16 @@
 }
 .mdl-grid.welcome-introduction .intro {
   text-align: center;
+}
+.mdl-grid.welcome-introduction-images .intro-image {
+  text-align: center;
+  height: 250px;
+  overflow: hidden;
+}
+.mdl-grid.welcome-introduction-images .intro-image img {
+  width: 230px;
+  position: relative;
+  top: -60px;
 }
 
 .popular-tag-wrapper h4, .popular-list-wrapper h4 {
@@ -90,7 +103,7 @@
   background-size: cover;
   background-position: center;
   float: left;
-  width: 150px;
+  width: 120px;
   height: 100px;
   margin-right: 10px;
 }

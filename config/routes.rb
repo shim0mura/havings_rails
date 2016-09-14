@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   get 'user/:user_id/followers', to: 'user#followers'
   post '/user/:user_id/follow', to: 'follows#create'
   delete '/user/:user_id/follow', to: 'follows#destroy'
+  get 'user/classed_items/:tag_id', to: 'user#classed_items'
 
   get 'home', to: 'welcome#home'
   get 'home/timeline', to: 'welcome#timeline'

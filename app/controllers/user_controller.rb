@@ -1,6 +1,6 @@
 class UserController < ApplicationController
 
-  before_action :authenticate_user!, only:[:timeline, :list_tree, :user_items, :item_tree]
+  before_action :authenticate_user!, only:[:timeline, :list_tree, :user_items, :item_tree, :classed_items]
   before_action :set_user, only: [:index, :timeline, :user_items, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
 
   def get_self
@@ -49,6 +49,40 @@ class UserController < ApplicationController
 
   #   get_user_items(from)
   # end
+
+  # 自分のタグ分類されたアイテムを表示
+  # 今のところ自分のモノしか見れないように
+  def classed_items
+    @home_list = current_user.get_home_list
+    page = params[:page].to_i rescue 0
+    tag_id = params[:tag_id].to_i rescue 0
+    # relation_to_owner = @user.get_relation_to(current_user)
+    relation_to_owner = Relation::HIMSELF
+
+    tag = ActsAsTaggableOn::Tag.where(id: tag_id).first
+    tag_ids = []
+    if tag.present?
+      related_tags = ActsAsTaggableOn::Tag.where(parent_id: tag.id) if tag.present?
+      tag_ids.push(tag.id)
+      tag_ids.concat(related_tags.map(&:id))
+    end
+
+    @classed_item = Item
+      .includes(:item_images, :tags, :favorites)
+      .where(
+        user_id: current_user.id,
+        classed_tag_id: tag_ids,
+        is_list: true
+      )
+      .where("private_type <= ?", relation_to_owner)
+      .order("id DESC")
+      .page(page)
+
+    @has_next_item = !@classed_item.last_page?
+    @next_page_for_item = @has_next_item ? @classed_item.current_page + 1 : nil
+  end
+
+
   def user_items
     page = params[:page].to_i rescue 0
     get_user_items(page)

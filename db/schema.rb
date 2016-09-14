@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160808130456) do
+ActiveRecord::Schema.define(version: 20160914070239) do
 
   create_table "charts", force: :cascade do |t|
     t.integer  "user_id",      limit: 4,     null: false
@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 20160808130456) do
     t.integer  "private_type",     limit: 4,     default: 0,     null: false
     t.boolean  "is_deleted",       limit: 1,     default: false, null: false
     t.text     "count_properties", limit: 65535
+    t.integer  "classed_tag_id",   limit: 4
   end
 
   create_table "notifications", force: :cascade do |t|

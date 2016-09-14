@@ -1,4 +1,4 @@
-<div class="ribbon" style="background-image:url(<%= @background_image.image_url %>)">
+<div class="ribbon" style="background-image:url(<%= @background_image.image_url if @background_image.present? %>)">
 
   <div class="ribbon-gradation">
   </div>

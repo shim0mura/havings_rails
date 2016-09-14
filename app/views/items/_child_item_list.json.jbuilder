@@ -1,5 +1,5 @@
 json.owning_items child_items do |child_item|
-  json.extract! child_item, :id, :name, :is_list, :count
+  json.extract! child_item, :id, :name, :is_list, :count, :is_garbage
   json.thumbnail child_item.thumbnail
   json.tags child_item.tags.map{|t|t.name}
   json.favorite_count child_item.favorites.size
