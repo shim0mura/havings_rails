@@ -72,7 +72,7 @@ class UserController < ApplicationController
       .where(
         user_id: current_user.id,
         classed_tag_id: tag_ids,
-        is_list: true
+        is_list: false
       )
       .where("private_type <= ?", relation_to_owner)
       .order("id DESC")
