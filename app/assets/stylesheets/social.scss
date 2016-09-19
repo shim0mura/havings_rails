@@ -106,6 +106,19 @@ ul.social-button-syncer li {
 	width: 69px ;
 }
 
+
+@media screen and (max-width:480px) {
+  .fb-page {
+    width:270px !important;
+  }
+}
+
+@media screen and (min-width:640px) {
+  .fb-page {
+    width:100% !important;
+  }
+}
+
 /* [LINE] */
 .sc-li {
 	width: 50px ;

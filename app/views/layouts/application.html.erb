@@ -2,17 +2,22 @@
 <html>
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
 
-  <% og_title = yield(:og_title).present? ? yield(:og_title) + " | " : "" %>
-  <% og_title = og_title + "お部屋の片付け・お掃除サポートアプリ Havings" %>
-  <title><%= og_title %></title>
+  <% title_base = yield(:og_title).present? ? yield(:og_title) + " | " : "" %>
+  <% page_title = title_base + "お部屋の片付け・お掃除サポートアプリ Havings" %>
+  <% og_title = title_base + "部屋片付けサポートアプリ Havings" %>
+  <title><%= page_title %></title>
 
   <meta property="og:title" content="<%= og_title %>" />
   <meta property="og:type" content="<%= yield(:og_type).presence || "website" %>" />
   <meta property="og:url" content="<%= request.url %>" />
   <% og_img_url = yield(:og_image).presence || asset_path("device.png") %>
   <meta property="og:image" content="<%= request.base_url + og_img_url %>" />
-  <meta property="og:description" content="片付けたい場所、その場所にあるモノの情報を入力してグラフ化。持ちモノの把握を簡単に。お部屋の片付け・掃除をサポートするアプリです。iPhone、Androidで利用可能" />
+  <meta property="og:description" content="片付けたい場所、そこあるモノの情報を入力してグラフ化。持ちモノの把握を簡単に。お部屋の片付け掃除サポートアプリ Havings" />
   <meta name="description" content="片付けたい場所、その場所にあるモノの情報を入力してグラフ化。持ちモノの把握を簡単に。お部屋の片付け・掃除をサポートするアプリです。iPhone、Androidで利用可能" />
+
+  <meta property="fb:app_id" content="334595646876237">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@havings_me">
 
   <script src='https://www.google.com/jsapi'></script>
 
@@ -156,8 +161,11 @@
       </div>
       -->
 
-      <div class="mdl-mega-footer__bottom-section">
+      <div class="mdl-mega-footer__bottom-section" style="text-align: center;">
         <!--<div class="mdl-logo">Havings</div>-->
+
+        <div class="fb-page" data-href="https://www.facebook.com/Havings.me/" data-width="500" data-height="200" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/Havings.me/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/Havings.me/">Havings</a></blockquote></div>
+          
         <ul class="mdl-mega-footer__link-list">
           <li><%= link_to "Havings", root_path %></li>
           <li>Copyright (C) 2016 Havings All Rights Reserved.</li>

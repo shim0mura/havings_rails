@@ -13,7 +13,10 @@
 
 
 		<!-- Facebook -->
-    <li class="sc-fb"><div class="fb-like" data-href="<%= request.url %>" data-layout="box_count" data-action="like" data-show-faces="true" data-share="false"></div></li>
+    <li class="sc-fb">
+      <% page_url = request.url == "https://havings.me/" ? "https://www.facebook.com/Havings.me/" : request.url %>
+      <div class="fb-share-button" data-href="<%= page_url %>" data-layout="box_count" data-size="small" data-mobile-iframe="true"></div>
+    </li>
 
 		<!-- Google+ -->
     <li><div data-href="<%= request.url %>" class="g-plusone" data-size="tall"></div></li>
