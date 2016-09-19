@@ -29,7 +29,7 @@ Rails.application.routes.draw do
   delete '/user/:user_id/follow', to: 'follows#destroy'
   get 'user/classed_items/:tag_id', to: 'user#classed_items'
 
-  get 'home', to: 'welcome#home'
+  get 'home', to: 'welcome#home', as: :dashboard
   get 'home/timeline', to: 'welcome#timeline'
   get 'home/graph', to: 'welcome#item_graph'
   get 'home/all_done_task', to: 'welcome#all_done_task'

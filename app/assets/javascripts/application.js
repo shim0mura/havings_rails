@@ -34,16 +34,11 @@ function createToast(message) {
 }
 
 
-/*
 if(window.addEventListener) {
 	window.addEventListener( "load" , shareButtonReadSyncer, false );
 }else{
 	window.attachEvent( "onload", shareButtonReadSyncer );
 }
-*/
-$(function(){
-  shareButtonReadSyncer();
-})
 
 /* シェアボタンを読み込む関数 */
 function shareButtonReadSyncer(){
@@ -79,7 +74,5 @@ document.getElementsByTagName("head")[0].appendChild(scriptTag);
 
 // pocket
 (!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js"));
-
-//},5000);	//ページを開いて5秒後(5,000ミリ秒後)にシェアボタンを読み込む
 
 }

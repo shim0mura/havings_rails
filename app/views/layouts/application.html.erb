@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Havings</title>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+
+  <% og_title = yield(:og_title).present? ? yield(:og_title) + " | " : "" %>
+  <% og_title = og_title + "お部屋の片付け・お掃除サポートアプリ Havings" %>
+  <title><%= og_title %></title>
+
+  <meta property="og:title" content="<%= og_title %>" />
+  <meta property="og:type" content="<%= yield(:og_type).presence || "website" %>" />
+  <meta property="og:url" content="<%= request.url %>" />
+  <% og_img_url = yield(:og_image).presence || asset_path("device.png") %>
+  <meta property="og:image" content="<%= request.base_url + og_img_url %>" />
+  <meta property="og:description" content="片付けたい場所、その場所にあるモノの情報を入力してグラフ化。持ちモノの把握を簡単に。お部屋の片付け・掃除をサポートするアプリです。iPhone、Androidで利用可能" />
+  <meta name="description" content="片付けたい場所、その場所にあるモノの情報を入力してグラフ化。持ちモノの把握を簡単に。お部屋の片付け・掃除をサポートするアプリです。iPhone、Androidで利用可能" />
+
   <script src='https://www.google.com/jsapi'></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,6 +54,8 @@
           <% end %>
 
           <% if user_signed_in? %>
+            <%= link_to "ダッシュボード", dashboard_path, class: "mdl-navigation__link" %>
+
             <% notifications = current_user.notification.get_showing_notification %>
             <% unread_notifications = notifications.count{|e|e[:unread]} %>
             <span id="notification_button" class="material-icons mdl-badge <%= "already-read" if unread_notifications <= 0 %>" <%= "data-badge=#{unread_notifications}" if unread_notifications > 0 %>>notifications</span>

@@ -40,28 +40,70 @@
 .welcome .welcome-description h2 img {
   height: 50px;
 }
-.mdl-grid.welcome-introduction {
-  padding-top: 3vh;
-  padding-bottom: 0px;
+
+.intro-1 {
+  
 }
+.intro-2 {
+  background: white;
+  padding-top: 2vh;
+}
+.intro-2 h4 {
+  text-align: center;
+  font-weight: bold;
+}
+.toppage-share .share {
+  margin: 0 auto;
+}
+.toppage-share .share h6 {
+  visibility: hidden;
+  margin-top: 0;
+}
+.mdl-grid.welcome-introduction {
+  padding-top: 9vh;
+  padding-bottom: 5vh;
+  text-align: center;
+}
+.mdl-grid.welcome-introduction i {
+  font-size: 70px;
+  color: rgb(255,215,64);
+}
+
 .mdl-grid.welcome-introduction-images {
   padding-bottom: 5vh;
 }
-.mdl-grid.welcome-introduction h5 {
+.mdl-grid.welcome-introduction h6, .mdl-grid.welcome-introduction-images h6 {
+  margin-top: 0px;
   text-align: center;
 }
-.mdl-grid.welcome-introduction .intro {
+.mdl-grid.welcome-introduction .intro, .mdl-grid.welcome-introduction-images .intro {
   text-align: center;
+  line-height: 1.7;
+  color: #999;
 }
 .mdl-grid.welcome-introduction-images .intro-image {
   text-align: center;
-  height: 250px;
+  height: 200px;
   overflow: hidden;
+  margin-top: 15px;
+  margin-bottom: 35px;
 }
 .mdl-grid.welcome-introduction-images .intro-image img {
-  width: 230px;
+  width: 200px;
   position: relative;
   top: -60px;
+}
+.mdl-grid.welcome-introduction-images .intro-image img.desc1 {
+  top: -126px;
+}
+.mdl-grid.welcome-introduction-images .intro-image img.desc2 {
+  top: -74px;
+}
+.mdl-grid.welcome-introduction-images .intro-image img.desc3 {
+  top: -52px;
+}
+.mdl-grid.welcome-introduction-images .intro-image img.desc4 {
+  top: -75px;
 }
 
 .popular-tag-wrapper h4, .popular-list-wrapper h4 {

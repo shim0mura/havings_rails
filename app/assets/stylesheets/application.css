@@ -337,6 +337,12 @@ select {
   color: white;
   text-transform: capitalize;
 }
+.mdl-button.mdl-button-facebook {
+  width: 80%;
+  background: #3b5998;
+  color: white;
+  text-transform: capitalize;
+}
 
 .ribbon {
   width: 100%;

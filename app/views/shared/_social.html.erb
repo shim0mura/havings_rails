@@ -20,7 +20,11 @@
 
 		<!-- はてなブックマーク -->
 
-    <li><a href="http://b.hatena.ne.jp/entry/<%= request.url %>" class="hatena-bookmark-button" data-hatena-bookmark-layout="vertical-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a></li>
+    <li>
+
+      <a href="http://b.hatena.ne.jp/entry/<%= request.url %>" class="hatena-bookmark-button" data-hatena-bookmark-layout="vertical-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a>
+    
+    </li>
 
 		<!-- pocket -->
     <li style="width: 60px;"><a data-save-url="<%= request.url %>" data-pocket-label="pocket" data-pocket-count="vertical" class="pocket-btn" data-lang="en"></a></li>
@@ -28,6 +32,7 @@
 		<!-- LINE -->
     <li class="sc-li"><a href="http://line.me/R/msg/text/?<%= request.url %>"><%= image_tag("linebutton_36x60.png", class: "sc-li-img") %></a></li>
 	</ul>
+
 
 <!-- Facebook用 -->
 <div id="fb-root"></div>

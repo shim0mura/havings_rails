@@ -1,4 +1,9 @@
-<div class="ribbon" style="background-image:url(<%= @item.item_images.last.image_url unless @item.item_images.empty? %>)">
+<% background_image = @item.item_images.last.image_url unless @item.item_images.empty? %>
+<% provide :og_title, "#{@item.name} (#{@item.user.name}さんの#{@item.is_list ? 'リスト' : 'アイテム'})" %>
+<% provide :og_type, "article" %>
+<% provide :og_image, background_image %>
+
+<div class="ribbon" style="background-image:url(<%= background_image %>)">
 
   <div class="ribbon-gradation">
   </div>
@@ -51,7 +56,7 @@
               &nbsp;
               <i class="material-icons">chat_bubble</i><span><%= @item.comments.size %></span>
               &nbsp;
-              <% if @item.is_list && user_signed_in? && (done_task_count = Timer.done_task_count(current_user.id, @item.id)) %>
+              <% if @item.is_list && user_signed_in? && @item.user_id == current_user.id && (done_task_count = Timer.done_task_count(current_user.id, @item.id)) %>
                 <%= link_to ({controller: "items", action: "done_task", id: @item.id}), {class: "done-tasks"} do %>
                   <i class="material-icons">done</i><span><%= done_task_count %></span>
                 <% end %>

@@ -1,3 +1,7 @@
+<% provide :og_title, @user.name %>
+<% provide :og_type, "profile" %>
+<% provide :og_image, @background_image || nil %>
+
 <%# TODO: userの一番Likeが多い画像をbgにする %>
 <div class="ribbon" style="background-image:url(<%= @background_image if @background_image.present? %>)">
 

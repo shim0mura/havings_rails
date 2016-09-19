@@ -23,38 +23,68 @@
 
 </div>
 
+
+
 <div>
   <div class="mdl-grid section--center welcome-introduction">
     <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
-      <h5>グラフ化でモノを把握</h5>
+      <i class="material-icons">timeline</i>
+      <h6>グラフ化でモノを把握</h6>
       <div class="intro">片付けたい場所、その中にあるモノの情報を入力すれば、モノの個数やカテゴリをグラフ化。何をどれだけ持っているかの把握が簡単に。</div>
     </div>
     <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
-      <h5>タイマーで定期的に掃除</h5>
+      <i class="material-icons">alarm_on</i>
+      <h6>タイマーで定期的に掃除</h6>
       <div class="intro">片付けたい場所ごとにタイマーを登録可能。通知だけでなく掃除記録も保存されるので、記録を見返して楽しみながらお掃除できるかも！</div>
     </div>
     <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
-      <h5>モノを手放して部屋を綺麗に</h5>
+      <i class="material-icons">delete_sweep</i>
+      <h6>モノを手放して部屋を綺麗に</h6>
       <div class="intro">「手放す」からモノを捨てた記録が可能。モノを捨てても、思い出やそのモノの写真を保存しておくことができます。</div>
     </div>
   </div>
+</div>
+
+
+<div class="intro-2">
+  <h4>Havingsの使い方</h4>
   <div class="mdl-grid section--center welcome-introduction-images">
-    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet">
+      <h6>今、片付けたい場所を決める</h6>
+      <div class="intro">押し入れのような広い場所から化粧ポーチのような小さな所まで、どんなところでも!</div>
       <div class="intro-image">
-        <%= image_tag("desc1.png") %>
+        <%= image_tag("desc1.png", class: "desc1") %>
       </div>
     </div>
-    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet">
+      <h6>片付けたい場所にあるモノを入力</h6>
+      <div class="intro">画像や個数などの情報を指定しながら、片付けたいところにあるモノを入力</div>
       <div class="intro-image">
-        <%= image_tag("desc2.png") %>
+        <%= image_tag("desc2.png", class: "desc2") %>
       </div>
     </div>
-    <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet">
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet">
+      <h6>片付けたい場所のグラフを見る</h6>
+      <div class="intro">グラフ化で片付けたい場所の状態やモノの個数を把握、要らないものがあれば手放そう</div>
       <div class="intro-image">
-        <%= image_tag("desc3.png") %>
+        <%= image_tag("desc3.png", class: "desc3") %>
+      </div>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet">
+      <h6>片付けたい場所のタイマーをセット</h6>
+      <div class="intro">片付けたい場所ごとにセットできるタイマーで、忘れることなく定期的にお掃除。</div>
+      <div class="intro-image">
+        <%= image_tag("desc4.png", class: "desc4") %>
       </div>
     </div>
 
+  </div>
+</div>
+
+
+<div class="toppage-share">
+  <div class="mdl-grid section--center">
+    <%= render 'shared/social', name: "お部屋の片付け・お掃除サポートアプリ Havings" %>
   </div>
 </div>
 
