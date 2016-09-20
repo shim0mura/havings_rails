@@ -45,12 +45,12 @@
       </div>
       <div class="user-meta-data">
         <div class="following">
-          <%= @user.following.count %>
+          <%= link_to @user.following.count, controller: :user, action: :following %>
           <div class="meta-data-unit">following</div>
         </div>
         <div class="follower">
-          <%= @user.following.count %>
-          <div class="meta-data-unit">following</div>
+          <%= link_to @user.followed.count, controller: :user, action: :followers %>
+          <div class="meta-data-unit">followers</div>
         </div>
       </div>
     </div>

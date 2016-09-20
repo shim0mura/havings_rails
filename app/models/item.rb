@@ -782,4 +782,70 @@ class Item < ActiveRecord::Base
     Timer::MAX_COUNT_PER_LIST > timers.count
   end
 
+  # cacheは今のところtmpディレクトリに入れる
+  # （デフォルトのまま、redisなどに変更してない）
+  # cachestoreについて: http://guides.rubyonrails.org/caching_with_rails.html
+  # redis使うにしてもexpireを指定しないといけない
+  # http://stackoverflow.com/questions/14404584/what-is-the-default-expiry-time-for-rails-cache
+  # また、キャッシュするのもARオブジェクトとかじゃなくて
+  # idなどの動的な変更がないものにする
+  # http://stackoverflow.com/questions/11218917/confusion-caching-active-record-queries-with-rails-cache-fetch?answertab=votes#tab-top
+  def self.get_popular_list
+    popular_list_ids = Rails.cache.fetch('popular_list', expires_in: 6.hours) do
+      items = Item
+        .includes(:tags, :item_images, :favorites)
+        .joins(:item_images)
+        .order(created_at: :desc)
+        .limit(100)
+
+        # TODO: 最近追加された奴に限定したい
+        #.where("items.created_at > ?", Time.now - 1.days)
+
+      item_ids = items
+        .sort_by{|i|i.favorites.size}
+        .reverse
+        .slice(0, 15)
+        .map(&:id)
+    end
+
+    Item
+      .includes(:tags, :item_images, :favorites)
+      .where(id: popular_list_ids)
+  end
+
+  def self.get_popular_tag
+    tag_hash = Rails.cache.fetch('popular_tags', expires_in: 6.hours) do
+      popular_tags = ActsAsTaggableOn::Tag.most_used(10)
+
+      tag_items = popular_tags.map do |tag|
+        hash = {}
+        hash[:tag_name] = tag.name
+        hash[:tag_id]   = tag.id
+        hash[:tag_count] = Item.tagged_with(tag.name).count
+
+        items = Item
+          .includes(:item_images, :favorites)
+          .joins(:item_images)
+          .tagged_with(tag.name)
+          .order(created_at: :desc)
+          .limit(100)
+
+        items = items.sort_by{|i|i.favorites.size}.reverse
+        hash[:item_ids] = items.slice(0,5).map(&:id)
+
+        hash
+      end
+
+      tag_items
+    end
+
+    tag_hash.each do |hash|
+      hash[:item] = Item
+        .includes(:tags, :item_images, :favorites)
+        .where(id: hash[:item_ids])
+    end
+
+    tag_hash
+  end
+
 end

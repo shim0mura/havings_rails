@@ -1,6 +1,6 @@
 <div class="ribbon page-guide">
 
-  <div class="inner-ribbon">
+  <div class="inner-ribbon user-list">
 <section class="mdl-grid section--center list-content">
   <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--top">
     <div class="bread-crumb"><%= link_to(@user.name, user_page_path(@user.id)) %> > <%= @heading_text %>
@@ -21,7 +21,7 @@
       <% if @users.present? %>
         <div class="mdl-card__supporting-text">
 
-          <ul class="list-items generic-lists">
+          <ul class="list-items generic-lists user-list">
             <% @users.each do |user| %>
               <li>
                 <!-- user-avater -->
@@ -46,7 +46,6 @@
                     </div>
                     <div class="description">
                       <%= user[:description] %>
-                      おあいうえおあいうえおあいうえおあいうえおあいうえおあいうえおあいうえおあいうえお
                     </div>
                   </div>
                 </div>
@@ -99,13 +98,31 @@
 
   <!-- secondary card -->
   <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
-    <div>
-      <h6>カテゴリリスト</h6>
-      <nav class="category-nav">
 
-        <%== category_list(current_user.item_tree) %>
-      </nav>
+
+    <div class="popular-list-wrapper sidebar">
+      <h5>
+        <i class="material-icons">trending_up</i>
+        <div>
+        人気のリスト
+        </div>
+      </h5>
+      <div class="mdl-card__supporting-text">
+        <div class="popular-list list">
+          <% @popular_list.slice(0..5).each do |item| %>
+            <div class="popular" style="background-image:url(<%= asset_path(item.thumbnail) %>)">
+              <div class="popular-layer"></div>
+              <div class="popular-label"><%= item.name %></div>
+              <%= link_to item_path(item.id) do %>
+              <% end %>
+            
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
     </div>
+    
   </div>
 
 </section>

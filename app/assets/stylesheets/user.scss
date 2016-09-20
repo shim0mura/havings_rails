@@ -81,3 +81,40 @@
 .delete-user .mdl-button {
   background: #D32F2F;
 }
+
+.ribbon.page-guide .inner-ribbon.user-list {
+  padding-bottom: 0;
+}
+
+.user-list.generic-lists .list-item-image .image-circle {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+.user-list.generic-lists .list-item-image {
+  width: 40px;
+}
+
+ul.list-items.user-list li {
+  width: 97%;
+}
+.sidebar h5 {
+  margin-top: 5px;
+  margin-left: 15px;
+}
+.sidebar i {
+  float: left;
+}
+.sidebar .popular-list.list {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: 0;
+}
+.sidebar .popular-list.list > div {
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 100px;
+  margin-right: 10px;
+}
+

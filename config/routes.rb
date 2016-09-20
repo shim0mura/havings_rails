@@ -1,11 +1,5 @@
 Rails.application.routes.draw do
 
-  get 'admin/index'
-  post 'admin/extract'
-  get 'admin/extracted_item'
-  post 'admin/type_item'
-  get 'admin/tags'
-
   get 'dummy', to: 'items#dummy'
   get 'tes', to: 'items#tes'
 
@@ -82,10 +76,20 @@ Rails.application.routes.draw do
 
   get '/privacy-policy', to: 'welcome#privacy_policy'
 
+  get  'inquiry', to: 'inquiry#index'
+  post 'inquiry/confirm', to: 'inquiry#confirm'
+  post 'inquiry/thanks', to: 'inquiry#thanks'
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks',
     registrations: 'registrations'
   }
+
+  get 'admin/index'
+  post 'admin/extract'
+  get 'admin/extracted_item'
+  post 'admin/type_item'
+  get 'admin/tags'
 
   require 'sidekiq/web'
   Sidekiq::Web.use Rack::Auth::Basic do |username, password|

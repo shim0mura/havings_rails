@@ -1,0 +1,23 @@
+<section class="mdl-grid section--center list-content">
+
+  <div class="inquiry mdl-card mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet">
+    <h4>お問い合わせ内容の確認</h4>
+
+    <%= form_for @inquiry, url: {action: :thanks} do |f| %>
+
+      <div>
+        <div>名前</div>
+        <%= f.hidden_field :name %>
+        <div class="inquiry-field"><%= @inquiry.name %></div>
+        <div>メールアドレス</div>
+        <%= f.hidden_field :email %>
+        <div class="inquiry-field"><%= @inquiry.email %></div>
+        <div>お問い合わせ内容</div>
+        <%= f.hidden_field :message %>
+        <div class="inquiry-field"><%= simple_format(@inquiry.message) %></div>
+      </div>
+      <%= f.submit '送信', class: "mdl-button mdl-js-button mdl-button--raised" %>
+    <% end %>
+  </div>
+
+</section>

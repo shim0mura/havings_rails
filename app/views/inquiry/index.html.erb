@@ -1,0 +1,32 @@
+<section class="mdl-grid section--center list-content">
+
+  <div class="inquiry mdl-card mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet">
+    <h4>お問い合わせ</h4>
+
+    <p>分類タグの追加要望、バグ情報、その他質問などは以下のフォームから送信してください。</p>
+
+    <%= form_for @inquiry, url: {action: :confirm} do |f| %>
+
+      <% if @inquiry.errors.any? %>
+        <div class="alert alert-danger" role="alert">
+          <strong>入力内容にエラーがあります</strong>
+          <ul>
+            <% @inquiry.errors.each do |attr, msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <div>名前</div>
+        <div class="inquiry-field"><%= f.text_field :name %></div>
+        <div>メールアドレス</div>
+        <div class="inquiry-field"><%= f.text_field :email %></div>
+        <div>お問い合わせ内容</div>
+        <div class="inquiry-field"><%= f.text_area :message, size: "40x10" %></div>
+      </div>
+      <%= f.submit '確認', class: "mdl-button mdl-js-button mdl-button--raised" %>
+    <% end %>
+  </div>
+</section>

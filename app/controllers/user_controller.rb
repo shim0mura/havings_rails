@@ -1,6 +1,7 @@
 class UserController < ApplicationController
 
-  before_action :authenticate_user!, only:[:timeline, :list_tree, :user_items, :item_tree, :classed_items]
+  # before_action :authenticate_user!, only:[:timeline, :list_tree, :user_items, :item_tree, :classed_items]
+  before_action :authenticate_user!, only:[:timeline, :list_tree, :item_tree, :classed_items]
   before_action :set_user, only: [:index, :timeline, :user_items, :item_tree, :item_images, :favorite_items, :favorite_images, :dump_items, :following, :followers]
 
   def get_self
@@ -155,12 +156,14 @@ class UserController < ApplicationController
 
   def following
     @users = get_users(@user.following, current_user)
+    @popular_list = Item.get_popular_list
     @heading_text = "フォローしているユーザー"
   end
 
   def followers
     @users = get_users(@user.followed, current_user)
     @heading_text = "フォロワー"
+    @popular_list = Item.get_popular_list
     render 'following'
   end
 

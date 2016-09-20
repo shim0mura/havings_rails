@@ -1,5 +1,7 @@
 class AdminController < ApplicationController
 
+  before_filter :basic_auth
+
   def index
     @item = YahooCategory.find(43780)
     @items = YahooCategory.where(tagged_depth: 100, is_default_tag: true, parent_id: nil)
@@ -39,5 +41,12 @@ class AdminController < ApplicationController
     YahooCategory.delete(ids)
 
   end
+
+  def basic_auth
+    authenticate_or_request_with_http_basic do |user, pass|
+      user == "havings" && "shimomura"
+    end
+  end
+  
 
 end
