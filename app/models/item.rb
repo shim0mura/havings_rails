@@ -796,6 +796,7 @@ class Item < ActiveRecord::Base
         .includes(:tags, :item_images, :favorites)
         .joins(:item_images)
         .where("private_type <= ?", 0)
+        .where.not(list_id: nil)
         .order(created_at: :desc)
         .limit(100)
 
