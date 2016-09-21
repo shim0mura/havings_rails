@@ -17,9 +17,11 @@ class SearchController < ApplicationController
       .order(created_at: :desc)
     # TODO: 閲覧権限設定
 
+    @tag = tag
     @current_page = @items.current_page
     @total_count = @items.total_count
     @has_next_page = !@items.last_page?
+
   end
 
   def user
@@ -37,8 +39,10 @@ class SearchController < ApplicationController
       .or(arel_nickname.matches("%#{name}%")))
 
     @users = User.where(id: social_profiles.map{|s|s.user.id})
+  end
 
-
+  private
+  def tag_params
   end
 
 end

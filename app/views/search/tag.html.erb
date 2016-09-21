@@ -1,0 +1,68 @@
+<div class="ribbon page-guide">
+
+  <div class="inner-ribbon user-list">
+<section class="mdl-grid section--center list-content">
+  <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--top">
+    <h3>
+      <i class="material-icons">label</i>
+      <%= @tag %>の検索結果
+    </h3>
+  </div>
+</section>
+  </div>
+
+</div>
+<section class="mdl-grid section--center list-content">
+
+  <div class="mdl-cell mdl-cell--8-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp mdl-cell--top">
+
+    <div class="popular-list-wrapper">
+      <% if @items.present? %>
+        <div class="mdl-card__supporting-text" id="item-list">
+
+
+          <ul class="list-items" id="owning_items">
+            <%= render partial: 'items/child_item_list', locals: {child_items: @items , is_user_page: false} %>
+          </ul>
+
+        </div>
+      <% else %>
+        <div class="nothing-in-generic-list">
+          「<%= @tag %>」のタグが付いているアイテムはありません。
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- secondary card -->
+  <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-card mdl-shadow--4dp secondary-card mdl-cell--top">
+
+
+    <div class="popular-list-wrapper sidebar">
+      <h5>
+        <i class="material-icons">trending_up</i>
+        <div>
+        人気のリスト
+        </div>
+      </h5>
+      <div class="mdl-card__supporting-text">
+        <div class="popular-list list">
+          <% @popular_list = Item.get_popular_list %>
+
+          <% @popular_list.slice(0..5).each do |item| %>
+            <div class="popular" style="background-image:url(<%= asset_path(item.thumbnail) %>)">
+              <div class="popular-layer"></div>
+              <div class="popular-label"><%= item.name %></div>
+              <%= link_to item_path(item.id) do %>
+              <% end %>
+            
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+
+</section>
