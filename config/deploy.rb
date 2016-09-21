@@ -97,7 +97,7 @@ namespace :deploy do
   task :restart do
     on roles(:app) do |host|
       execute :kill, "-s USR2 $(< #{shared_path}/tmp/pids/unicorn.pid)"
-      invoke 'unicorn:start'
+      invoke 'unicorn:restart'
     end
   end
   after :publishing, :restart

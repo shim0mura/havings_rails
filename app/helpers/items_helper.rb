@@ -8,7 +8,8 @@ module ItemsHelper
     end
 
     if include_self
-      result = breadcrumb_html(item.list, include_self) + " > " + tag("br") + link_to(item.name, items_path(item.id))
+      # result = breadcrumb_html(item.list, include_self) + " > " + tag("br") + link_to(item.name, items_path(item.id))
+      result = breadcrumb_html(item.list, include_self) + " > " + tag("br") + link_to(item.name, {controller: :items, action: :show, id: item.id})
     else
       result = breadcrumb_html(item.list, true) + " > " + tag("br")
     end
