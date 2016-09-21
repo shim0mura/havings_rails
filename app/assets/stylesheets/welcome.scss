@@ -33,6 +33,30 @@
   padding-top: 10vh;
   color: white;
 }
+.app-button {
+  position: relative;
+  padding-bottom: 40px;
+}
+.app-button-big {
+  position: relative;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: white;
+  margin-bottom: 50px;
+}
+.app-button-big img {
+  height: 70px;
+}
+.app-button-big a {
+  margin: 0 auto;
+}
+.app-button .google-play {
+  position: relative;
+  left: 165px;
+}
+.app-button .google-play img {
+  height: 40px;
+}
 
 .welcome .welcome-description h2 {
   margin-top: -10px;
@@ -59,6 +83,7 @@
   visibility: hidden;
   margin-top: 0;
 }
+
 .mdl-grid.welcome-introduction {
   padding-top: 9vh;
   padding-bottom: 5vh;

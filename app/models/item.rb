@@ -791,7 +791,7 @@ class Item < ActiveRecord::Base
   # idなどの動的な変更がないものにする
   # http://stackoverflow.com/questions/11218917/confusion-caching-active-record-queries-with-rails-cache-fetch?answertab=votes#tab-top
   def self.get_popular_list
-    popular_list_ids = Rails.cache.fetch('popular_list', expires_in: 6.hours) do
+    popular_list_ids = Rails.cache.fetch('popular_list', expires_in: 1.hours) do
       items = Item
         .includes(:tags, :item_images, :favorites)
         .joins(:item_images)
@@ -814,7 +814,7 @@ class Item < ActiveRecord::Base
   end
 
   def self.get_popular_tag
-    tag_hash = Rails.cache.fetch('popular_tags', expires_in: 6.hours) do
+    tag_hash = Rails.cache.fetch('popular_tags', expires_in: 3.hours) do
       popular_tags = ActsAsTaggableOn::Tag.most_used(10)
 
       tag_items = popular_tags.map do |tag|

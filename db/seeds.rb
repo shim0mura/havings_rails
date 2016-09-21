@@ -1356,5 +1356,13 @@ ActsAsTaggableOn::Tag.create!([
   {name: "トイレ", taggings_count: 0, yomi_jp: "といれ", yomi_roma: "toire", parent_id: 658, tag_type: 0, priority: 300, nest: nil, is_default_tag: true, is_deleted: false},
   {name: "バルコニー", taggings_count: 0, yomi_jp: "ばるこにー", yomi_roma: "barukoni-", parent_id: nil, tag_type: 0, priority: 100, nest: nil, is_default_tag: true, is_deleted: false},
   {name: "車庫", taggings_count: 0, yomi_jp: "しゃこ", yomi_roma: "shako", parent_id: nil, tag_type: 0, priority: 100, nest: nil, is_default_tag: true, is_deleted: false},
-  {name: "ガレージ", taggings_count: 0, yomi_jp: "がれーじ", yomi_roma: "gare-ji", parent_id: nil, tag_type: 0, priority: 100, nest: nil, is_default_tag: true, is_deleted: false}
+  {name: "ガレージ", taggings_count: 0, yomi_jp: "がれーじ", yomi_roma: "gare-ji", parent_id: nil, tag_type: 0, priority: 100, nest: nil, is_default_tag: true, is_deleted: false},
+
+  {name: "服", taggings_count: 0, yomi_jp: "ふく", yomi_roma: "huku", parent_id: 1, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false},
+  {name: "洋服", taggings_count: 0, yomi_jp: "ようふく", yomi_roma: "youhuku", parent_id: 1, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false},
+  {name: "専門書", taggings_count: 0, yomi_jp: "せんもんしょ", yomi_roma: "senmonsho", parent_id: 1305, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false},
+  {name: "技術書", taggings_count: 0, yomi_jp: "ぎじゅつしょ", yomi_roma: "gijutusho", parent_id: 1305, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false},
+  {name: "漫画", taggings_count: 0, yomi_jp: "まんが", yomi_roma: "manga", parent_id: 1306, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false},
+  {name: "マンガ", taggings_count: 0, yomi_jp: "まんが", yomi_roma: "manga", parent_id: 1306, tag_type: 2, priority: 200, nest: nil, is_default_tag: true, is_deleted: false}
+  
 ])
