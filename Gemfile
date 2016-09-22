@@ -89,5 +89,6 @@ group :development, :test do
 
   gem 'seed_dump'
 
+  gem 'sitemap_generator'
 end
 

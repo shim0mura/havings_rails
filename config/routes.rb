@@ -80,6 +80,8 @@ Rails.application.routes.draw do
   post 'inquiry/confirm', to: 'inquiry#confirm'
   post 'inquiry/thanks', to: 'inquiry#thanks'
 
+  get '/robots.:format' => 'welcome#robots'
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'omniauth_callbacks',
     registrations: 'registrations'

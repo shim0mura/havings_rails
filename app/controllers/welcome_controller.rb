@@ -82,6 +82,10 @@ class WelcomeController < ApplicationController
   def privacy_policy
   end
 
+  def robots
+    render 'robots.txt.erb', layout: false, content_type: 'text/plain'
+  end
+
   private
   def following_timeline(from = 0, size = User::MAX_SHOWING_EVENTS)
     timeline = []
