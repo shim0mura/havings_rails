@@ -167,6 +167,7 @@
 
       <!-- item images -->
       <div class="mdl-tabs__panel <%= "is-active" unless @item.is_list %>" id="image-list">
+        <%# render partial: 'items/item_image_list', locals: {next_images: @next_images, is_user_page: true } %>
         <%= render partial: 'item_image_list', locals: {next_images: @next_images , is_user_page: false} %>
       </div>
 

@@ -1,5 +1,6 @@
 <div class="mdl-grid item-image-list">
 
+
   <% unless next_images.present? %>
     <div class="mdl-cell mdl-cell--4-col">
       画像はありません
@@ -11,7 +12,7 @@
       <div class="card-image mdl-card mdl-shadow--2dp" style="background-image:url('<%= image.image_url %>')">
 
       <a class="fancybox" href="<%= image.image_url %>"><img class="thumb" src="<%= image.image_url %>"></a>
-      <div class="image-layer <%= "is-user-page" if is_user_page.present? && is_user_page %>"></div>
+      <div class="image-layer <%= "is-user-page" if is_user_page %>"></div>
         <div class="item-image-label <%= "is-user-page" if is_user_page.present? && is_user_page %>">
           <div class="image-date"><%= date_to_str(image.added_at) %></div>
           <% if is_user_page.present? && is_user_page %>

@@ -74,9 +74,9 @@ Rails.application.routes.draw do
   put '/device_token/:type/', to: 'device_tokens#update'
   put '/device_token/state/:type/:value', to: 'device_tokens#change_state'
 
-  get '/privacy-policy', to: 'welcome#privacy_policy'
+  get '/privacy-policy', to: 'welcome#privacy_policy', as: :privacy_policy
 
-  get  'inquiry', to: 'inquiry#index'
+  get  'inquiry', to: 'inquiry#index', as: :inquiry
   post 'inquiry/confirm', to: 'inquiry#confirm'
   post 'inquiry/thanks', to: 'inquiry#thanks'
 
